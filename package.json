@@ -19,5 +19,8 @@
   "bugs": {
     "url": "https://github.com/aMoniker/reign-abates/issues"
   },
-  "homepage": "https://github.com/aMoniker/reign-abates#readme"
+  "homepage": "https://github.com/aMoniker/reign-abates#readme",
+  "dependencies": {
+    "lodash": "^4.17.4"
+  }
 }
