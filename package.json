@@ -1,0 +1,23 @@
+{
+  "name": "reign-abates",
+  "version": "1.0.0",
+  "description": "The Reign Abates is a game made in 72 hours for Ludum Dare 39",
+  "main": "dist/index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aMoniker/reign-abates.git"
+  },
+  "keywords": [
+    "ludum-dare",
+    "game"
+  ],
+  "author": "James Greenleaf",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/aMoniker/reign-abates/issues"
+  },
+  "homepage": "https://github.com/aMoniker/reign-abates#readme"
+}
