@@ -67,20 +67,32 @@
 /* 0 */
 /***/ (function(module, exports, __webpack_require__) {
 
-// handles events for the game
-// any class that needs events should require this
-
 const EventEmitter = __webpack_require__(6);
-console.log('emitter?', EventEmitter);
 
-const type = {
-    beginTurn: 1,
-}
+const gameActions = {
+    reset        : 'game.reset',        // completely reset game
+    begin        : 'game.begin',        // begin a new game
+    beginTurn    : 'game.beginTurn',    // begin a new turn N
+    endTurn      : 'game.endTurn',      // end the current turn N
+    beginEvent   : 'game.beginEvent',   // load a new event for player to handle
+    respondEvent : 'game.respondEvent', // send a response to the player choice
+    endEvent     : 'game.endEvent',     // end the current event
+    endGame      : 'game.endGame',      // game over, send final score data
+    statUpdate   : 'game.statUpdate',   // update the current player stats
+};
+
+const interfaceActions = {
+    newGame     : 'interface.newGame',     // press New Game or Play Again
+    doneIntro   : 'interface.doneIntro',   // press Done on intro sequence
+    eventChoice : 'interface.eventChoice', // make event choice
+    doneEvent   : 'interface.doneEvent',   // press Done on event response
+};
 
 class Actions extends EventEmitter {
     constructor() {
         super();
-        this.type = type;
+        this.game = gameActions;
+        this.interface = interfaceActions;
     }
 }
 
@@ -91,19 +103,20 @@ module.exports = {
 
 /***/ }),
 /* 1 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__style_css__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__style_css___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__style_css__);
+
 
 const _           = __webpack_require__(2);
 const {Game}      = __webpack_require__(5);
 const {Interface} = __webpack_require__(7);
 const {Actions}   = __webpack_require__(0);
 
-Game.newGame();
-
-// test
-for (var i = 0; i < 10; i++) {
-    Game.processTurn();
-}
+Interface.initialize();
 
 
 /***/ }),
@@ -17285,6 +17298,15 @@ class Game {
         this.var = {
             amount: amount,
         };
+
+        this.hookInterfaceActions();
+    }
+
+    hookInterfaceActions() {
+        Actions.on(Actions.interface.newGame, this.newGame);
+        Actions.on(Actions.interface.doneIntro, this.process);
+        Actions.on(Actions.interface.eventChoice, this.processEventChoice);
+        Actions.on(Actions.interface.doneEvent, this.process);
     }
 
     newGame() {
@@ -17293,16 +17315,59 @@ class Game {
 
     initialize() {
         this.turn = 0;
+        this.totalTurns = 30;
+        this.eventsPerTurn = 3;
+        this.eventsThisTurn = 0;
+        this.gameStarted = false;
+
         this.stats = {
             gold: 50,
             army: 50,
             like: 50,
-        }
+        };
+
+        this.currentEvent = null;
     }
 
-    processTurn() {
-        this.turn++;
-        Actions.emit(Actions.type.beginTurn, this.turn);
+    process() {
+        if (!this.gameStarted || this.eventsThisTurn === this.eventsPerTurn) {
+            if (this.gameStarted) {
+                Actions.emit(Actions.game.endTurn(this.turn));
+            } else {
+                this.gameStarted = true;
+            }
+            this.turn++;
+            this.eventsThisTurn = 0;
+        }
+
+        if (this.turn === this.totalTurns) {
+            Actions.emit(Actions.game.endGame, result);
+        } else if (this.eventsThisTurn === 0) {
+            Actions.emit(Actions.type.beginTurn, turn);
+        }
+
+        this.eventsThisTurn++;
+        this.currentEvent = this.getNewEvent();
+        Actions.emit(Actions.game.beginEvent, this.currentEvent);
+    }
+
+    processEventChoice(choice) {
+        // send stat effects event if needed
+        // send event response event
+        // wait for doneEvent
+    }
+
+    getNewEvent() {
+        // choose an event according to the current game state
+        // for now just random, eventually events appear based
+        // on stats, previous events, etc.
+        // return event;
+    }
+
+    getGameResult() {
+        // based on the current game state, determine
+        // whether the player won or lost
+        // and the description of how they fared
     }
 }
 
@@ -17621,28 +17686,67 @@ function isUndefined(arg) {
 
 /***/ }),
 /* 7 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* WEBPACK VAR INJECTION */(function(module) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__style_css__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__style_css___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__style_css__);
-
-
 
 
 const {Actions} = __webpack_require__(0);
 
 class Interface {
     constructor() {
-        this.assignHandlers();
+        this.hookGameActions();
     }
 
-    assignHandlers() {
-        console.log('assign handlers..');
-        Actions.on(Actions.type.beginTurn, function(turnNum) {
-            console.log('beginning turn ' + turnNum);
-        });
+    initialize() {
+        // destroy everything
+        // create brand new DOM structure
+        // display splash screen
+    }
+
+    begin() {
+        // show the intro text
+        // show the Done button
+    }
+
+    beginTurn() {
+        // show turn intro
+    }
+
+    endTurn() {
+        // show turn outro
+    }
+
+    beginEvent(event) {
+        // display the event and its choices
+    }
+
+    respondEvent(response) {
+        // show the response to the event choice and a Done button
+    }
+
+    endEvent(event) {
+        // show the event outro
+    }
+
+    endGame(result) {
+        // display the final result and a Play Again button
+    }
+
+    statUpdate(stats) {
+        // update the display of the player's current stats
+    }
+
+    hookGameActions() {
+        Actions.on(Actions.game.reset, this.initialize);
+        Actions.on(Actions.game.begin, this.begin);
+        Actions.on(Actions.game.beginTurn, this.beginTurn);
+        Actions.on(Actions.game.endTurn, this.endTurn);
+        Actions.on(Actions.game.beginEvent, this.beginEvent);
+        Actions.on(Actions.game.respondEvent, this.respondEvent);
+        Actions.on(Actions.game.endEvent, this.endEvent);
+        Actions.on(Actions.game.endGame, this.endGame);
+        Actions.on(Actions.game.statUpdate, this.statUpdate);
     }
 }
 
@@ -17650,39 +17754,9 @@ module.exports = {
     Interface: new Interface
 };
 
-/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(8)(module)))
 
 /***/ }),
-/* 8 */
-/***/ (function(module, exports) {
-
-module.exports = function(originalModule) {
-	if(!originalModule.webpackPolyfill) {
-		var module = Object.create(originalModule);
-		// module.parent = undefined by default
-		if(!module.children) module.children = [];
-		Object.defineProperty(module, "loaded", {
-			enumerable: true,
-			get: function() {
-				return module.l;
-			}
-		});
-		Object.defineProperty(module, "id", {
-			enumerable: true,
-			get: function() {
-				return module.i;
-			}
-		});
-		Object.defineProperty(module, "exports", {
-			enumerable: true,
-		});
-		module.webpackPolyfill = 1;
-	}
-	return module;
-};
-
-
-/***/ }),
+/* 8 */,
 /* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
