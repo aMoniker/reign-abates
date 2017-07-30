@@ -1,5 +1,6 @@
 'use strict';
 
+const $ = require('jquery');
 const {Actions} = require('./actions');
 
 class Interface {
@@ -8,9 +9,51 @@ class Interface {
     }
 
     initialize() {
-        // destroy everything
-        // create brand new DOM structure
-        // display splash screen
+        $(function() {
+            // reinitialize template
+            let template = $('#game-template').html();
+            this.$game = $('#game');
+            this.$game.html(template);
+
+            // hide other sections so splash shows
+            this.$game.find('#gameplay').hide();
+            this.$game.find('#intro').hide();
+
+            this.hookInterface();
+        }.bind(this));
+    }
+
+    hookInterface() {
+        var $splash = $('#splash');
+        var $intro = $('#intro');
+        var $gameplay = $('#gameplay');
+
+        // splash screen leads to intro
+        $splash.find('.new-game').on('click', function(e) {
+            $(e.target).css({
+                opacity: 0,
+                pointerEvents: 'none'
+            });
+            $splash.fadeOut(function() {
+                $intro.fadeIn();
+            });
+        }.bind(this));
+
+        // intro leads to gameplay
+        $intro.find('.start-game').on('click', function(e) {
+            $(e.target).css({
+                opacity: 0,
+                pointerEvents: 'none'
+            });
+            $intro.fadeOut(function() {
+                Actions.emit(Actions.interface.newGame);
+                $gameplay.fadeIn();
+            });
+        });
+    }
+
+    reset() {
+        this.initialize();
     }
 
     begin() {
@@ -47,15 +90,15 @@ class Interface {
     }
 
     hookGameActions() {
-        Actions.on(Actions.game.reset, this.initialize);
-        Actions.on(Actions.game.begin, this.begin);
-        Actions.on(Actions.game.beginTurn, this.beginTurn);
-        Actions.on(Actions.game.endTurn, this.endTurn);
-        Actions.on(Actions.game.beginEvent, this.beginEvent);
-        Actions.on(Actions.game.respondEvent, this.respondEvent);
-        Actions.on(Actions.game.endEvent, this.endEvent);
-        Actions.on(Actions.game.endGame, this.endGame);
-        Actions.on(Actions.game.statUpdate, this.statUpdate);
+        let gameActions = [
+            'reset', 'begin', 'beginTurn', 'endTurn',
+            'beginEvent', 'respondEvent', 'endEvent',
+            'endGame', 'statUpdate'
+        ];
+
+        for (let action of gameActions) {
+            Actions.on(Actions.game[action], this[action].bind(this));
+        }
     }
 }
 

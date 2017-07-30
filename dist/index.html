@@ -2,7 +2,38 @@
 <head>
     <title>The Reign Abates</title>
     <script type="text/javascript" src="bundle.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Fondamento" rel="stylesheet">
 </head>
 <body>
     <div id="game"></div>
+    <div id="game-template">
+        <!-- <div id="fade"></div> -->
+        <div id="splash">
+            <h1>The Reign Abates</h1>
+            <div class="new-game">New Game</div>
+        </div>
+        <div id="intro">
+            <h2>The Situation</h2>
+            <div class="description">
+                <p>Your worst suspicions were correct. The Archduke has been moving pieces into place, and you've just learned of his plan to murder you and your Heir after opening wide the gates of the city to the armies of the Southern Kingdom. You have learned that he will do this on the eve of the Anniversary of your Coronation, in one month's time.</p>
+                <p>However, he does not know that you have found out. While it is far too late to undo his plans, there is still a chance for your Heir to escape, and you as well if you're lucky.</p>
+                <p>Now, gather your resources, delegate your forces, and make certain your Heir escapes so that he may reclaim his rightful place one day! If you, your Queen, and your Chamberlain can escape too, all the better, but your Heir must survive!</p>
+            </div>
+            <div class="start-game">Begin</div>
+        </div>
+        <div id="gameplay">
+            <div id="stats">
+                <div class="stat" id="stat-gold">
+                    <div class="amount">0</div>
+                </div>
+                <div class="stat" id="stat-army">
+                    <div class="amount">0</div>
+                </div>
+                <div class="stat" id="stat-like">
+                    <div class="amount">0</div>
+                </div>
+            </div>
+            <div id="events"></div>
+        </div>
+    </div>
 </body>

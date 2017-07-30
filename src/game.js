@@ -25,15 +25,14 @@ class Game {
         this.var = {
             amount: amount,
         };
-
         this.hookInterfaceActions();
     }
 
     hookInterfaceActions() {
-        Actions.on(Actions.interface.newGame, this.newGame);
-        Actions.on(Actions.interface.doneIntro, this.process);
-        Actions.on(Actions.interface.eventChoice, this.processEventChoice);
-        Actions.on(Actions.interface.doneEvent, this.process);
+        let interfaceActions = ['newGame', 'eventChoice', 'doneEvent'];
+        for (let action of interfaceActions) {
+            Actions.on(Actions.interface[action], this[action].bind(this));
+        }
     }
 
     newGame() {
@@ -78,7 +77,11 @@ class Game {
         Actions.emit(Actions.game.beginEvent, this.currentEvent);
     }
 
-    processEventChoice(choice) {
+    doneEvent() {
+
+    }
+
+    eventChoice(choice) {
         // send stat effects event if needed
         // send event response event
         // wait for doneEvent

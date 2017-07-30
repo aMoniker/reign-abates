@@ -14,7 +14,6 @@ const gameActions = {
 
 const interfaceActions = {
     newGame     : 'interface.newGame',     // press New Game or Play Again
-    doneIntro   : 'interface.doneIntro',   // press Done on intro sequence
     eventChoice : 'interface.eventChoice', // make event choice
     doneEvent   : 'interface.doneEvent',   // press Done on event response
 };
