@@ -31,7 +31,7 @@ let event = {
     }, {
         text: 'Attack with your worst legion',
         effects: {
-            army: Game.var.amount.army.medium,
+            army: -Game.var.amount.army.medium,
         },
         response: "Even your worst soldiers don't have much trouble chasing off the scoundrels. A score of men on each side are killed, and the barbarians begrudgingly retreat."
     }, {

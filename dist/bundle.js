@@ -17286,7 +17286,6 @@ class Game {
         } else if (this.turn === this.totalTurns
                 && this.eventsThisTurn === this.eventsPerTurn
         ) { // if this is the last event, show the final event
-            console.log('final', this.turn, this.totalTurns, this.eventsThisTurn, this.eventsPerTurn);
             event = this.pluckEvent(this.events.final);
         } else if (this.isMoneyLow()) { // send the banker
             event = this.pluckEvent(this.events.moneylow, false);
@@ -17348,15 +17347,41 @@ class Game {
         return (this.stats.like >= 100);
     }
 
+    // based on the current game state, determine
+    // whether the player won or lost
+    // and the description of how they fared
     getGameResult() {
-        // based on the current game state, determine
-        // whether the player won or lost
-        // and the description of how they fared
-        return {
+        let worstOutcome = {
+            win: false,
+            title: 'Your legacy ends.',
+            text: "Unfortunately you did not have the resources necessary to escape, and on your way out of the city in disguise, you are spotted by one of the Archduke's spies. His soldiers capture you and your Heir, and haul you into his dungeon, where you are both left to rot while he rules your kingdom...",
+        };
+
+        let decentOutcome = {
             win: true,
             title: 'Your Heir Escapes!',
             text: 'You however, are not so lucky. Realizing you were under close scrutiny, you arranged to have the boy dress as a pauper and be hauled out by a few loyal guards who pretended he was a prisoner. In a way, he was. You sit on your throne, sipping wine from a golden goblet, and reminiscing over the unbelievable exploits you\'ve experienced in your long and storied life as king. As the door to the chamber opens, you know who it will be. A smile crosses your lips, you drop the goblet, and stand to meet your fate...',
         };
+
+        let bestOutcome = {
+            win: true,
+            title: "You escape!",
+            text: "Having wisely managed your resources, both you and your Heir are able to sneak out of the kingdom, dressed as commoners, in the dead of night. A core of loyal soldiers scouts ahead, while you bribe your way through foreign lands, to a friendly kingdom ruled by a distant cousin. Here you will plot your revenge, while your young son trains with fierce determination to raise the army he'll need to recapture his birthright. Onward!"
+        };
+
+        let escapeThreshold = 40;
+        let average = (this.stats.gold + this.stats.army + this.stats.like) / 3;
+        if (average < escapeThreshold) {
+            return worstOutcome;
+        } else {
+            let bonusChance = ((average - escapeThreshold) / 100) * 5;
+            let roll = Math.random();
+            if (roll <= bonusChance) {
+                return bestOutcome;
+            } else {
+                return decentOutcome;
+            }
+        }
     }
 
     gameOver() {
@@ -18484,7 +18509,7 @@ let event = {
     }, {
         text: 'Attack with your worst legion',
         effects: {
-            army: Game.var.amount.army.medium,
+            army: -Game.var.amount.army.medium,
         },
         response: "Even your worst soldiers don't have much trouble chasing off the scoundrels. A score of men on each side are killed, and the barbarians begrudgingly retreat."
     }, {
