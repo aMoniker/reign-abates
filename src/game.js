@@ -134,8 +134,17 @@ class Game {
             event = this.pluckEvent(this.events.random);
         }
 
-        // if we somehow run out of events, it's game over I guess
-        return (event || this.gameOver());
+        // if we somehow run out of events, show the final event
+        if (!event) {
+            event = this.pluckEvent(this.events.final);
+        }
+
+        // if there are no more events, it's game over
+        if (!event) {
+            return this.gameOver();
+        }
+
+        return event;
     }
 
     // return a random element from the given event array
