@@ -17274,17 +17274,25 @@ class Game {
         Actions.emit(Actions.game.respondEvent, choice.response);
     }
 
+    // choose the next event according to the current game state
     getNewEvent() {
-        // choose an event according to the current game state
-        // for now just random, eventually events appear based
-        // on stats, previous events, etc.
         let event = undefined;
 
-        // first turn show the intro event
-        if (this.turn === 1 && this.eventsThisTurn === 1) {
+        if (this.turn === 1 && this.eventsThisTurn === 1) { // first turn intro
             event = this.pluckEvent(this.events.intro);
-        } else {
-            // otherwise return a random event
+        } else if (this.isMoneyLow()) { // send the banker
+            event = this.pluckEvent(this.events.moneylow, false);
+        } else if (this.isMoneyHigh()) { // spend on troops/approval
+            event = this.pluckEvent(this.events.moneyhigh, false);
+        } else if (this.isArmyLow()) { // get more troops
+            event = this.pluckEvent(this.events.armylow, false);
+        } else if (this.isArmyHigh()){ // send the troops on missions
+            event = this.pluckEvent(this.events.armyhigh, false);
+        } else if (this.isLikeLow()) { // garner support
+            event = this.pluckEvent(this.events.likelow, false);
+        } else if (this.isLikeHigh()) { // use approval for money/soldiers
+            event = this.pluckEvent(this.events.likehigh, false);
+        } else { // otherwise return a random event
             event = this.pluckEvent(this.events.random);
         }
 
@@ -17292,10 +17300,35 @@ class Game {
         return (event || this.gameOver());
     }
 
-    // remove and return a random element from the given event array
-    pluckEvent(eventArray) {
+    // return a random element from the given event array
+    // and optionally remove it for the rest of the game
+    pluckEvent(eventArray, remove = true) {
         let index = _.random(0, eventArray.length - 1);
-        return _.pullAt(eventArray, index)[0];
+        return (remove ? _.pullAt(eventArray, index)[0] : eventArray[index]);
+    }
+
+    isMoneyLow() {
+        return (this.stats.gold <= 5);
+    }
+
+    isMoneyHigh() {
+        return (this.stats.gold >= 100);
+    }
+
+    isArmyLow() {
+        return (this.stats.army <= 10);
+    }
+
+    isArmyHigh() {
+        return (this.stats.army >= 100);
+    }
+
+    isLikeLow() {
+        return (this.stats.like <= 0);
+    }
+
+    isLikeHigh() {
+        return (this.stats.like >= 100);
     }
 
     getGameResult() {
@@ -18362,8 +18395,15 @@ function isUndefined(arg) {
 /***/ (function(module, exports, __webpack_require__) {
 
 var map = {
+	"./army-high.js": 123,
+	"./army-low.js": 124,
 	"./barbarians-attack-farmers.js": 17,
-	"./intro.js": 18
+	"./intro.js": 18,
+	"./like-high.js": 125,
+	"./like-low.js": 126,
+	"./money-high.js": 122,
+	"./money-low.js": 127,
+	"./template.js": 120
 };
 function webpackContext(req) {
 	return __webpack_require__(webpackContextResolve(req));
@@ -29627,6 +29667,261 @@ module.exports = __webpack_require__.p + "442d1b80827adbb14cd0cb62e1adf5b8.jpg";
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "e1adc146fd553c3dd3d9dba85ad49402.jpg";
+
+/***/ }),
+/* 120 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const {Game} = __webpack_require__(1);
+
+let event = {
+    name: 'template',
+    type: 'template',
+    image: 'erasmus',
+    text: 'Intro text here',
+    choices: [{
+        text: 'Choice 1',
+        effects: {
+            gold: -Game.var.amount.gold.small,
+            army: -Game.var.amount.army.medium,
+            like: -Game.var.amount.like.large
+        },
+        response: "Choice 1 response"
+    }, {
+        text: 'Choice 2',
+        effects: {
+            gold: Game.var.amount.gold.small,
+            army: Game.var.amount.army.medium,
+            like: Game.var.amount.like.large
+        },
+        response: 'Choice 2 response'
+    }]
+};
+
+module.exports = {
+    event
+};
+
+
+/***/ }),
+/* 121 */,
+/* 122 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const {Game} = __webpack_require__(1);
+
+let event = {
+    name: 'money-high',
+    type: 'moneyhigh',
+    image: 'machiavelli',
+    text: 'Sire, our gold reserves overflow the vault. We cannot keep this much, but we can use it for other purposes. We could hire mercenaries, or distribute it to the population. What shall we do?',
+    choices: [{
+        text: 'Hire mercenaries',
+        effects: {
+            gold: -Game.var.amount.gold.large * 5,
+            army: +Game.var.amount.army.large,
+        },
+        response: "You hire a number of professional soldiers from a band of mercenaries. They may not be loyal, but they will fight..."
+    }, {
+        text: 'Distribute money to the populace',
+        effects: {
+            gold: -Game.var.amount.gold.large * 5,
+            like: +Game.var.amount.like.large
+        },
+        response: 'You send carriages through the streets, distributing gold to the commoners in the name of the king. They leap at the coins and rejoice with smiles and laughter. Some openly weep with joy at their good fortune. There is much drunkenness that night, and everyone is heard praising the good king.'
+    }]
+};
+
+module.exports = {
+    event
+};
+
+
+/***/ }),
+/* 123 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const {Game} = __webpack_require__(1);
+
+let event = {
+    name: 'army-high',
+    type: 'armyhigh',
+    image: 'machiavelli',
+    text: "Sire, we have many restless soldiers. We should give them something to do before they start getting ideas. I've been receiving reports that the Archduke has been actively recruiting some of the more discontent among them. We could send them on a patrol to attack the highwaymen that have been plaguing our outer roads, or we could have them roam the city, rounding up criminals. What shall it be?",
+    choices: [{
+        text: 'Send them on patrol',
+        effects: {
+            gold: +Game.var.amount.gold.large * 3,
+            army: -Game.var.amount.army.large * 2,
+        },
+        response: "The soldiers gladly obey and set out to deter, capture, and slay the robbers of your kingdom's countryside. As they root out the menace, most of the gold they capture is returned to your coffers."
+    }, {
+        text: 'Have them police the city',
+        effects: {
+            army: -Game.var.amount.army.large * 2,
+            like: +Game.var.amount.like.large
+        },
+        response: 'You send your troops through the streets of the city to round up and remove the criminal menaces that have been preying on the populace. The commoners, no longer extorted by local gangs, are very grateful.'
+    }]
+};
+
+module.exports = {
+    event
+};
+
+
+/***/ }),
+/* 124 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const {Game} = __webpack_require__(1);
+
+let event = {
+    name: 'army-low',
+    type: 'armylow',
+    image: 'machiavelli',
+    text: "Sire, we are running dangerously low on loyal soldiers. If we do not find more, it will be noticed, and there will be no holding off the usurpers. We can hire more from mercenary bands, or conscript the best men from the citizenry.",
+    choices: [{
+        text: 'Hire mercenaries',
+        effects: {
+            gold: -Game.var.amount.gold.large * 5,
+            army: +Game.var.amount.army.large,
+        },
+        response: "You hire a number of professional soldiers from a band of mercenaries. They may not be loyal, but they will fight..."
+    }, {
+        text: 'Conscript citizens',
+        effects: {
+            army: +Game.var.amount.army.large * 2,
+            like: -Game.var.amount.like.large * 2
+        },
+        response: 'You send out your remaining troops to forcibly conscript strong young men and boys from the populace. A few are glad of the opportunity, but most detest being taken against their will.'
+    }]
+};
+
+module.exports = {
+    event
+};
+
+
+/***/ }),
+/* 125 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const {Game} = __webpack_require__(1);
+
+let event = {
+    name: 'like-high',
+    type: 'likehigh',
+    image: 'machiavelli',
+    text: "Sire, our populace is giddy with delight at the way you've been ruling. Most would lay down their lives for you. We should take advantage of this. We could raise taxes, which they would gladly pay, or we could recruit more soldiers from their ranks.",
+    choices: [{
+        text: 'Collect taxes',
+        effects: {
+            gold: +Game.var.amount.gold.large * 3,
+            like: -Game.var.amount.like.large * 2,
+        },
+        response: "You send around the tax collectors to gather additional money from the peasants. Suddenly they don't seem to like you as much..."
+    }, {
+        text: 'Recruit soldiers',
+        effects: {
+            army: +Game.var.amount.army.large,
+            like: -Game.var.amount.like.large,
+        },
+        response: "You recruit a number of young men and boys from the populace, who enter the ranks of your army willingly. Their parents and friends however, are not so happy."
+    }]
+};
+
+module.exports = {
+    event
+};
+
+
+/***/ }),
+/* 126 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const {Game} = __webpack_require__(1);
+
+let event = {
+    name: 'like-low',
+    type: 'likelow',
+    image: 'machiavelli',
+    text: "Sire, our populace on the verge of open revolt. They have many grievances, and we shall certainly not make it out alive if they siege the castle. We could simply shower them with gold, or we could send soldiers to root out the criminal gangs that plague the city.",
+    choices: [{
+        text: 'Distribute gold',
+        effects: {
+            gold: -Game.var.amount.gold.large * 5,
+            like: +Game.var.amount.like.large
+        },
+        response: "You send carriages through the streets, distributing gold to the commoners in the name of the king. They leap at the coins and rejoice with smiles and laughter. Some openly weep with joy at their good fortune. There is much drunkenness that night, and everyone is heard praising the good king."
+    }, {
+        text: 'Round up the criminals',
+        effects: {
+            army: -Game.var.amount.army.large * 2,
+            like: +Game.var.amount.like.large
+        },
+        response: "You send your troops through the streets of the city to round up and remove the criminal menaces that have been preying on the populace. The commoners, no longer extorted by local gangs, are very grateful."
+    }]
+};
+
+module.exports = {
+    event
+};
+
+
+/***/ }),
+/* 127 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const {Game} = __webpack_require__(1);
+
+let event = {
+    name: 'bank-loan',
+    type: 'moneylow',
+    image: 'man-10',
+    text: 'A sly looking man approaches and greets you. "Greetings my good king. I have heard of your monetary plight, and have come to offer a wonderful deal." Did he just wink at the king? "In return for a relatively small number of soldiers, or alternatively a reasonable number of slaves from your populace, I could certainly help you with some extra gold. At interest, of course." Of course, you think. Well, gold is needed. What will you do?',
+    choices: [{
+        text: 'Offer soldiers',
+        effects: {
+            gold: +Game.var.amount.gold.large,
+            army: -Game.var.amount.army.medium,
+        },
+        response: "You select a mix of soldiers to transfer to them. They look disgusted, but are sworn to obey your orders. Only one objects, and the others drag him away in shame. The rest follow the banker as he leaves with a smirk."
+    }, {
+        text: 'Offer slaves',
+        effects: {
+            gold: +Game.var.amount.gold.large,
+            like: -Game.var.amount.like.large
+        },
+        response: 'You send soldiers to forcibly remove some of the less desirable but sturdy citizens. Word gets around, and the populace is not happy. The banker makes good on his gold though, at the expense of your approval, and your conscience...'
+    }]
+};
+
+module.exports = {
+    event
+};
+
 
 /***/ })
 /******/ ]);

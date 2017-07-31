@@ -112,17 +112,25 @@ class Game {
         Actions.emit(Actions.game.respondEvent, choice.response);
     }
 
+    // choose the next event according to the current game state
     getNewEvent() {
-        // choose an event according to the current game state
-        // for now just random, eventually events appear based
-        // on stats, previous events, etc.
         let event = undefined;
 
-        // first turn show the intro event
-        if (this.turn === 1 && this.eventsThisTurn === 1) {
+        if (this.turn === 1 && this.eventsThisTurn === 1) { // first turn intro
             event = this.pluckEvent(this.events.intro);
-        } else {
-            // otherwise return a random event
+        } else if (this.isMoneyLow()) { // send the banker
+            event = this.pluckEvent(this.events.moneylow, false);
+        } else if (this.isMoneyHigh()) { // spend on troops/approval
+            event = this.pluckEvent(this.events.moneyhigh, false);
+        } else if (this.isArmyLow()) { // get more troops
+            event = this.pluckEvent(this.events.armylow, false);
+        } else if (this.isArmyHigh()){ // send the troops on missions
+            event = this.pluckEvent(this.events.armyhigh, false);
+        } else if (this.isLikeLow()) { // garner support
+            event = this.pluckEvent(this.events.likelow, false);
+        } else if (this.isLikeHigh()) { // use approval for money/soldiers
+            event = this.pluckEvent(this.events.likehigh, false);
+        } else { // otherwise return a random event
             event = this.pluckEvent(this.events.random);
         }
 
@@ -130,10 +138,35 @@ class Game {
         return (event || this.gameOver());
     }
 
-    // remove and return a random element from the given event array
-    pluckEvent(eventArray) {
+    // return a random element from the given event array
+    // and optionally remove it for the rest of the game
+    pluckEvent(eventArray, remove = true) {
         let index = _.random(0, eventArray.length - 1);
-        return _.pullAt(eventArray, index)[0];
+        return (remove ? _.pullAt(eventArray, index)[0] : eventArray[index]);
+    }
+
+    isMoneyLow() {
+        return (this.stats.gold <= 5);
+    }
+
+    isMoneyHigh() {
+        return (this.stats.gold >= 100);
+    }
+
+    isArmyLow() {
+        return (this.stats.army <= 10);
+    }
+
+    isArmyHigh() {
+        return (this.stats.army >= 100);
+    }
+
+    isLikeLow() {
+        return (this.stats.like <= 0);
+    }
+
+    isLikeHigh() {
+        return (this.stats.like >= 100);
     }
 
     getGameResult() {
