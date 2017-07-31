@@ -10,7 +10,7 @@ let event = {
     choices: [{
         text: 'Distribute gold',
         effects: {
-            gold: -Game.var.amount.gold.large * 5,
+            gold: -Game.var.amount.gold.large * 2,
             like: +Game.var.amount.like.large
         },
         response: "You send carriages through the streets, distributing gold to the commoners in the name of the king. They leap at the coins and rejoice with smiles and laughter. Some openly weep with joy at their good fortune. There is much drunkenness that night, and everyone is heard praising the good king."

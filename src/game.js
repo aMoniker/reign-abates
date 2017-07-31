@@ -5,19 +5,19 @@ const {Actions} = require('./actions');
 
 const amount = {
     gold: {
-        small: 1,
-        medium: 3,
-        large: 5,
+        small: 5,
+        medium: 10,
+        large: 15,
     },
     army: {
-        small: 2,
-        medium: 5,
-        large: 10,
+        small: 5,
+        medium: 10,
+        large: 20,
     },
     like: {
         small: 5,
         medium: 10,
-        large: 15,
+        large: 25,
     }
 };
 
@@ -43,9 +43,10 @@ class Game {
     initialize() {
         this.turn = 0;
         this.totalTurns = 4;
-        this.eventsPerTurn = 4;
+        this.eventsPerTurn = 2;
         this.eventsThisTurn = 0;
         this.gameStarted = false;
+        this.introShown = false;
 
         this.stats = {
             gold: 50,
@@ -116,8 +117,15 @@ class Game {
     getNewEvent() {
         let event = undefined;
 
-        if (this.turn === 1 && this.eventsThisTurn === 1) { // first turn intro
+        if (!this.introShown) { // first turn intro
+            this.introShown = true;
             event = this.pluckEvent(this.events.intro);
+            this.eventsThisTurn--; // intro doesn't count
+        } else if (this.turn === this.totalTurns
+                && this.eventsThisTurn === this.eventsPerTurn
+        ) { // if this is the last event, show the final event
+            console.log('final', this.turn, this.totalTurns, this.eventsThisTurn, this.eventsPerTurn);
+            event = this.pluckEvent(this.events.final);
         } else if (this.isMoneyLow()) { // send the banker
             event = this.pluckEvent(this.events.moneylow, false);
         } else if (this.isMoneyHigh()) { // spend on troops/approval

@@ -107,7 +107,7 @@ class Interface {
         if (turn === 1) {
             timedFade(2000);
         } else {
-            $turnDisplay.show(timedFade);
+            $turnDisplay.show(0, timedFade);
         }
     }
 

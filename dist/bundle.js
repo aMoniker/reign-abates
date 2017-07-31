@@ -17167,19 +17167,19 @@ const {Actions} = __webpack_require__(2);
 
 const amount = {
     gold: {
-        small: 1,
-        medium: 3,
-        large: 5,
+        small: 5,
+        medium: 10,
+        large: 15,
     },
     army: {
-        small: 2,
-        medium: 5,
-        large: 10,
+        small: 5,
+        medium: 10,
+        large: 20,
     },
     like: {
         small: 5,
         medium: 10,
-        large: 15,
+        large: 25,
     }
 };
 
@@ -17205,9 +17205,10 @@ class Game {
     initialize() {
         this.turn = 0;
         this.totalTurns = 4;
-        this.eventsPerTurn = 4;
+        this.eventsPerTurn = 2;
         this.eventsThisTurn = 0;
         this.gameStarted = false;
+        this.introShown = false;
 
         this.stats = {
             gold: 50,
@@ -17278,8 +17279,15 @@ class Game {
     getNewEvent() {
         let event = undefined;
 
-        if (this.turn === 1 && this.eventsThisTurn === 1) { // first turn intro
+        if (!this.introShown) { // first turn intro
+            this.introShown = true;
             event = this.pluckEvent(this.events.intro);
+            this.eventsThisTurn--; // intro doesn't count
+        } else if (this.turn === this.totalTurns
+                && this.eventsThisTurn === this.eventsPerTurn
+        ) { // if this is the last event, show the final event
+            console.log('final', this.turn, this.totalTurns, this.eventsThisTurn, this.eventsPerTurn);
+            event = this.pluckEvent(this.events.final);
         } else if (this.isMoneyLow()) { // send the banker
             event = this.pluckEvent(this.events.moneylow, false);
         } else if (this.isMoneyHigh()) { // spend on troops/approval
@@ -18407,14 +18415,20 @@ var map = {
 	"./army-high.js": 123,
 	"./army-low.js": 124,
 	"./barbarians-attack-farmers.js": 17,
+	"./concerned-soldier.js": 135,
+	"./fat-merchant.js": 133,
 	"./final.js": 128,
+	"./foreign-general.js": 130,
 	"./intro.js": 18,
 	"./like-high.js": 125,
 	"./like-low.js": 126,
 	"./money-high.js": 122,
 	"./money-low.js": 127,
+	"./poison-archduke.js": 131,
+	"./sorceress.js": 134,
 	"./strange-invention.js": 129,
-	"./template.js": 120
+	"./template.js": 120,
+	"./weeping-nun.js": 132
 };
 function webpackContext(req) {
 	return __webpack_require__(webpackContextResolve(req));
@@ -18634,7 +18648,7 @@ class Interface {
         if (turn === 1) {
             timedFade(2000);
         } else {
-            $turnDisplay.show(timedFade);
+            $turnDisplay.show(0, timedFade);
         }
     }
 
@@ -29754,14 +29768,14 @@ let event = {
     choices: [{
         text: 'Hire mercenaries',
         effects: {
-            gold: -Game.var.amount.gold.large * 5,
+            gold: -Game.var.amount.gold.large * 3,
             army: +Game.var.amount.army.large,
         },
         response: "You hire a number of professional soldiers from a band of mercenaries. They may not be loyal, but they will fight..."
     }, {
         text: 'Distribute money to the populace',
         effects: {
-            gold: -Game.var.amount.gold.large * 5,
+            gold: -Game.var.amount.gold.large * 3,
             like: +Game.var.amount.like.large
         },
         response: 'You send carriages through the streets, distributing gold to the commoners in the name of the king. They leap at the coins and rejoice with smiles and laughter. Some openly weep with joy at their good fortune. There is much drunkenness that night, and everyone is heard praising the good king.'
@@ -29898,7 +29912,7 @@ let event = {
     choices: [{
         text: 'Distribute gold',
         effects: {
-            gold: -Game.var.amount.gold.large * 5,
+            gold: -Game.var.amount.gold.large * 2,
             like: +Game.var.amount.like.large
         },
         response: "You send carriages through the streets, distributing gold to the commoners in the name of the king. They leap at the coins and rejoice with smiles and laughter. Some openly weep with joy at their good fortune. There is much drunkenness that night, and everyone is heard praising the good king."
@@ -30015,6 +30029,264 @@ let event = {
             gold: -Game.var.amount.gold.medium,
         },
         response: "He accepts your offer on the condition of being given enough money to continue his research. With his machine expertise, he's able to improve a few things about your military's weapons.",
+    }]
+};
+
+module.exports = {
+    event
+};
+
+
+/***/ }),
+/* 130 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const {Game} = __webpack_require__(1);
+
+let event = {
+    name: 'foreign-general',
+    type: 'random',
+    image: 'beard-man-7',
+    text: "Your chamberlain introduces a foreign general. He explains that he and what remains of his troops fled from a neighboring kingdom into your land, and seeks a place to rest and recover. He offers some of his troops and a small amount of gold. Judging by his appearance though, it seems he might have a lot more...",
+    choices: [{
+        text: 'Accept his offer',
+        effects: {
+            gold: +Game.var.amount.gold.medium,
+            like: -Game.var.amount.like.small,
+        },
+        response: "The general bows graciously and signals for a small chest of gold to be delivered at your feet. He camps outside of town while his troops recover. The population seems a bit uneasy with a foreign army outside the city."
+    }, {
+        text: 'Demand more gold',
+        effects: {
+            gold: +Game.var.amount.gold.large,
+            like: -Game.var.amount.like.medium
+        },
+        response: 'The general has no choice but to grudgingly accept your offer. He camps outside of town, but looks the other way when his soldiers decide to stir up trouble with the locals.'
+    }, {
+        text: 'Kill him and his small army',
+        effects: {
+            gold: +Game.var.amount.gold.large * 3,
+            army: -Game.var.amount.army.medium,
+            like: -Game.var.amount.like.medium,
+        },
+        response: 'The general betrays no hint of shock as he draws his sword and orders his troops to defend themselves. Your overwhelming army make short work of the remnants of his, and you discover that he was hoarding quite a lot of gold. Some of your citizens are outraged at the bloodshed, and many of them fear for their own lives.'
+    }]
+};
+
+module.exports = {
+    event
+};
+
+
+/***/ }),
+/* 131 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const {Game} = __webpack_require__(1);
+
+let event = {
+    name: 'poison-archduke',
+    type: 'random',
+    image: 'contempt-woman',
+    text: "Late at night, your chamberlain hurriedly escorts in what appears to be a serving woman. She has an evil look about her, and after a token curtsey, explains in hushed tones that she works for the Archduke. She says has reason to despise him, but will not explain exactly why. From the look in her eyes, and your knowledge of the man, you believe she is telling the truth. She goes on to explain that his own troops could be sabotaged by poisoning the common meal they are all served. She would need supplies and a small bribe to carry out the mission.",
+    choices: [{
+        text: 'Give her supplies and gold',
+        effects: {
+            gold: -Game.var.amount.gold.medium,
+            army: +Game.var.amount.army.small,
+        },
+        response: "She thanks you, and leaves the chamber with a fierce and determined look. Later, you hear of the misfortune suffered by many soldiers among the Archduke's private guard. This will make your own army stronger by comparison."
+    }, {
+        text: 'Send the woman away',
+        response: "Poisoning is a low and dishonorable action that you refuse to take. As you send the woman away, the fire in her eyes dissipates, and a worried look appears. Who will she turn to now?"
+    }]
+};
+
+module.exports = {
+    event
+};
+
+
+/***/ }),
+/* 132 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const {Game} = __webpack_require__(1);
+
+let event = {
+    name: 'weeping-nun',
+    type: 'random',
+    image: 'crying-nun',
+    text: "A weeping nun barges into the throne room and kneels before you. You recognize her as the assistant to the mother superior at the abbey outside the city. She explains that some local scoundrels have been harassing and assaulting the sisters, causing much distress. She begs you to solve the problem. Even though she is upset, you still see a pleading mercy in her eyes.",
+    choices: [{
+        text: 'Slaughter the bastards',
+        effects: {
+            like: -Game.var.amount.like.small
+        },
+        response: "A small number of troops makes short work of the miscreants. The nuns are horrified at the bloodshed, and hold a vigil for the criminals. Perplexing."
+    }, {
+        text: 'Pay off the ruffians',
+        effects: {
+            gold: -Game.var.amount.gold.small,
+            like: +Game.var.amount.like.small,
+        },
+        response: 'While you detest bargaining with criminals, you realize that the nuns will not put up with bloodshed. You have some gold sent to them on the condition that they do not return. They greedily accept.'
+    }, {
+        text: 'Drive them away without bloodshed',
+        effects: {
+            like: +Game.var.amount.like.small,
+            army: -Game.var.amount.army.small,
+        },
+        response: 'The sisters appreciate that your troops removed the louts without killing them, but your troops do not agree. Fed up with what they see as your weakness, a few desert, and malcontent spreads among the rest.'
+    }, {
+        text: 'Send the nun away',
+        effects: {
+            like: -Game.var.amount.like.large,
+            army: -Game.var.amount.army.small,
+        },
+        response: "You don't have time to attend to the needs of these religious nuts. If their God is so merciful, why doesn't he help them? You callously send the sister away while silent tears fall from her despondent eyes. The wretches keep harassing the nuns, and your reputation among the populace and your own troops suffers for your cruelty."
+    }]
+};
+
+module.exports = {
+    event
+};
+
+
+/***/ }),
+/* 133 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const {Game} = __webpack_require__(1);
+
+let event = {
+    name: 'fat-merchant',
+    type: 'random',
+    image: 'fat-man-1',
+    text: "A well dressed and quite rotund man saunters into your chamber, giving an overly dramatic bow that ends with a smarmy flourish, bordering on outright disrespect. You frown as the man explains that he is the world's finest purveyor of arms, which he would gladly sell to your army. He demonstrates some of the weapons, which do seem of quite high quality. They're expensive, but they would give your army an edge...",
+    choices: [{
+        text: 'Buy arms for all your troops',
+        effects: {
+            gold: -Game.var.amount.gold.large * 2,
+            army: +Game.var.amount.army.large,
+            like: -Game.var.amount.like.small
+        },
+        response: "The merchant's eyes grow wide when you explain how many weapons you'd like to buy. He wipes his mouth and smacks his lips as he promises to have them delivered immediately. It costs a small fortune, but your soldiers seem impressed with their new hardware. Later, you notice the commoners acting more nervous than usual around your guards."
+    }, {
+        text: 'Buy arms for your elite troops',
+        effects: {
+            gold: -Game.var.amount.gold.large,
+            army: +Game.var.amount.army.medium,
+        },
+        response: "Equipping your entire army would be prohibitively expensive, so you buy enough to distribute to only your best soldiers and royal guard. The rest of your troops are a little jealous, but it also gives them incentive to climb the ranks. The merchant waddles away with a heavy sack of gold and a satisfied grin."
+    }, {
+        text: 'Send the merchant away',
+        effects: {
+            army: -Game.var.amount.army.small,
+        },
+        response: "The smile immediately drops from the merchant's fat mug, and he strides out with a look of frustration. Some of your troops, having seen the weapons on offer, are disappointed that they didn't get any."
+    }, {
+        text: 'Lock the bastard up',
+        effects: {
+            like: -Game.var.amount.like.large
+        },
+        response: "You don't take kindly to merchants who don't show proper respect and deference to the king. The man's eyes show great fear and his stammering mouth is agape in horror as he is dragged away, pleading. Word of your actions gets around, and you find it much harder to find trading partners for some reason..."
+    }]
+};
+
+module.exports = {
+    event
+};
+
+
+/***/ }),
+/* 134 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const {Game} = __webpack_require__(1);
+
+let event = {
+    name: 'sorceress',
+    type: 'random',
+    image: 'sorceress',
+    text: "As you prepare for bed in your chamber, a soft and low voice from behind frightens you. \"Do not be alarmed, Your Majesty, for I come to aid you.\" Spinning around to look, and ready to shout for your guards, you see a tall, pale, and thin woman who has an otherworldly quality about her. She raises a hand and asks you to wait. Entranced, you listen. She explains that she belongs to a coven of powerful mages who practice in secret. She knows about the Archduke and his plans, somehow. Removing a small, luminescent blue stone from the folds of her robe, she promises to aid your escape in return for a select few of your family's ancient gemstones.",
+    choices: [{
+        text: 'Give her the gems',
+        effects: {
+            gold: -Game.var.amount.gold.large,
+            army: +Game.var.amount.army.large,
+        },
+        response: "She gives you a mysterious smile and assures you that you've made a wise choice. With the stone in her closed fist, she tilts her head upward and her eyes roll back while she silently chants. With a shudder, she finishes the spell, and explains that your army will have a blessing of protection when they need it most. Before you can speak, she turns and leaps out of the nearest window. You rush to the sill, but see nothing but the black night."
+    }, {
+        text: 'Call for your guards',
+        effects: {
+            army: -Game.var.amount.army.small,
+        },
+        response: '"Fool!", she yells, and throws the stone to the ground. It shatters in a blinding flash of light, and when your vision recovers, she is gone. Your guards rushes in to your aid to find you bewildered, alone, and blinking. They seem concerned, and rumor spreads among the troops that the king who commands them is going insane.'
+    }]
+};
+
+module.exports = {
+    event
+};
+
+
+/***/ }),
+/* 135 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const {Game} = __webpack_require__(1);
+
+let event = {
+    name: 'conerned-soldier',
+    type: 'random',
+    image: 'soldier-2',
+    text: "One of your low-ranking soldiers requests a private audience with you. Noting the grave look of concern on his face, you grant his request, but ask him to make it quick. He explains that he's found out that some of the higher ranking men have been operating a smuggling operation, skimming some gold they were tasked with collecting from local lords. The soldier looks to you expectantly and explains that he does not want to be disloyal to his fellows, but could not in good conscience let them defraud the king.",
+    choices: [{
+        text: 'Purge the smugglers, promote the soldier',
+        effects: {
+            gold: +Game.var.amount.gold.small,
+            army: -Game.var.amount.army.small,
+        },
+        response: "You have the smugglers stripped of their rank and imprisoned as a warning to any others who would attempt such a thing. The young soldier is promoted and put in charge of collections. Your income immediately rises."
+    }, {
+        text: 'Kill the smugglers',
+        effects: {
+            gold: +Game.var.amount.gold.small,
+            army: -Game.var.amount.army.medium,
+            like: -Game.var.amount.like.small,
+        },
+        response: "You tell the young man you'll take care of it, and have the disloyal soldiers summarily executed. Their heads are placed on pikes around the city as a warning to any who would betray you. The young soldier, feeling responsible for their gruesome deaths, abandons his post and leaves the city. The citizens are noticeably fearful.",
+    }, {
+        text: 'Dismiss the fellow',
+        effects: {
+            army: -Game.var.amount.army.small
+        },
+        response: "You don't appreciate soldiers that are not loyal to each other, and dismiss the young man, who looks on the verge of tears. For a moment he appears as if he'll plead with you, but instead he lays his sword at your feet, turns and walks away with eyes downcast."
+    }, {
+        text: 'Blackmail the smugglers',
+        effects: {
+            army: +Game.var.amount.army.small
+        },
+        response: "You assure the young soldier you'll fix the problem. Afterward, you call the smugglers in to your chamber and explain that you know what they've been doing. Their eyes go wide, but before they can stammer a defense, you hold up your hand to silence them. Explaining that you don't care about the gold, but need their loyalty in the times ahead, you make them swear an oath to carry out any dirty work you find necessary. In return, they can keep their operation. They consider for a few moments, and come to agreement."
     }]
 };
 
