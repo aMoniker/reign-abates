@@ -17976,6 +17976,8 @@ class Game {
                 this.stats[stat] += choice.effects[stat];
                 if (this.stats[stat] < 0) {
                     this.stats[stat] = 0;
+                } else if (this.stats[stat] > 100) {
+                    this.stats[stat] = 100;
                 }
             }
         });
@@ -18498,7 +18500,7 @@ class Interface {
             $stat.find('.amount').text(amount);
             let $meter = $stat.find('.meter');
             $meter.css({ width: Math.min(amount, 100) + '%' });
-            $meter[(amount >= 100 ? 'addClass' : 'removeClass')]('.flashing');
+            $meter[(amount >= 100 ? 'addClass' : 'removeClass')]('flashing');
         });
     }
 
@@ -28812,7 +28814,7 @@ const {Game} = __webpack_require__(14);
 let event = {
     name: 'barbarians-attack-farmers',
     type: 'random',
-    image: 'erasmus',
+    image: 'machiavelli',
     text: 'Your majesty, I have grave news I must impart. There is a legion of barbarians on the outskirts of the city, harassing the local farmers. They will slaughter them if we do not send them gold.',
     choices: [{
         text: 'Send them a bribe of gold',

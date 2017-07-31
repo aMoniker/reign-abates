@@ -5,7 +5,7 @@ const {Game} = require('../game');
 let event = {
     name: 'barbarians-attack-farmers',
     type: 'random',
-    image: 'erasmus',
+    image: 'machiavelli',
     text: 'Your majesty, I have grave news I must impart. There is a legion of barbarians on the outskirts of the city, harassing the local farmers. They will slaughter them if we do not send them gold.',
     choices: [{
         text: 'Send them a bribe of gold',

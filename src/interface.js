@@ -162,7 +162,7 @@ class Interface {
             $stat.find('.amount').text(amount);
             let $meter = $stat.find('.meter');
             $meter.css({ width: Math.min(amount, 100) + '%' });
-            $meter[(amount >= 100 ? 'addClass' : 'removeClass')]('.flashing');
+            $meter[(amount >= 100 ? 'addClass' : 'removeClass')]('flashing');
         });
     }
 

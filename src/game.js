@@ -99,6 +99,8 @@ class Game {
                 this.stats[stat] += choice.effects[stat];
                 if (this.stats[stat] < 0) {
                     this.stats[stat] = 0;
+                } else if (this.stats[stat] > 100) {
+                    this.stats[stat] = 100;
                 }
             }
         });
