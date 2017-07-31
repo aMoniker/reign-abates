@@ -67,6 +67,275 @@
 /* 0 */
 /***/ (function(module, exports, __webpack_require__) {
 
+"use strict";
+
+
+const _         = __webpack_require__(1);
+const {Actions} = __webpack_require__(2);
+
+const amount = {
+    gold: {
+        small: 5,
+        medium: 10,
+        large: 15,
+    },
+    army: {
+        small: 5,
+        medium: 10,
+        large: 20,
+    },
+    like: {
+        small: 5,
+        medium: 10,
+        large: 25,
+    }
+};
+
+class Game {
+    constructor() {
+        this.var = {
+            amount: amount,
+        };
+        this.hookInterfaceActions();
+    }
+
+    hookInterfaceActions() {
+        let interfaceActions = ['newGame', 'eventChoice', 'doneEvent'];
+        for (let action of interfaceActions) {
+            Actions.on(Actions.interface[action], this[action].bind(this));
+        }
+    }
+
+    newGame() {
+        this.initialize();
+    }
+
+    initialize() {
+        this.turn = 0;
+        this.totalTurns = 4;
+        this.eventsPerTurn = 2;
+        this.eventsThisTurn = 0;
+        this.gameStarted = false;
+        this.introShown = false;
+        this.bonusScore = 0;
+
+        this.stats = {
+            gold: 50,
+            army: 50,
+            like: 50,
+        };
+        Actions.emit(Actions.game.statUpdate, this.stats);
+
+        this.events = [];
+        this.currentEvent = null;
+
+        this.loadEvents();
+        this.process();
+    }
+
+    process() {
+        if (!this.gameStarted || this.eventsThisTurn >= this.eventsPerTurn) {
+            if (this.gameStarted) {
+                Actions.emit(Actions.game.endTurn, this.turn);
+            } else {
+                this.gameStarted = true;
+            }
+
+            this.turn++;
+            this.eventsThisTurn = 0;
+        }
+
+        if (this.turn > this.totalTurns) {
+            return this.gameOver();
+        } else if (this.eventsThisTurn === 0) {
+            Actions.emit(Actions.game.beginTurn, this.turn, this.totalTurns);
+        }
+
+        this.eventsThisTurn++;
+        this.currentEvent = this.getNewEvent();
+        if (this.currentEvent) {
+            Actions.emit(Actions.game.beginEvent, this.currentEvent);
+        }
+    }
+
+    doneEvent() {
+        this.process();
+    }
+
+    eventChoice(choiceIndex) {
+        let choice = this.currentEvent.choices[choiceIndex];
+
+        // if there are no effects, just send the response
+        if (choice.effects === undefined) {
+            return Actions.emit(Actions.game.respondEvent, choice.response);
+        }
+
+        // send stat effects event if needed
+        var statsUpdated = false;
+        _.each(['gold', 'army', 'like'], (stat) => {
+            if (choice.effects[stat] !== undefined) {
+                statsUpdated = true;
+                this.stats[stat] += choice.effects[stat];
+                if (this.stats[stat] < 0) {
+                    this.stats[stat] = 0;
+                } else if (this.stats[stat] > 100) {
+                    this.stats[stat] = 100;
+                }
+            }
+        });
+        if (statsUpdated) {
+            Actions.emit(Actions.game.statUpdate, this.stats);
+        }
+
+        // apply any special callbacks
+        if (choice.effects.callback !== undefined) {
+            choice.effects.callback();
+        }
+
+        // send event response event
+        Actions.emit(Actions.game.respondEvent, choice.response);
+    }
+
+    // choose the next event according to the current game state
+    getNewEvent() {
+        let event = undefined;
+
+        if (!this.introShown) { // first turn intro
+            this.introShown = true;
+            event = this.pluckEvent(this.events.intro);
+            this.eventsThisTurn--; // intro doesn't count
+        } else if (this.turn === this.totalTurns
+                && this.eventsThisTurn === this.eventsPerTurn
+        ) { // if this is the last event, show the final event
+            event = this.pluckEvent(this.events.final);
+        } else if (this.isMoneyLow()) { // send the banker
+            event = this.pluckEvent(this.events.moneylow, false);
+        } else if (this.isMoneyHigh()) { // spend on troops/approval
+            event = this.pluckEvent(this.events.moneyhigh, false);
+        } else if (this.isArmyLow()) { // get more troops
+            event = this.pluckEvent(this.events.armylow, false);
+        } else if (this.isArmyHigh()){ // send the troops on missions
+            event = this.pluckEvent(this.events.armyhigh, false);
+        } else if (this.isLikeLow()) { // garner support
+            event = this.pluckEvent(this.events.likelow, false);
+        } else if (this.isLikeHigh()) { // use approval for money/soldiers
+            event = this.pluckEvent(this.events.likehigh, false);
+        } else { // otherwise return a random event
+            event = this.pluckEvent(this.events.random);
+        }
+
+        // if we somehow run out of events, show the final event
+        if (!event) {
+            event = this.pluckEvent(this.events.final);
+        }
+
+        // if there are no more events, it's game over
+        if (!event) {
+            return this.gameOver();
+        }
+
+        return event;
+    }
+
+    // return a random element from the given event array
+    // and optionally remove it for the rest of the game
+    pluckEvent(eventArray, remove = true) {
+        let index = _.random(0, eventArray.length - 1);
+        return (remove ? _.pullAt(eventArray, index)[0] : eventArray[index]);
+    }
+
+    isMoneyLow() {
+        return (this.stats.gold <= 5);
+    }
+
+    isMoneyHigh() {
+        return (this.stats.gold >= 100);
+    }
+
+    isArmyLow() {
+        return (this.stats.army <= 10);
+    }
+
+    isArmyHigh() {
+        return (this.stats.army >= 100);
+    }
+
+    isLikeLow() {
+        return (this.stats.like <= 0);
+    }
+
+    isLikeHigh() {
+        return (this.stats.like >= 100);
+    }
+
+    // based on the current game state, determine
+    // whether the player won or lost
+    // and the description of how they fared
+    getGameResult() {
+        let worstOutcome = {
+            win: false,
+            title: 'Your legacy ends.',
+            text: "Unfortunately you did not have the resources necessary to escape, and on your way out of the city in disguise, you are spotted by one of the Archduke's spies. His soldiers capture you and your Heir, and haul you into his dungeon, where you are both left to rot while he rules your kingdom...",
+        };
+
+        let decentOutcome = {
+            win: true,
+            title: 'Your Heir Escapes!',
+            text: 'You however, are not so lucky. Realizing you were under close scrutiny, you arranged to have the boy dress as a pauper and be hauled out by a few loyal guards who pretended he was a prisoner. In a way, he was. You sit on your throne, sipping wine from a golden goblet, and reminiscing over the unbelievable exploits you\'ve experienced in your long and storied life as king. As the door to the chamber opens, you know who it will be. A smile crosses your lips, you drop the goblet, and stand to meet your fate...',
+        };
+
+        let bestOutcome = {
+            win: true,
+            title: "You escape!",
+            text: "Having wisely managed your resources, both you and your Heir are able to sneak out of the kingdom, dressed as commoners, in the dead of night. A core of loyal soldiers scouts ahead, while you bribe your way through foreign lands, to a friendly kingdom ruled by a distant cousin. Here you will plot your revenge, while your young son trains with fierce determination to raise the army he'll need to recapture his birthright. Onward!"
+        };
+
+        let escapeThreshold = 40;
+        let average = (this.stats.gold + this.stats.army + this.stats.like) / 3;
+        average += this.bonusScore;
+
+        if (average < escapeThreshold) {
+            return worstOutcome;
+        } else {
+            let bonusChance = ((average - escapeThreshold) / 100) * 5;
+            let roll = Math.random();
+            if (roll <= bonusChance) {
+                return bestOutcome;
+            } else {
+                return decentOutcome;
+            }
+        }
+    }
+
+    gameOver() {
+        let result = this.getGameResult();
+        Actions.emit(Actions.game.endGame, result);
+    }
+
+    /**
+     * Load all events into memory
+     */
+    loadEvents() {
+        let req = __webpack_require__(16);
+        req.keys().forEach((file) => {
+            let {event} = req(file);
+            if (this.events[event.type] === undefined) {
+                this.events[event.type] = [];
+            }
+            this.events[event.type].push(event);
+        });
+    }
+}
+
+module.exports = {
+    Game: new Game()
+};
+
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
 /* WEBPACK VAR INJECTION */(function(global, module) {var __WEBPACK_AMD_DEFINE_RESULT__;/**
  * @license
  * Lodash <https://lodash.com/>
@@ -17156,260 +17425,6 @@
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(13), __webpack_require__(14)(module)))
 
 /***/ }),
-/* 1 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-const _         = __webpack_require__(0);
-const {Actions} = __webpack_require__(2);
-
-const amount = {
-    gold: {
-        small: 5,
-        medium: 10,
-        large: 15,
-    },
-    army: {
-        small: 5,
-        medium: 10,
-        large: 20,
-    },
-    like: {
-        small: 5,
-        medium: 10,
-        large: 25,
-    }
-};
-
-class Game {
-    constructor() {
-        this.var = {
-            amount: amount,
-        };
-        this.hookInterfaceActions();
-    }
-
-    hookInterfaceActions() {
-        let interfaceActions = ['newGame', 'eventChoice', 'doneEvent'];
-        for (let action of interfaceActions) {
-            Actions.on(Actions.interface[action], this[action].bind(this));
-        }
-    }
-
-    newGame() {
-        this.initialize();
-    }
-
-    initialize() {
-        this.turn = 0;
-        this.totalTurns = 4;
-        this.eventsPerTurn = 2;
-        this.eventsThisTurn = 0;
-        this.gameStarted = false;
-        this.introShown = false;
-
-        this.stats = {
-            gold: 50,
-            army: 50,
-            like: 50,
-        };
-        Actions.emit(Actions.game.statUpdate, this.stats);
-
-        this.events = [];
-        this.currentEvent = null;
-
-        this.loadEvents();
-        this.process();
-    }
-
-    process() {
-        if (!this.gameStarted || this.eventsThisTurn >= this.eventsPerTurn) {
-            if (this.gameStarted) {
-                Actions.emit(Actions.game.endTurn, this.turn);
-            } else {
-                this.gameStarted = true;
-            }
-
-            this.turn++;
-            this.eventsThisTurn = 0;
-        }
-
-        if (this.turn > this.totalTurns) {
-            return this.gameOver();
-        } else if (this.eventsThisTurn === 0) {
-            Actions.emit(Actions.game.beginTurn, this.turn, this.totalTurns);
-        }
-
-        this.eventsThisTurn++;
-        this.currentEvent = this.getNewEvent();
-        if (this.currentEvent) {
-            Actions.emit(Actions.game.beginEvent, this.currentEvent);
-        }
-    }
-
-    doneEvent() {
-        this.process();
-    }
-
-    eventChoice(choiceIndex) {
-        let choice = this.currentEvent.choices[choiceIndex];
-
-        // send stat effects event if needed
-        if (choice.effects !== undefined) {
-            _.each(['gold', 'army', 'like'], (stat) => {
-                if (choice.effects[stat] !== undefined) {
-                    this.stats[stat] += choice.effects[stat];
-                    if (this.stats[stat] < 0) {
-                        this.stats[stat] = 0;
-                    } else if (this.stats[stat] > 100) {
-                        this.stats[stat] = 100;
-                    }
-                }
-            });
-        }
-        Actions.emit(Actions.game.statUpdate, this.stats);
-
-        // send event response event
-        Actions.emit(Actions.game.respondEvent, choice.response);
-    }
-
-    // choose the next event according to the current game state
-    getNewEvent() {
-        let event = undefined;
-
-        if (!this.introShown) { // first turn intro
-            this.introShown = true;
-            event = this.pluckEvent(this.events.intro);
-            this.eventsThisTurn--; // intro doesn't count
-        } else if (this.turn === this.totalTurns
-                && this.eventsThisTurn === this.eventsPerTurn
-        ) { // if this is the last event, show the final event
-            event = this.pluckEvent(this.events.final);
-        } else if (this.isMoneyLow()) { // send the banker
-            event = this.pluckEvent(this.events.moneylow, false);
-        } else if (this.isMoneyHigh()) { // spend on troops/approval
-            event = this.pluckEvent(this.events.moneyhigh, false);
-        } else if (this.isArmyLow()) { // get more troops
-            event = this.pluckEvent(this.events.armylow, false);
-        } else if (this.isArmyHigh()){ // send the troops on missions
-            event = this.pluckEvent(this.events.armyhigh, false);
-        } else if (this.isLikeLow()) { // garner support
-            event = this.pluckEvent(this.events.likelow, false);
-        } else if (this.isLikeHigh()) { // use approval for money/soldiers
-            event = this.pluckEvent(this.events.likehigh, false);
-        } else { // otherwise return a random event
-            event = this.pluckEvent(this.events.random);
-        }
-
-        // if we somehow run out of events, show the final event
-        if (!event) {
-            event = this.pluckEvent(this.events.final);
-        }
-
-        // if there are no more events, it's game over
-        if (!event) {
-            return this.gameOver();
-        }
-
-        return event;
-    }
-
-    // return a random element from the given event array
-    // and optionally remove it for the rest of the game
-    pluckEvent(eventArray, remove = true) {
-        let index = _.random(0, eventArray.length - 1);
-        return (remove ? _.pullAt(eventArray, index)[0] : eventArray[index]);
-    }
-
-    isMoneyLow() {
-        return (this.stats.gold <= 5);
-    }
-
-    isMoneyHigh() {
-        return (this.stats.gold >= 100);
-    }
-
-    isArmyLow() {
-        return (this.stats.army <= 10);
-    }
-
-    isArmyHigh() {
-        return (this.stats.army >= 100);
-    }
-
-    isLikeLow() {
-        return (this.stats.like <= 0);
-    }
-
-    isLikeHigh() {
-        return (this.stats.like >= 100);
-    }
-
-    // based on the current game state, determine
-    // whether the player won or lost
-    // and the description of how they fared
-    getGameResult() {
-        let worstOutcome = {
-            win: false,
-            title: 'Your legacy ends.',
-            text: "Unfortunately you did not have the resources necessary to escape, and on your way out of the city in disguise, you are spotted by one of the Archduke's spies. His soldiers capture you and your Heir, and haul you into his dungeon, where you are both left to rot while he rules your kingdom...",
-        };
-
-        let decentOutcome = {
-            win: true,
-            title: 'Your Heir Escapes!',
-            text: 'You however, are not so lucky. Realizing you were under close scrutiny, you arranged to have the boy dress as a pauper and be hauled out by a few loyal guards who pretended he was a prisoner. In a way, he was. You sit on your throne, sipping wine from a golden goblet, and reminiscing over the unbelievable exploits you\'ve experienced in your long and storied life as king. As the door to the chamber opens, you know who it will be. A smile crosses your lips, you drop the goblet, and stand to meet your fate...',
-        };
-
-        let bestOutcome = {
-            win: true,
-            title: "You escape!",
-            text: "Having wisely managed your resources, both you and your Heir are able to sneak out of the kingdom, dressed as commoners, in the dead of night. A core of loyal soldiers scouts ahead, while you bribe your way through foreign lands, to a friendly kingdom ruled by a distant cousin. Here you will plot your revenge, while your young son trains with fierce determination to raise the army he'll need to recapture his birthright. Onward!"
-        };
-
-        let escapeThreshold = 40;
-        let average = (this.stats.gold + this.stats.army + this.stats.like) / 3;
-        if (average < escapeThreshold) {
-            return worstOutcome;
-        } else {
-            let bonusChance = ((average - escapeThreshold) / 100) * 5;
-            let roll = Math.random();
-            if (roll <= bonusChance) {
-                return bestOutcome;
-            } else {
-                return decentOutcome;
-            }
-        }
-    }
-
-    gameOver() {
-        let result = this.getGameResult();
-        Actions.emit(Actions.game.endGame, result);
-    }
-
-    /**
-     * Load all events into memory
-     */
-    loadEvents() {
-        let req = __webpack_require__(16);
-        req.keys().forEach((file) => {
-            let {event} = req(file);
-            if (this.events[event.type] === undefined) {
-                this.events[event.type] = [];
-            }
-            this.events[event.type].push(event);
-        });
-    }
-}
-
-module.exports = {
-    Game: new Game()
-};
-
-
-/***/ }),
 /* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -17456,9 +17471,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__style_css___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__style_css__);
 
 
-const _           = __webpack_require__(0);
-const {Game}      = __webpack_require__(1);
-const {Interface} = __webpack_require__(19);
+const _           = __webpack_require__(1);
+const {Game}      = __webpack_require__(0);
+const {Interface} = __webpack_require__(35);
 const {Actions}   = __webpack_require__(2);
 
 Interface.initialize();
@@ -18437,23 +18452,24 @@ function isUndefined(arg) {
 /***/ (function(module, exports, __webpack_require__) {
 
 var map = {
-	"./army-high.js": 123,
-	"./army-low.js": 124,
-	"./barbarians-attack-farmers.js": 17,
-	"./concerned-soldier.js": 135,
-	"./fat-merchant.js": 133,
-	"./final.js": 128,
-	"./foreign-general.js": 130,
-	"./intro.js": 18,
-	"./like-high.js": 125,
-	"./like-low.js": 126,
-	"./money-high.js": 122,
-	"./money-low.js": 127,
-	"./poison-archduke.js": 131,
-	"./sorceress.js": 134,
-	"./strange-invention.js": 129,
-	"./template.js": 120,
-	"./weeping-nun.js": 132
+	"./army-high.js": 17,
+	"./army-low.js": 18,
+	"./barbarians-attack-farmers.js": 19,
+	"./concerned-soldier.js": 20,
+	"./fat-merchant.js": 21,
+	"./final.js": 22,
+	"./foreign-general.js": 23,
+	"./intro.js": 24,
+	"./like-high.js": 25,
+	"./like-low.js": 26,
+	"./money-high.js": 27,
+	"./money-low.js": 28,
+	"./poison-archduke.js": 29,
+	"./secret-tunnel.js": 30,
+	"./sorceress.js": 31,
+	"./strange-invention.js": 32,
+	"./template.js": 33,
+	"./weeping-nun.js": 34
 };
 function webpackContext(req) {
 	return __webpack_require__(webpackContextResolve(req));
@@ -18478,7 +18494,79 @@ webpackContext.id = 16;
 "use strict";
 
 
-const {Game} = __webpack_require__(1);
+const {Game} = __webpack_require__(0);
+
+let event = {
+    name: 'army-high',
+    type: 'armyhigh',
+    image: 'machiavelli',
+    text: "Sire, we have many restless soldiers. We should give them something to do before they start getting ideas. I've been receiving reports that the Archduke has been actively recruiting some of the more discontent among them. We could send them on a patrol to attack the highwaymen that have been plaguing our outer roads, or we could have them roam the city, rounding up criminals. What shall it be?",
+    choices: [{
+        text: 'Send them on patrol',
+        effects: {
+            gold: +Game.var.amount.gold.large * 3,
+            army: -Game.var.amount.army.large * 2,
+        },
+        response: "The soldiers gladly obey and set out to deter, capture, and slay the robbers of your kingdom's countryside. As they root out the menace, most of the gold they capture is returned to your coffers."
+    }, {
+        text: 'Have them police the city',
+        effects: {
+            army: -Game.var.amount.army.large * 2,
+            like: +Game.var.amount.like.large
+        },
+        response: 'You send your troops through the streets of the city to round up and remove the criminal menaces that have been preying on the populace. The commoners, no longer extorted by local gangs, are very grateful.'
+    }]
+};
+
+module.exports = {
+    event
+};
+
+
+/***/ }),
+/* 18 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const {Game} = __webpack_require__(0);
+
+let event = {
+    name: 'army-low',
+    type: 'armylow',
+    image: 'machiavelli',
+    text: "Sire, we are running dangerously low on loyal soldiers. If we do not find more, it will be noticed, and there will be no holding off the usurpers. We can hire more from mercenary bands, or conscript the best men from the citizenry.",
+    choices: [{
+        text: 'Hire mercenaries',
+        effects: {
+            gold: -Game.var.amount.gold.large * 5,
+            army: +Game.var.amount.army.large,
+        },
+        response: "You hire a number of professional soldiers from a band of mercenaries. They may not be loyal, but they will fight..."
+    }, {
+        text: 'Conscript citizens',
+        effects: {
+            army: +Game.var.amount.army.large * 2,
+            like: -Game.var.amount.like.large * 2
+        },
+        response: 'You send out your remaining troops to forcibly conscript strong young men and boys from the populace. A few are glad of the opportunity, but most detest being taken against their will.'
+    }]
+};
+
+module.exports = {
+    event
+};
+
+
+/***/ }),
+/* 19 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const {Game} = __webpack_require__(0);
 
 let event = {
     name: 'barbarians-attack-farmers',
@@ -18535,13 +18623,180 @@ module.exports = {
 
 
 /***/ }),
-/* 18 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-const {Game} = __webpack_require__(1);
+const {Game} = __webpack_require__(0);
+
+let event = {
+    name: 'conerned-soldier',
+    type: 'random',
+    image: 'soldier-2',
+    text: "One of your low-ranking soldiers requests a private audience with you. Noting the grave look of concern on his face, you grant his request, but ask him to make it quick. He explains that he's found out that some of the higher ranking men have been operating a smuggling operation, skimming some gold they were tasked with collecting from local lords. The soldier looks to you expectantly and explains that he does not want to be disloyal to his fellows, but could not in good conscience let them defraud the king.",
+    choices: [{
+        text: 'Purge the smugglers, promote the soldier',
+        effects: {
+            gold: +Game.var.amount.gold.small,
+            army: -Game.var.amount.army.small,
+        },
+        response: "You have the smugglers stripped of their rank and imprisoned as a warning to any others who would attempt such a thing. The young soldier is promoted and put in charge of collections. Your income immediately rises."
+    }, {
+        text: 'Kill the smugglers',
+        effects: {
+            gold: +Game.var.amount.gold.small,
+            army: -Game.var.amount.army.medium,
+            like: -Game.var.amount.like.small,
+        },
+        response: "You tell the young man you'll take care of it, and have the disloyal soldiers summarily executed. Their heads are placed on pikes around the city as a warning to any who would betray you. The young soldier, feeling responsible for their gruesome deaths, abandons his post and leaves the city. The citizens are noticeably fearful.",
+    }, {
+        text: 'Dismiss the fellow',
+        effects: {
+            army: -Game.var.amount.army.small
+        },
+        response: "You don't appreciate soldiers that are not loyal to each other, and dismiss the young man, who looks on the verge of tears. For a moment he appears as if he'll plead with you, but instead he lays his sword at your feet, turns and walks away with eyes downcast."
+    }, {
+        text: 'Blackmail the smugglers',
+        effects: {
+            army: +Game.var.amount.army.small
+        },
+        response: "You assure the young soldier you'll fix the problem. Afterward, you call the smugglers in to your chamber and explain that you know what they've been doing. Their eyes go wide, but before they can stammer a defense, you hold up your hand to silence them. Explaining that you don't care about the gold, but need their loyalty in the times ahead, you make them swear an oath to carry out any dirty work you find necessary. In return, they can keep their operation. They consider for a few moments, and come to agreement."
+    }]
+};
+
+module.exports = {
+    event
+};
+
+
+/***/ }),
+/* 21 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const {Game} = __webpack_require__(0);
+
+let event = {
+    name: 'fat-merchant',
+    type: 'random',
+    image: 'fat-man-1',
+    text: "A well dressed and quite rotund man saunters into your chamber, giving an overly dramatic bow that ends with a smarmy flourish, bordering on outright disrespect. You frown as the man explains that he is the world's finest purveyor of arms, which he would gladly sell to your army. He demonstrates some of the weapons, which do seem of quite high quality. They're expensive, but they would give your army an edge...",
+    choices: [{
+        text: 'Buy arms for all your troops',
+        effects: {
+            gold: -Game.var.amount.gold.large * 2,
+            army: +Game.var.amount.army.large,
+            like: -Game.var.amount.like.small
+        },
+        response: "The merchant's eyes grow wide when you explain how many weapons you'd like to buy. He wipes his mouth and smacks his lips as he promises to have them delivered immediately. It costs a small fortune, but your soldiers seem impressed with their new hardware. Later, you notice the commoners acting more nervous than usual around your guards."
+    }, {
+        text: 'Buy arms for your elite troops',
+        effects: {
+            gold: -Game.var.amount.gold.large,
+            army: +Game.var.amount.army.medium,
+        },
+        response: "Equipping your entire army would be prohibitively expensive, so you buy enough to distribute to only your best soldiers and royal guard. The rest of your troops are a little jealous, but it also gives them incentive to climb the ranks. The merchant waddles away with a heavy sack of gold and a satisfied grin."
+    }, {
+        text: 'Send the merchant away',
+        effects: {
+            army: -Game.var.amount.army.small,
+        },
+        response: "The smile immediately drops from the merchant's fat mug, and he strides out with a look of frustration. Some of your troops, having seen the weapons on offer, are disappointed that they didn't get any."
+    }, {
+        text: 'Lock the bastard up',
+        effects: {
+            like: -Game.var.amount.like.large
+        },
+        response: "You don't take kindly to merchants who don't show proper respect and deference to the king. The man's eyes show great fear and his stammering mouth is agape in horror as he is dragged away, pleading. Word of your actions gets around, and you find it much harder to find trading partners for some reason..."
+    }]
+};
+
+module.exports = {
+    event
+};
+
+
+/***/ }),
+/* 22 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const {Game} = __webpack_require__(0);
+
+let event = {
+    name: 'final',
+    type: 'final',
+    image: 'machiavelli',
+    text: "The hour has arrived, Your Majesty. We have gathered what gold and loyal guards we can, and the populace has been placated as much as possible. We are now at the mercy of fate. It has been my great honor and privilege to have served you.",
+    choices: [{
+        text: 'May God help us all.',
+        response: "Your chamberlain gives a grave bow and leaves your chamber to make the final preparations for escape. You sit comtemplative, thinking that you should be feeling nervous or anxious. Instead what you feel is a strange sort of giddy anticipation. There is some kind of relief at leaving all these problems behind. Whatever happens, you know you are ready.",
+    }]
+};
+
+module.exports = {
+    event
+};
+
+
+/***/ }),
+/* 23 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const {Game} = __webpack_require__(0);
+
+let event = {
+    name: 'foreign-general',
+    type: 'random',
+    image: 'beard-man-7',
+    text: "Your chamberlain introduces a foreign general. He explains that he and what remains of his troops fled from a neighboring kingdom into your land, and seeks a place to rest and recover. He offers some of his troops and a small amount of gold. Judging by his appearance though, it seems he might have a lot more...",
+    choices: [{
+        text: 'Accept his offer',
+        effects: {
+            gold: +Game.var.amount.gold.medium,
+            like: -Game.var.amount.like.small,
+        },
+        response: "The general bows graciously and signals for a small chest of gold to be delivered at your feet. He camps outside of town while his troops recover. The population seems a bit uneasy with a foreign army outside the city."
+    }, {
+        text: 'Demand more gold',
+        effects: {
+            gold: +Game.var.amount.gold.large,
+            like: -Game.var.amount.like.medium
+        },
+        response: 'The general has no choice but to grudgingly accept your offer. He camps outside of town, but looks the other way when his soldiers decide to stir up trouble with the locals.'
+    }, {
+        text: 'Kill him and his small army',
+        effects: {
+            gold: +Game.var.amount.gold.large * 3,
+            army: -Game.var.amount.army.medium,
+            like: -Game.var.amount.like.medium,
+        },
+        response: 'The general betrays no hint of shock as he draws his sword and orders his troops to defend themselves. Your overwhelming army make short work of the remnants of his, and you discover that he was hoarding quite a lot of gold. Some of your citizens are outraged at the bloodshed, and many of them fear for their own lives.'
+    }]
+};
+
+module.exports = {
+    event
+};
+
+
+/***/ }),
+/* 24 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const {Game} = __webpack_require__(0);
 
 let event = {
     name: 'intro',
@@ -18560,14 +18815,402 @@ module.exports = {
 
 
 /***/ }),
-/* 19 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-const _ = __webpack_require__(0);
-const $ = __webpack_require__(20);
+const {Game} = __webpack_require__(0);
+
+let event = {
+    name: 'like-high',
+    type: 'likehigh',
+    image: 'machiavelli',
+    text: "Sire, our populace is giddy with delight at the way you've been ruling. Most would lay down their lives for you. We should take advantage of this. We could raise taxes, which they would gladly pay, or we could recruit more soldiers from their ranks.",
+    choices: [{
+        text: 'Collect taxes',
+        effects: {
+            gold: +Game.var.amount.gold.large * 3,
+            like: -Game.var.amount.like.large * 2,
+        },
+        response: "You send around the tax collectors to gather additional money from the peasants. Suddenly they don't seem to like you as much..."
+    }, {
+        text: 'Recruit soldiers',
+        effects: {
+            army: +Game.var.amount.army.large,
+            like: -Game.var.amount.like.large,
+        },
+        response: "You recruit a number of young men and boys from the populace, who enter the ranks of your army willingly. Their parents and friends however, are not so happy."
+    }]
+};
+
+module.exports = {
+    event
+};
+
+
+/***/ }),
+/* 26 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const {Game} = __webpack_require__(0);
+
+let event = {
+    name: 'like-low',
+    type: 'likelow',
+    image: 'machiavelli',
+    text: "Sire, our populace on the verge of open revolt. They have many grievances, and we shall certainly not make it out alive if they siege the castle. We could simply shower them with gold, or we could send soldiers to root out the criminal gangs that plague the city.",
+    choices: [{
+        text: 'Distribute gold',
+        effects: {
+            gold: -Game.var.amount.gold.large * 2,
+            like: +Game.var.amount.like.large
+        },
+        response: "You send carriages through the streets, distributing gold to the commoners in the name of the king. They leap at the coins and rejoice with smiles and laughter. Some openly weep with joy at their good fortune. There is much drunkenness that night, and everyone is heard praising the good king."
+    }, {
+        text: 'Round up the criminals',
+        effects: {
+            army: -Game.var.amount.army.large * 2,
+            like: +Game.var.amount.like.large
+        },
+        response: "You send your troops through the streets of the city to round up and remove the criminal menaces that have been preying on the populace. The commoners, no longer extorted by local gangs, are very grateful."
+    }]
+};
+
+module.exports = {
+    event
+};
+
+
+/***/ }),
+/* 27 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const {Game} = __webpack_require__(0);
+
+let event = {
+    name: 'money-high',
+    type: 'moneyhigh',
+    image: 'machiavelli',
+    text: 'Sire, our gold reserves overflow the vault. We cannot keep this much, but we can use it for other purposes. We could hire mercenaries, or distribute it to the population. What shall we do?',
+    choices: [{
+        text: 'Hire mercenaries',
+        effects: {
+            gold: -Game.var.amount.gold.large * 3,
+            army: +Game.var.amount.army.large,
+        },
+        response: "You hire a number of professional soldiers from a band of mercenaries. They may not be loyal, but they will fight..."
+    }, {
+        text: 'Distribute money to the populace',
+        effects: {
+            gold: -Game.var.amount.gold.large * 3,
+            like: +Game.var.amount.like.large
+        },
+        response: 'You send carriages through the streets, distributing gold to the commoners in the name of the king. They leap at the coins and rejoice with smiles and laughter. Some openly weep with joy at their good fortune. There is much drunkenness that night, and everyone is heard praising the good king.'
+    }]
+};
+
+module.exports = {
+    event
+};
+
+
+/***/ }),
+/* 28 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const {Game} = __webpack_require__(0);
+
+let event = {
+    name: 'bank-loan',
+    type: 'moneylow',
+    image: 'man-10',
+    text: 'A sly looking man approaches and greets you. "Greetings my good king. I have heard of your monetary plight, and have come to offer a wonderful deal." Did he just wink at the king? "In return for a relatively small number of soldiers, or alternatively a reasonable number of slaves from your populace, I could certainly help you with some extra gold. At interest, of course." Of course, you think. Well, gold is needed. What will you do?',
+    choices: [{
+        text: 'Offer soldiers',
+        effects: {
+            gold: +Game.var.amount.gold.large,
+            army: -Game.var.amount.army.medium,
+        },
+        response: "You select a mix of soldiers to transfer to them. They look disgusted, but are sworn to obey your orders. Only one objects, and the others drag him away in shame. The rest follow the banker as he leaves with a smirk."
+    }, {
+        text: 'Offer slaves',
+        effects: {
+            gold: +Game.var.amount.gold.large,
+            like: -Game.var.amount.like.large
+        },
+        response: 'You send soldiers to forcibly remove some of the less desirable but sturdy citizens. Word gets around, and the populace is not happy. The banker makes good on his gold though, at the expense of your approval, and your conscience...'
+    }]
+};
+
+module.exports = {
+    event
+};
+
+
+/***/ }),
+/* 29 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const {Game} = __webpack_require__(0);
+
+let event = {
+    name: 'poison-archduke',
+    type: 'random',
+    image: 'contempt-woman',
+    text: "Late at night, your chamberlain hurriedly escorts in what appears to be a serving woman. She has an evil look about her, and after a token curtsey, explains in hushed tones that she works for the Archduke. She says has reason to despise him, but will not explain exactly why. From the look in her eyes, and your knowledge of the man, you believe she is telling the truth. She goes on to explain that his own troops could be sabotaged by poisoning the common meal they are all served. She would need supplies and a small bribe to carry out the mission.",
+    choices: [{
+        text: 'Give her supplies and gold',
+        effects: {
+            gold: -Game.var.amount.gold.medium,
+            army: +Game.var.amount.army.small,
+        },
+        response: "She thanks you, and leaves the chamber with a fierce and determined look. Later, you hear of the misfortune suffered by many soldiers among the Archduke's private guard. This will make your own army stronger by comparison."
+    }, {
+        text: 'Send the woman away',
+        response: "Poisoning is a low and dishonorable action that you refuse to take. As you send the woman away, the fire in her eyes dissipates, and a worried look appears. Who will she turn to now?"
+    }]
+};
+
+module.exports = {
+    event
+};
+
+
+/***/ }),
+/* 30 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const {Game} = __webpack_require__(0);
+
+let event = {
+    name: 'secret-tunnel',
+    type: 'random',
+    image: 'erasmus',
+    text: "Your most senior scribe gets your attention and asks a moment of your time. He explains that while studying the ancient history of the castle, he discovered that there used to be a secret tunnel leading to the forest outside the city. The tunnel fell into disrepair, but he knows its location, and thinks that with some inexpensive supplies and a good number of soldiers working away, it can be reopened. This would significantly increase your chances of escape. He further explains that with even more resources, the tunnel could be rigged to collapse behind you, making it near impossible for anyone to capture you en route.",
+    choices: [{
+        text: 'Dig the tunnel',
+        effects: {
+            gold: -Game.var.amount.gold.small,
+            army: -Game.var.amount.army.medium,
+            callback: () => {
+                Game.bonusScore += 0.1;
+            }
+        },
+        response: "You have your scribe quietly procure the needed supplies and set your most trustworthy soldiers on the task. They find the ancient passage and make good progress on digging it out. They expect to be finished just in time for your escape."
+    }, {
+        text: 'Dig the tunnel, rig the collapse',
+        effects: {
+            gold: -Game.var.amount.gold.medium,
+            army: -Game.var.amount.army.large,
+            callback: () => {
+                Game.bonusScore += 0.2;
+            },
+        },
+        response: "It's exceedingly expensive, but who can put a price on your lineage? You procure a large number of supplies and set many of your most loyal soldiers to the task while your scribe oversees the engineering aspects. It's tough work, but they think it can be finished just in time for you to escape."
+    }, {
+        text: "We can't risk it",
+        response: "You thank your scribe for calling this to your attention, but it's just not worth the risk. If the Archduke got word of this he would know something was wrong, and might accelerate his plans."
+    }]
+};
+
+module.exports = {
+    event
+};
+
+
+/***/ }),
+/* 31 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const {Game} = __webpack_require__(0);
+
+let event = {
+    name: 'sorceress',
+    type: 'random',
+    image: 'sorceress',
+    text: "As you prepare for bed in your chamber, a soft and low voice from behind frightens you. \"Do not be alarmed, Your Majesty, for I come to aid you.\" Spinning around to look, and ready to shout for your guards, you see a tall, pale, and thin woman who has an otherworldly quality about her. She raises a hand and asks you to wait. Entranced, you listen. She explains that she belongs to a coven of powerful mages who practice in secret. She knows about the Archduke and his plans, somehow. Removing a small, luminescent blue stone from the folds of her robe, she promises to aid your escape in return for a select few of your family's ancient gemstones.",
+    choices: [{
+        text: 'Give her the gems',
+        effects: {
+            gold: -Game.var.amount.gold.large,
+            army: +Game.var.amount.army.large,
+        },
+        response: "She gives you a mysterious smile and assures you that you've made a wise choice. With the stone in her closed fist, she tilts her head upward and her eyes roll back while she silently chants. With a shudder, she finishes the spell, and explains that your army will have a blessing of protection when they need it most. Before you can speak, she turns and leaps out of the nearest window. You rush to the sill, but see nothing but the black night."
+    }, {
+        text: 'Call for your guards',
+        effects: {
+            army: -Game.var.amount.army.small,
+        },
+        response: '"Fool!", she yells, and throws the stone to the ground. It shatters in a blinding flash of light, and when your vision recovers, she is gone. Your guards rushes in to your aid to find you bewildered, alone, and blinking. They seem concerned, and rumor spreads among the troops that the king who commands them is going insane.'
+    }]
+};
+
+module.exports = {
+    event
+};
+
+
+/***/ }),
+/* 32 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const {Game} = __webpack_require__(0);
+
+let event = {
+    name: 'strange-invention',
+    type: 'random',
+    image: 'beard-man-1',
+    text: 'An odd and excited man is granted an audience. He approaches the throne with an intense look of wonder, and there is a kind of strange fire in his eyes whose origin you cannot quite discern. He approaches and speaks: "Your Majesty! I come from the far north, from a distant kingdom. They do not appreciate my genius there, but I have heard that you are far more refined. I come to offer you an invention that will bestow upon you great power..." He goes on to describe a contraption for harnessing aetheric energy whose mechanics you can\'t quite grasp. However, the uses he describes for it are truly fantastic. "I would be glad to sell you this machine, for enough money so that I may continue my research." He\'s asking for a lot. Will you buy it?',
+    choices: [{
+        text: 'Buy the stange machine',
+        effects: {
+            gold: -Game.var.amount.gold.large,
+            like: +Game.var.amount.like.medium
+        },
+        response: "While it isn't entirely useless, your best astronomers can't seem to find much use for it beyond parlour tricks. You give it to the court magician who exhibits it to a bewildered public. They don't know what to make of it either, but they seem to enjoy the spectacle, and leave whispering that the king surely has great powers..."
+    }, {
+        text: 'Lock the charlatan in the dungeon',
+        effects: {
+            like: -Game.var.amount.like.small
+        },
+        response: 'Word gets around of your cruelty. Several members of your staff seem more cautious and distant around you.'
+    },  {
+        text: 'Send the man away',
+        response: "You have no time for the silly inventions of madmen. There are great doings afoot, and you must focus on keeping alive your dynasty."
+    }, {
+        text: "Offer him a royal appointment",
+        effects: {
+            army: +Game.var.amount.army.small,
+            gold: -Game.var.amount.gold.medium,
+        },
+        response: "He accepts your offer on the condition of being given enough money to continue his research. With his machine expertise, he's able to improve a few things about your military's weapons.",
+    }]
+};
+
+module.exports = {
+    event
+};
+
+
+/***/ }),
+/* 33 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const {Game} = __webpack_require__(0);
+
+let event = {
+    name: 'template',
+    type: 'template',
+    image: 'erasmus',
+    text: 'Intro text here',
+    choices: [{
+        text: 'Choice 1',
+        effects: {
+            gold: -Game.var.amount.gold.small,
+            army: -Game.var.amount.army.medium,
+            like: -Game.var.amount.like.large
+        },
+        response: "Choice 1 response"
+    }, {
+        text: 'Choice 2',
+        effects: {
+            gold: Game.var.amount.gold.small,
+            army: Game.var.amount.army.medium,
+            like: Game.var.amount.like.large
+        },
+        response: 'Choice 2 response'
+    }]
+};
+
+module.exports = {
+    event
+};
+
+
+/***/ }),
+/* 34 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const {Game} = __webpack_require__(0);
+
+let event = {
+    name: 'weeping-nun',
+    type: 'random',
+    image: 'crying-nun',
+    text: "A weeping nun barges into the throne room and kneels before you. You recognize her as the assistant to the mother superior at the abbey outside the city. She explains that some local scoundrels have been harassing and assaulting the sisters, causing much distress. She begs you to solve the problem. Even though she is upset, you still see a pleading mercy in her eyes.",
+    choices: [{
+        text: 'Slaughter the bastards',
+        effects: {
+            like: -Game.var.amount.like.small
+        },
+        response: "A small number of troops makes short work of the miscreants. The nuns are horrified at the bloodshed, and hold a vigil for the criminals. Perplexing."
+    }, {
+        text: 'Pay off the ruffians',
+        effects: {
+            gold: -Game.var.amount.gold.small,
+            like: +Game.var.amount.like.small,
+        },
+        response: 'While you detest bargaining with criminals, you realize that the nuns will not put up with bloodshed. You have some gold sent to them on the condition that they do not return. They greedily accept.'
+    }, {
+        text: 'Drive them away without bloodshed',
+        effects: {
+            like: +Game.var.amount.like.small,
+            army: -Game.var.amount.army.small,
+        },
+        response: 'The sisters appreciate that your troops removed the louts without killing them, but your troops do not agree. Fed up with what they see as your weakness, a few desert, and malcontent spreads among the rest.'
+    }, {
+        text: 'Send the nun away',
+        effects: {
+            like: -Game.var.amount.like.large,
+            army: -Game.var.amount.army.small,
+        },
+        response: "You don't have time to attend to the needs of these religious nuts. If their God is so merciful, why doesn't he help them? You callously send the sister away while silent tears fall from her despondent eyes. The wretches keep harassing the nuns, and your reputation among the populace and your own troops suffers for your cruelty."
+    }]
+};
+
+module.exports = {
+    event
+};
+
+
+/***/ }),
+/* 35 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const _ = __webpack_require__(1);
+const $ = __webpack_require__(36);
 const {Actions} = __webpack_require__(2);
 
 class Interface {
@@ -18687,7 +19330,7 @@ class Interface {
         let $eventChoices = this.$gameplay.find('#event-choices');
 
         // load the face image
-        let image = __webpack_require__(21)(`./${event.image}.jpg`);
+        let image = __webpack_require__(37)(`./${event.image}.jpg`);
         $eventContent.find('.event-image').css({
             'background-image': `url("${image}")`
         });
@@ -18770,7 +19413,7 @@ module.exports = {
 
 
 /***/ }),
-/* 20 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -29030,108 +29673,108 @@ return jQuery;
 
 
 /***/ }),
-/* 21 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var map = {
-	"./angry-man-1.jpg": 22,
-	"./beard-man-1.jpg": 23,
-	"./beard-man-10.jpg": 24,
-	"./beard-man-11.jpg": 25,
-	"./beard-man-12.jpg": 26,
-	"./beard-man-13.jpg": 27,
-	"./beard-man-14.jpg": 28,
-	"./beard-man-2.jpg": 29,
-	"./beard-man-3.jpg": 30,
-	"./beard-man-4.jpg": 31,
-	"./beard-man-5.jpg": 32,
-	"./beard-man-6.jpg": 33,
-	"./beard-man-7.jpg": 34,
-	"./beard-man-8.jpg": 35,
-	"./beard-man-9.jpg": 36,
-	"./boy-2.jpg": 37,
-	"./contempt-woman.jpg": 38,
-	"./crosseyed-man.jpg": 39,
-	"./crying-nun.jpg": 40,
-	"./deformed-man.jpg": 41,
-	"./erasmus.jpg": 42,
-	"./fat-man-1.jpg": 43,
-	"./girl-1.jpg": 44,
-	"./girl-2.jpg": 45,
-	"./girl-3.jpg": 46,
-	"./girl-4.jpg": 47,
-	"./girl-5.jpg": 48,
-	"./grave-man.jpg": 49,
-	"./heir.jpg": 50,
-	"./horror-man.jpg": 51,
-	"./machiavelli.jpg": 52,
-	"./man-1.jpg": 53,
-	"./man-10.jpg": 54,
-	"./man-11.jpg": 55,
-	"./man-12.jpg": 56,
-	"./man-13.jpg": 57,
-	"./man-14.jpg": 58,
-	"./man-15.jpg": 59,
-	"./man-2.jpg": 60,
-	"./man-3.jpg": 61,
-	"./man-4.jpg": 62,
-	"./man-5.jpg": 63,
-	"./man-6.jpg": 64,
-	"./man-7.jpg": 65,
-	"./man-8.jpg": 66,
-	"./man-9.jpg": 67,
-	"./moustache-man-1.jpg": 68,
-	"./moustache-man-2.jpg": 69,
-	"./moustache-man-3.jpg": 70,
-	"./moustache-man-4.jpg": 71,
-	"./moustache-man-5.jpg": 72,
-	"./moustache-man-6.jpg": 73,
-	"./moustache-man-7.jpg": 74,
-	"./moustache-man-8.jpg": 75,
-	"./moustache-man-9.jpg": 76,
-	"./nun.jpg": 77,
-	"./old-man-1.jpg": 78,
-	"./old-man-2.jpg": 79,
-	"./old-man-3.jpg": 80,
-	"./old-man-4.jpg": 81,
-	"./old-woman-1.jpg": 82,
-	"./old-woman-2.jpg": 83,
-	"./old-woman-3.jpg": 84,
-	"./old-woman-4.jpg": 85,
-	"./old-woman-5.jpg": 86,
-	"./princely-man.jpg": 87,
-	"./queen.jpg": 88,
-	"./regal-woman-1.jpg": 89,
-	"./regal-woman-2.jpg": 90,
-	"./regal-woman-3.jpg": 91,
-	"./regal-woman-4.jpg": 92,
-	"./scar-man.jpg": 93,
-	"./scruffy-man.jpg": 94,
-	"./sideburns-man-1.jpg": 95,
-	"./smug-man-1.jpg": 96,
-	"./soldier-1.jpg": 97,
-	"./soldier-2.jpg": 98,
-	"./sorceress.jpg": 99,
-	"./weary-man-1.jpg": 100,
-	"./woman-.jpg": 101,
-	"./woman-1.jpg": 102,
-	"./woman-10.jpg": 103,
-	"./woman-11.jpg": 104,
-	"./woman-12.jpg": 105,
-	"./woman-13.jpg": 106,
-	"./woman-14.jpg": 107,
-	"./woman-15.jpg": 108,
-	"./woman-16.jpg": 109,
-	"./woman-2.jpg": 110,
-	"./woman-3.jpg": 111,
-	"./woman-4.jpg": 112,
-	"./woman-5.jpg": 113,
-	"./woman-6.jpg": 114,
-	"./woman-7.jpg": 115,
-	"./woman-8.jpg": 116,
-	"./woman-9.jpg": 117,
-	"./woman-and-child.jpg": 118,
-	"./young-man-1.jpg": 119
+	"./angry-man-1.jpg": 38,
+	"./beard-man-1.jpg": 39,
+	"./beard-man-10.jpg": 40,
+	"./beard-man-11.jpg": 41,
+	"./beard-man-12.jpg": 42,
+	"./beard-man-13.jpg": 43,
+	"./beard-man-14.jpg": 44,
+	"./beard-man-2.jpg": 45,
+	"./beard-man-3.jpg": 46,
+	"./beard-man-4.jpg": 47,
+	"./beard-man-5.jpg": 48,
+	"./beard-man-6.jpg": 49,
+	"./beard-man-7.jpg": 50,
+	"./beard-man-8.jpg": 51,
+	"./beard-man-9.jpg": 52,
+	"./boy-2.jpg": 53,
+	"./contempt-woman.jpg": 54,
+	"./crosseyed-man.jpg": 55,
+	"./crying-nun.jpg": 56,
+	"./deformed-man.jpg": 57,
+	"./erasmus.jpg": 58,
+	"./fat-man-1.jpg": 59,
+	"./girl-1.jpg": 60,
+	"./girl-2.jpg": 61,
+	"./girl-3.jpg": 62,
+	"./girl-4.jpg": 63,
+	"./girl-5.jpg": 64,
+	"./grave-man.jpg": 65,
+	"./heir.jpg": 66,
+	"./horror-man.jpg": 67,
+	"./machiavelli.jpg": 68,
+	"./man-1.jpg": 69,
+	"./man-10.jpg": 70,
+	"./man-11.jpg": 71,
+	"./man-12.jpg": 72,
+	"./man-13.jpg": 73,
+	"./man-14.jpg": 74,
+	"./man-15.jpg": 75,
+	"./man-2.jpg": 76,
+	"./man-3.jpg": 77,
+	"./man-4.jpg": 78,
+	"./man-5.jpg": 79,
+	"./man-6.jpg": 80,
+	"./man-7.jpg": 81,
+	"./man-8.jpg": 82,
+	"./man-9.jpg": 83,
+	"./moustache-man-1.jpg": 84,
+	"./moustache-man-2.jpg": 85,
+	"./moustache-man-3.jpg": 86,
+	"./moustache-man-4.jpg": 87,
+	"./moustache-man-5.jpg": 88,
+	"./moustache-man-6.jpg": 89,
+	"./moustache-man-7.jpg": 90,
+	"./moustache-man-8.jpg": 91,
+	"./moustache-man-9.jpg": 92,
+	"./nun.jpg": 93,
+	"./old-man-1.jpg": 94,
+	"./old-man-2.jpg": 95,
+	"./old-man-3.jpg": 96,
+	"./old-man-4.jpg": 97,
+	"./old-woman-1.jpg": 98,
+	"./old-woman-2.jpg": 99,
+	"./old-woman-3.jpg": 100,
+	"./old-woman-4.jpg": 101,
+	"./old-woman-5.jpg": 102,
+	"./princely-man.jpg": 103,
+	"./queen.jpg": 104,
+	"./regal-woman-1.jpg": 105,
+	"./regal-woman-2.jpg": 106,
+	"./regal-woman-3.jpg": 107,
+	"./regal-woman-4.jpg": 108,
+	"./scar-man.jpg": 109,
+	"./scruffy-man.jpg": 110,
+	"./sideburns-man-1.jpg": 111,
+	"./smug-man-1.jpg": 112,
+	"./soldier-1.jpg": 113,
+	"./soldier-2.jpg": 114,
+	"./sorceress.jpg": 115,
+	"./weary-man-1.jpg": 116,
+	"./woman-.jpg": 117,
+	"./woman-1.jpg": 118,
+	"./woman-10.jpg": 119,
+	"./woman-11.jpg": 120,
+	"./woman-12.jpg": 121,
+	"./woman-13.jpg": 122,
+	"./woman-14.jpg": 123,
+	"./woman-15.jpg": 124,
+	"./woman-16.jpg": 125,
+	"./woman-2.jpg": 126,
+	"./woman-3.jpg": 127,
+	"./woman-4.jpg": 128,
+	"./woman-5.jpg": 129,
+	"./woman-6.jpg": 130,
+	"./woman-7.jpg": 131,
+	"./woman-8.jpg": 132,
+	"./woman-9.jpg": 133,
+	"./woman-and-child.jpg": 134,
+	"./young-man-1.jpg": 135
 };
 function webpackContext(req) {
 	return __webpack_require__(webpackContextResolve(req));
@@ -29147,1178 +29790,595 @@ webpackContext.keys = function webpackContextKeys() {
 };
 webpackContext.resolve = webpackContextResolve;
 module.exports = webpackContext;
-webpackContext.id = 21;
-
-/***/ }),
-/* 22 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__.p + "63d6e6d5b56059e22245c24cb3d031a2.jpg";
-
-/***/ }),
-/* 23 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__.p + "c0c8a362c14e7405ec28c09fb570544a.jpg";
-
-/***/ }),
-/* 24 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__.p + "ef8c6ab9d702b13dd21b59bff0b85ff9.jpg";
-
-/***/ }),
-/* 25 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__.p + "eab7cff9a46d89874a5374e5e7c51218.jpg";
-
-/***/ }),
-/* 26 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__.p + "8b50ec9c85b7f18358a6353ca6609402.jpg";
-
-/***/ }),
-/* 27 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__.p + "67e0f812de3d3a3e5bd542e30f9e6380.jpg";
-
-/***/ }),
-/* 28 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__.p + "a24c65de38464d2f9691daa325d6109f.jpg";
-
-/***/ }),
-/* 29 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__.p + "08cdac6f656922afb80f05b044f6dd0a.jpg";
-
-/***/ }),
-/* 30 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__.p + "c49acbdff9592d5f6fcfc28256c1cebc.jpg";
-
-/***/ }),
-/* 31 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__.p + "1aee46190c2f3559269cbee6ed52001c.jpg";
-
-/***/ }),
-/* 32 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__.p + "0ccf621be059235bd0644f8323a6db41.jpg";
-
-/***/ }),
-/* 33 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__.p + "5e65620feca432769ab657bd1f826a2d.jpg";
-
-/***/ }),
-/* 34 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__.p + "d1fd5c4b86b13c73dcfcc75b06c4f969.jpg";
-
-/***/ }),
-/* 35 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__.p + "877cb6be2fe14d7d07e43a43418335a9.jpg";
-
-/***/ }),
-/* 36 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__.p + "2be571afa03c2eb8f58f8bc511038232.jpg";
-
-/***/ }),
-/* 37 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__.p + "57907b2ce6222d7581854a3158c4483c.jpg";
+webpackContext.id = 37;
 
 /***/ }),
 /* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "a100f5a2f7b7b881bccb1ac5bb4e2ebc.jpg";
+module.exports = __webpack_require__.p + "63d6e6d5b56059e22245c24cb3d031a2.jpg";
 
 /***/ }),
 /* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "a5dbf8f542d296d1e5af409885be459d.jpg";
+module.exports = __webpack_require__.p + "c0c8a362c14e7405ec28c09fb570544a.jpg";
 
 /***/ }),
 /* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "b8e0f836fad7dc1a97a259de7a2310d0.jpg";
+module.exports = __webpack_require__.p + "ef8c6ab9d702b13dd21b59bff0b85ff9.jpg";
 
 /***/ }),
 /* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "82d8791138bcd8bb983e4d2a5287bad2.jpg";
+module.exports = __webpack_require__.p + "eab7cff9a46d89874a5374e5e7c51218.jpg";
 
 /***/ }),
 /* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "727e0f8396d8e4671afb759448f37067.jpg";
+module.exports = __webpack_require__.p + "8b50ec9c85b7f18358a6353ca6609402.jpg";
 
 /***/ }),
 /* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "f9c2ac8521887acaaf9f6fca18d25e5c.jpg";
+module.exports = __webpack_require__.p + "67e0f812de3d3a3e5bd542e30f9e6380.jpg";
 
 /***/ }),
 /* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "f37aedbb4984c340791ca5c6738622ff.jpg";
+module.exports = __webpack_require__.p + "a24c65de38464d2f9691daa325d6109f.jpg";
 
 /***/ }),
 /* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "b3d11facbbdc38c7965cb963214cc8f1.jpg";
+module.exports = __webpack_require__.p + "08cdac6f656922afb80f05b044f6dd0a.jpg";
 
 /***/ }),
 /* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "e34d146b7a6b2caf59df346a6b288c5e.jpg";
+module.exports = __webpack_require__.p + "c49acbdff9592d5f6fcfc28256c1cebc.jpg";
 
 /***/ }),
 /* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "990d56bf51ed2aefe27122495c5733a9.jpg";
+module.exports = __webpack_require__.p + "1aee46190c2f3559269cbee6ed52001c.jpg";
 
 /***/ }),
 /* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "48d30e94455cd0daa73ebbaab5a2c724.jpg";
+module.exports = __webpack_require__.p + "0ccf621be059235bd0644f8323a6db41.jpg";
 
 /***/ }),
 /* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "c0805990db3c31275ad20d45fee4aefa.jpg";
+module.exports = __webpack_require__.p + "5e65620feca432769ab657bd1f826a2d.jpg";
 
 /***/ }),
 /* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "768b0533e0a6a6dc966702771bb2b190.jpg";
+module.exports = __webpack_require__.p + "d1fd5c4b86b13c73dcfcc75b06c4f969.jpg";
 
 /***/ }),
 /* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "f2d39d94c5eddadfbff5c3eb78a68448.jpg";
+module.exports = __webpack_require__.p + "877cb6be2fe14d7d07e43a43418335a9.jpg";
 
 /***/ }),
 /* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "976f75fea7d5bb42019544ef90c8eb54.jpg";
+module.exports = __webpack_require__.p + "2be571afa03c2eb8f58f8bc511038232.jpg";
 
 /***/ }),
 /* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "15d1635af84cc7b745be2f4c38214cde.jpg";
+module.exports = __webpack_require__.p + "57907b2ce6222d7581854a3158c4483c.jpg";
 
 /***/ }),
 /* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "c88a07760e4051ccdaccb116174d3a3a.jpg";
+module.exports = __webpack_require__.p + "a100f5a2f7b7b881bccb1ac5bb4e2ebc.jpg";
 
 /***/ }),
 /* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "14ef691e3a1a99a3b8c4406fa65c75ee.jpg";
+module.exports = __webpack_require__.p + "a5dbf8f542d296d1e5af409885be459d.jpg";
 
 /***/ }),
 /* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "1552617ea9078a4f41a68fa7850f7cb9.jpg";
+module.exports = __webpack_require__.p + "b8e0f836fad7dc1a97a259de7a2310d0.jpg";
 
 /***/ }),
 /* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "8f87c33ae9e1ce835a14362842d307f8.jpg";
+module.exports = __webpack_require__.p + "82d8791138bcd8bb983e4d2a5287bad2.jpg";
 
 /***/ }),
 /* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "1ecb6029d88010f4c555393bd1bf2c78.jpg";
+module.exports = __webpack_require__.p + "727e0f8396d8e4671afb759448f37067.jpg";
 
 /***/ }),
 /* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "c91136b2a4bfa32a08f3032b83c671f5.jpg";
+module.exports = __webpack_require__.p + "f9c2ac8521887acaaf9f6fca18d25e5c.jpg";
 
 /***/ }),
 /* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "f3f0426e4c5ca6017b16bbe94f5c30ed.jpg";
+module.exports = __webpack_require__.p + "f37aedbb4984c340791ca5c6738622ff.jpg";
 
 /***/ }),
 /* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "fc5a8baee707c1a28a92ef2bbb7f4fc1.jpg";
+module.exports = __webpack_require__.p + "b3d11facbbdc38c7965cb963214cc8f1.jpg";
 
 /***/ }),
 /* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "454ab11d4eb3bd5d8ccd692656930fc1.jpg";
+module.exports = __webpack_require__.p + "e34d146b7a6b2caf59df346a6b288c5e.jpg";
 
 /***/ }),
 /* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "60c02faa5452c1c2a1effd8792cfa8e8.jpg";
+module.exports = __webpack_require__.p + "990d56bf51ed2aefe27122495c5733a9.jpg";
 
 /***/ }),
 /* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "d395b4064511b617813d5186112a52c0.jpg";
+module.exports = __webpack_require__.p + "48d30e94455cd0daa73ebbaab5a2c724.jpg";
 
 /***/ }),
 /* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "43f92ce21b9d7f164648444a74c9fedb.jpg";
+module.exports = __webpack_require__.p + "c0805990db3c31275ad20d45fee4aefa.jpg";
 
 /***/ }),
 /* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "4dd9e5919b5c5068399e665bbedaa571.jpg";
+module.exports = __webpack_require__.p + "768b0533e0a6a6dc966702771bb2b190.jpg";
 
 /***/ }),
 /* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "3bf477da5484dc6584ccb62122aa2601.jpg";
+module.exports = __webpack_require__.p + "f2d39d94c5eddadfbff5c3eb78a68448.jpg";
 
 /***/ }),
 /* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "aca4bf93d5a544a2fe2b0a09100de963.jpg";
+module.exports = __webpack_require__.p + "976f75fea7d5bb42019544ef90c8eb54.jpg";
 
 /***/ }),
 /* 69 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "79a825dac1759c07f1590c696097e9c2.jpg";
+module.exports = __webpack_require__.p + "15d1635af84cc7b745be2f4c38214cde.jpg";
 
 /***/ }),
 /* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "3067a6873d17c285d9b2f6820fcf1a54.jpg";
+module.exports = __webpack_require__.p + "c88a07760e4051ccdaccb116174d3a3a.jpg";
 
 /***/ }),
 /* 71 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "c6c0890fa1b0014c45137df006686364.jpg";
+module.exports = __webpack_require__.p + "14ef691e3a1a99a3b8c4406fa65c75ee.jpg";
 
 /***/ }),
 /* 72 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "4776631b843375bc19c22a99954a3c04.jpg";
+module.exports = __webpack_require__.p + "1552617ea9078a4f41a68fa7850f7cb9.jpg";
 
 /***/ }),
 /* 73 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "88c3c01b87375e161c14757eb32f27c7.jpg";
+module.exports = __webpack_require__.p + "8f87c33ae9e1ce835a14362842d307f8.jpg";
 
 /***/ }),
 /* 74 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "e60da4577bde1a56a14666155d743842.jpg";
+module.exports = __webpack_require__.p + "1ecb6029d88010f4c555393bd1bf2c78.jpg";
 
 /***/ }),
 /* 75 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "19903bcea284afa09e6aab00ca481b46.jpg";
+module.exports = __webpack_require__.p + "c91136b2a4bfa32a08f3032b83c671f5.jpg";
 
 /***/ }),
 /* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "47f1c0222d2793d6217f53d9f1fb9114.jpg";
+module.exports = __webpack_require__.p + "f3f0426e4c5ca6017b16bbe94f5c30ed.jpg";
 
 /***/ }),
 /* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "864f805bcdbb93e7be0b3ad5fe309cb8.jpg";
+module.exports = __webpack_require__.p + "fc5a8baee707c1a28a92ef2bbb7f4fc1.jpg";
 
 /***/ }),
 /* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "abb2a62133e4d3ac686a565df0aaa88b.jpg";
+module.exports = __webpack_require__.p + "454ab11d4eb3bd5d8ccd692656930fc1.jpg";
 
 /***/ }),
 /* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "ac1dc8688380048c66644e08d2610905.jpg";
+module.exports = __webpack_require__.p + "60c02faa5452c1c2a1effd8792cfa8e8.jpg";
 
 /***/ }),
 /* 80 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "761b458977979f2e1365ef38324be830.jpg";
+module.exports = __webpack_require__.p + "d395b4064511b617813d5186112a52c0.jpg";
 
 /***/ }),
 /* 81 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "45f373fa400becbc4681264df4043751.jpg";
+module.exports = __webpack_require__.p + "43f92ce21b9d7f164648444a74c9fedb.jpg";
 
 /***/ }),
 /* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "193aebebfcd5bf4ec541a57e0afd7302.jpg";
+module.exports = __webpack_require__.p + "4dd9e5919b5c5068399e665bbedaa571.jpg";
 
 /***/ }),
 /* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "207f564ccfc2eff15a86d1f151156401.jpg";
+module.exports = __webpack_require__.p + "3bf477da5484dc6584ccb62122aa2601.jpg";
 
 /***/ }),
 /* 84 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "e96a1280cbdf18368e5d964d6d7fcc59.jpg";
+module.exports = __webpack_require__.p + "aca4bf93d5a544a2fe2b0a09100de963.jpg";
 
 /***/ }),
 /* 85 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "cfe2f5013b069c36bd6d60c894a952e7.jpg";
+module.exports = __webpack_require__.p + "79a825dac1759c07f1590c696097e9c2.jpg";
 
 /***/ }),
 /* 86 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "980d87b7f442d78d029d9ecfe74fde42.jpg";
+module.exports = __webpack_require__.p + "3067a6873d17c285d9b2f6820fcf1a54.jpg";
 
 /***/ }),
 /* 87 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "c833cceef66bb5a25baa2e15325365c3.jpg";
+module.exports = __webpack_require__.p + "c6c0890fa1b0014c45137df006686364.jpg";
 
 /***/ }),
 /* 88 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "d4183df1d7b5f86a7104c9a06f7556cf.jpg";
+module.exports = __webpack_require__.p + "4776631b843375bc19c22a99954a3c04.jpg";
 
 /***/ }),
 /* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "65fdeb0305ba7b571e057f13172faa83.jpg";
+module.exports = __webpack_require__.p + "88c3c01b87375e161c14757eb32f27c7.jpg";
 
 /***/ }),
 /* 90 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "6771207522e95d419794fe0ff5cdf70f.jpg";
+module.exports = __webpack_require__.p + "e60da4577bde1a56a14666155d743842.jpg";
 
 /***/ }),
 /* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "2e6e9a88adf58dd31884d9245ced7a08.jpg";
+module.exports = __webpack_require__.p + "19903bcea284afa09e6aab00ca481b46.jpg";
 
 /***/ }),
 /* 92 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "e39462e2dff96476af8e5030a5f2e9c7.jpg";
+module.exports = __webpack_require__.p + "47f1c0222d2793d6217f53d9f1fb9114.jpg";
 
 /***/ }),
 /* 93 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "a79cbbb283ee6874551a4c65d0adf816.jpg";
+module.exports = __webpack_require__.p + "864f805bcdbb93e7be0b3ad5fe309cb8.jpg";
 
 /***/ }),
 /* 94 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "d1b0a0c246af3aeb645b2090bd783b80.jpg";
+module.exports = __webpack_require__.p + "abb2a62133e4d3ac686a565df0aaa88b.jpg";
 
 /***/ }),
 /* 95 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "4e91e17b3659989505ea24fa9fd18874.jpg";
+module.exports = __webpack_require__.p + "ac1dc8688380048c66644e08d2610905.jpg";
 
 /***/ }),
 /* 96 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "66022db8df0906e6e712ec79a476c5c4.jpg";
+module.exports = __webpack_require__.p + "761b458977979f2e1365ef38324be830.jpg";
 
 /***/ }),
 /* 97 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "c12116c57415c9dcc79b43eba306508a.jpg";
+module.exports = __webpack_require__.p + "45f373fa400becbc4681264df4043751.jpg";
 
 /***/ }),
 /* 98 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "69844651695c19b9294c5ddb85322dba.jpg";
+module.exports = __webpack_require__.p + "193aebebfcd5bf4ec541a57e0afd7302.jpg";
 
 /***/ }),
 /* 99 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "2fdaa55a2ba268e86758b6d3d780de31.jpg";
+module.exports = __webpack_require__.p + "207f564ccfc2eff15a86d1f151156401.jpg";
 
 /***/ }),
 /* 100 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "9945f0e16db28ecc1c3edc208ce70a1a.jpg";
+module.exports = __webpack_require__.p + "e96a1280cbdf18368e5d964d6d7fcc59.jpg";
 
 /***/ }),
 /* 101 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "b82b69e06357348bd762c66eb5085f0d.jpg";
+module.exports = __webpack_require__.p + "cfe2f5013b069c36bd6d60c894a952e7.jpg";
 
 /***/ }),
 /* 102 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "118c6258b08a21fdf4a50bb5deecd71d.jpg";
+module.exports = __webpack_require__.p + "980d87b7f442d78d029d9ecfe74fde42.jpg";
 
 /***/ }),
 /* 103 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "17655560edba1d0df8a43015c5ad148b.jpg";
+module.exports = __webpack_require__.p + "c833cceef66bb5a25baa2e15325365c3.jpg";
 
 /***/ }),
 /* 104 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "d192c50e78c312b996271790a15ba14e.jpg";
+module.exports = __webpack_require__.p + "d4183df1d7b5f86a7104c9a06f7556cf.jpg";
 
 /***/ }),
 /* 105 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "06fd5fd68d974553377b624595dc422f.jpg";
+module.exports = __webpack_require__.p + "65fdeb0305ba7b571e057f13172faa83.jpg";
 
 /***/ }),
 /* 106 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "94ccaf4f19c5ed395444d1d96dca4aae.jpg";
+module.exports = __webpack_require__.p + "6771207522e95d419794fe0ff5cdf70f.jpg";
 
 /***/ }),
 /* 107 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "eecafa5f5c73410100d1fc0bb1f89ef0.jpg";
+module.exports = __webpack_require__.p + "2e6e9a88adf58dd31884d9245ced7a08.jpg";
 
 /***/ }),
 /* 108 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "1c0c64bb7321d7cfa7d78fdc856db6fc.jpg";
+module.exports = __webpack_require__.p + "e39462e2dff96476af8e5030a5f2e9c7.jpg";
 
 /***/ }),
 /* 109 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "fc5a200e2275afba20c64b3addab46d0.jpg";
+module.exports = __webpack_require__.p + "a79cbbb283ee6874551a4c65d0adf816.jpg";
 
 /***/ }),
 /* 110 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "0375e913dcf904a9868a72763313e941.jpg";
+module.exports = __webpack_require__.p + "d1b0a0c246af3aeb645b2090bd783b80.jpg";
 
 /***/ }),
 /* 111 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "c1caaba064e25f05a48551ceb4468887.jpg";
+module.exports = __webpack_require__.p + "4e91e17b3659989505ea24fa9fd18874.jpg";
 
 /***/ }),
 /* 112 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "c1c0114745f08f12e1bbb66baab2f8a4.jpg";
+module.exports = __webpack_require__.p + "66022db8df0906e6e712ec79a476c5c4.jpg";
 
 /***/ }),
 /* 113 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "143dfc590e97db879c1a17d7088c0fdb.jpg";
+module.exports = __webpack_require__.p + "c12116c57415c9dcc79b43eba306508a.jpg";
 
 /***/ }),
 /* 114 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "eb52a564ce981bfa1d97e4c5e8a07141.jpg";
+module.exports = __webpack_require__.p + "69844651695c19b9294c5ddb85322dba.jpg";
 
 /***/ }),
 /* 115 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "27674d0fe3a72382e9e92b3e82c192b5.jpg";
+module.exports = __webpack_require__.p + "2fdaa55a2ba268e86758b6d3d780de31.jpg";
 
 /***/ }),
 /* 116 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "a74e7caa84ac015f22a121f6488b577f.jpg";
+module.exports = __webpack_require__.p + "9945f0e16db28ecc1c3edc208ce70a1a.jpg";
 
 /***/ }),
 /* 117 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "8ff058bc3f88963ed77a4271671d2eed.jpg";
+module.exports = __webpack_require__.p + "b82b69e06357348bd762c66eb5085f0d.jpg";
 
 /***/ }),
 /* 118 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "442d1b80827adbb14cd0cb62e1adf5b8.jpg";
+module.exports = __webpack_require__.p + "118c6258b08a21fdf4a50bb5deecd71d.jpg";
 
 /***/ }),
 /* 119 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "e1adc146fd553c3dd3d9dba85ad49402.jpg";
+module.exports = __webpack_require__.p + "17655560edba1d0df8a43015c5ad148b.jpg";
 
 /***/ }),
 /* 120 */
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-
-
-const {Game} = __webpack_require__(1);
-
-let event = {
-    name: 'template',
-    type: 'template',
-    image: 'erasmus',
-    text: 'Intro text here',
-    choices: [{
-        text: 'Choice 1',
-        effects: {
-            gold: -Game.var.amount.gold.small,
-            army: -Game.var.amount.army.medium,
-            like: -Game.var.amount.like.large
-        },
-        response: "Choice 1 response"
-    }, {
-        text: 'Choice 2',
-        effects: {
-            gold: Game.var.amount.gold.small,
-            army: Game.var.amount.army.medium,
-            like: Game.var.amount.like.large
-        },
-        response: 'Choice 2 response'
-    }]
-};
-
-module.exports = {
-    event
-};
-
+module.exports = __webpack_require__.p + "d192c50e78c312b996271790a15ba14e.jpg";
 
 /***/ }),
-/* 121 */,
+/* 121 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__.p + "06fd5fd68d974553377b624595dc422f.jpg";
+
+/***/ }),
 /* 122 */
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-
-
-const {Game} = __webpack_require__(1);
-
-let event = {
-    name: 'money-high',
-    type: 'moneyhigh',
-    image: 'machiavelli',
-    text: 'Sire, our gold reserves overflow the vault. We cannot keep this much, but we can use it for other purposes. We could hire mercenaries, or distribute it to the population. What shall we do?',
-    choices: [{
-        text: 'Hire mercenaries',
-        effects: {
-            gold: -Game.var.amount.gold.large * 3,
-            army: +Game.var.amount.army.large,
-        },
-        response: "You hire a number of professional soldiers from a band of mercenaries. They may not be loyal, but they will fight..."
-    }, {
-        text: 'Distribute money to the populace',
-        effects: {
-            gold: -Game.var.amount.gold.large * 3,
-            like: +Game.var.amount.like.large
-        },
-        response: 'You send carriages through the streets, distributing gold to the commoners in the name of the king. They leap at the coins and rejoice with smiles and laughter. Some openly weep with joy at their good fortune. There is much drunkenness that night, and everyone is heard praising the good king.'
-    }]
-};
-
-module.exports = {
-    event
-};
-
+module.exports = __webpack_require__.p + "94ccaf4f19c5ed395444d1d96dca4aae.jpg";
 
 /***/ }),
 /* 123 */
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-
-
-const {Game} = __webpack_require__(1);
-
-let event = {
-    name: 'army-high',
-    type: 'armyhigh',
-    image: 'machiavelli',
-    text: "Sire, we have many restless soldiers. We should give them something to do before they start getting ideas. I've been receiving reports that the Archduke has been actively recruiting some of the more discontent among them. We could send them on a patrol to attack the highwaymen that have been plaguing our outer roads, or we could have them roam the city, rounding up criminals. What shall it be?",
-    choices: [{
-        text: 'Send them on patrol',
-        effects: {
-            gold: +Game.var.amount.gold.large * 3,
-            army: -Game.var.amount.army.large * 2,
-        },
-        response: "The soldiers gladly obey and set out to deter, capture, and slay the robbers of your kingdom's countryside. As they root out the menace, most of the gold they capture is returned to your coffers."
-    }, {
-        text: 'Have them police the city',
-        effects: {
-            army: -Game.var.amount.army.large * 2,
-            like: +Game.var.amount.like.large
-        },
-        response: 'You send your troops through the streets of the city to round up and remove the criminal menaces that have been preying on the populace. The commoners, no longer extorted by local gangs, are very grateful.'
-    }]
-};
-
-module.exports = {
-    event
-};
-
+module.exports = __webpack_require__.p + "eecafa5f5c73410100d1fc0bb1f89ef0.jpg";
 
 /***/ }),
 /* 124 */
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-
-
-const {Game} = __webpack_require__(1);
-
-let event = {
-    name: 'army-low',
-    type: 'armylow',
-    image: 'machiavelli',
-    text: "Sire, we are running dangerously low on loyal soldiers. If we do not find more, it will be noticed, and there will be no holding off the usurpers. We can hire more from mercenary bands, or conscript the best men from the citizenry.",
-    choices: [{
-        text: 'Hire mercenaries',
-        effects: {
-            gold: -Game.var.amount.gold.large * 5,
-            army: +Game.var.amount.army.large,
-        },
-        response: "You hire a number of professional soldiers from a band of mercenaries. They may not be loyal, but they will fight..."
-    }, {
-        text: 'Conscript citizens',
-        effects: {
-            army: +Game.var.amount.army.large * 2,
-            like: -Game.var.amount.like.large * 2
-        },
-        response: 'You send out your remaining troops to forcibly conscript strong young men and boys from the populace. A few are glad of the opportunity, but most detest being taken against their will.'
-    }]
-};
-
-module.exports = {
-    event
-};
-
+module.exports = __webpack_require__.p + "1c0c64bb7321d7cfa7d78fdc856db6fc.jpg";
 
 /***/ }),
 /* 125 */
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-
-
-const {Game} = __webpack_require__(1);
-
-let event = {
-    name: 'like-high',
-    type: 'likehigh',
-    image: 'machiavelli',
-    text: "Sire, our populace is giddy with delight at the way you've been ruling. Most would lay down their lives for you. We should take advantage of this. We could raise taxes, which they would gladly pay, or we could recruit more soldiers from their ranks.",
-    choices: [{
-        text: 'Collect taxes',
-        effects: {
-            gold: +Game.var.amount.gold.large * 3,
-            like: -Game.var.amount.like.large * 2,
-        },
-        response: "You send around the tax collectors to gather additional money from the peasants. Suddenly they don't seem to like you as much..."
-    }, {
-        text: 'Recruit soldiers',
-        effects: {
-            army: +Game.var.amount.army.large,
-            like: -Game.var.amount.like.large,
-        },
-        response: "You recruit a number of young men and boys from the populace, who enter the ranks of your army willingly. Their parents and friends however, are not so happy."
-    }]
-};
-
-module.exports = {
-    event
-};
-
+module.exports = __webpack_require__.p + "fc5a200e2275afba20c64b3addab46d0.jpg";
 
 /***/ }),
 /* 126 */
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-
-
-const {Game} = __webpack_require__(1);
-
-let event = {
-    name: 'like-low',
-    type: 'likelow',
-    image: 'machiavelli',
-    text: "Sire, our populace on the verge of open revolt. They have many grievances, and we shall certainly not make it out alive if they siege the castle. We could simply shower them with gold, or we could send soldiers to root out the criminal gangs that plague the city.",
-    choices: [{
-        text: 'Distribute gold',
-        effects: {
-            gold: -Game.var.amount.gold.large * 2,
-            like: +Game.var.amount.like.large
-        },
-        response: "You send carriages through the streets, distributing gold to the commoners in the name of the king. They leap at the coins and rejoice with smiles and laughter. Some openly weep with joy at their good fortune. There is much drunkenness that night, and everyone is heard praising the good king."
-    }, {
-        text: 'Round up the criminals',
-        effects: {
-            army: -Game.var.amount.army.large * 2,
-            like: +Game.var.amount.like.large
-        },
-        response: "You send your troops through the streets of the city to round up and remove the criminal menaces that have been preying on the populace. The commoners, no longer extorted by local gangs, are very grateful."
-    }]
-};
-
-module.exports = {
-    event
-};
-
+module.exports = __webpack_require__.p + "0375e913dcf904a9868a72763313e941.jpg";
 
 /***/ }),
 /* 127 */
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-
-
-const {Game} = __webpack_require__(1);
-
-let event = {
-    name: 'bank-loan',
-    type: 'moneylow',
-    image: 'man-10',
-    text: 'A sly looking man approaches and greets you. "Greetings my good king. I have heard of your monetary plight, and have come to offer a wonderful deal." Did he just wink at the king? "In return for a relatively small number of soldiers, or alternatively a reasonable number of slaves from your populace, I could certainly help you with some extra gold. At interest, of course." Of course, you think. Well, gold is needed. What will you do?',
-    choices: [{
-        text: 'Offer soldiers',
-        effects: {
-            gold: +Game.var.amount.gold.large,
-            army: -Game.var.amount.army.medium,
-        },
-        response: "You select a mix of soldiers to transfer to them. They look disgusted, but are sworn to obey your orders. Only one objects, and the others drag him away in shame. The rest follow the banker as he leaves with a smirk."
-    }, {
-        text: 'Offer slaves',
-        effects: {
-            gold: +Game.var.amount.gold.large,
-            like: -Game.var.amount.like.large
-        },
-        response: 'You send soldiers to forcibly remove some of the less desirable but sturdy citizens. Word gets around, and the populace is not happy. The banker makes good on his gold though, at the expense of your approval, and your conscience...'
-    }]
-};
-
-module.exports = {
-    event
-};
-
+module.exports = __webpack_require__.p + "c1caaba064e25f05a48551ceb4468887.jpg";
 
 /***/ }),
 /* 128 */
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-
-
-const {Game} = __webpack_require__(1);
-
-let event = {
-    name: 'final',
-    type: 'final',
-    image: 'machiavelli',
-    text: "The hour has arrived, Your Majesty. We have gathered what gold and loyal guards we can, and the populace has been placated as much as possible. We are now at the mercy of fate. It has been my great honor and privilege to have served you.",
-    choices: [{
-        text: 'May God help us all.',
-        response: "Your chamberlain gives a grave bow and leaves your chamber to make the final preparations for escape. You sit comtemplative, thinking that you should be feeling nervous or anxious. Instead what you feel is a strange sort of giddy anticipation. There is some kind of relief at leaving all these problems behind. Whatever happens, you know you are ready.",
-    }]
-};
-
-module.exports = {
-    event
-};
-
+module.exports = __webpack_require__.p + "c1c0114745f08f12e1bbb66baab2f8a4.jpg";
 
 /***/ }),
 /* 129 */
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-
-
-const {Game} = __webpack_require__(1);
-
-let event = {
-    name: 'strange-invention',
-    type: 'random',
-    image: 'beard-man-1',
-    text: 'An odd and excited man is granted an audience. He approaches the throne with an intense look of wonder, and there is a kind of strange fire in his eyes whose origin you cannot quite discern. He approaches and speaks: "Your Majesty! I come from the far north, from a distant kingdom. They do not appreciate my genius there, but I have heard that you are far more refined. I come to offer you an invention that will bestow upon you great power..." He goes on to describe a contraption for harnessing aetheric energy whose mechanics you can\'t quite grasp. However, the uses he describes for it are truly fantastic. "I would be glad to sell you this machine, for enough money so that I may continue my research." He\'s asking for a lot. Will you buy it?',
-    choices: [{
-        text: 'Buy the stange machine',
-        effects: {
-            gold: -Game.var.amount.gold.large,
-            like: +Game.var.amount.like.medium
-        },
-        response: "While it isn't entirely useless, your best astronomers can't seem to find much use for it beyond parlour tricks. You give it to the court magician who exhibits it to a bewildered public. They don't know what to make of it either, but they seem to enjoy the spectacle, and leave whispering that the king surely has great powers..."
-    }, {
-        text: 'Lock the charlatan in the dungeon',
-        effects: {
-            like: -Game.var.amount.like.small
-        },
-        response: 'Word gets around of your cruelty. Several members of your staff seem more cautious and distant around you.'
-    },  {
-        text: 'Send the man away',
-        response: "You have no time for the silly inventions of madmen. There are great doings afoot, and you must focus on keeping alive your dynasty."
-    }, {
-        text: "Offer him a royal appointment",
-        effects: {
-            army: +Game.var.amount.army.small,
-            gold: -Game.var.amount.gold.medium,
-        },
-        response: "He accepts your offer on the condition of being given enough money to continue his research. With his machine expertise, he's able to improve a few things about your military's weapons.",
-    }]
-};
-
-module.exports = {
-    event
-};
-
+module.exports = __webpack_require__.p + "143dfc590e97db879c1a17d7088c0fdb.jpg";
 
 /***/ }),
 /* 130 */
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-
-
-const {Game} = __webpack_require__(1);
-
-let event = {
-    name: 'foreign-general',
-    type: 'random',
-    image: 'beard-man-7',
-    text: "Your chamberlain introduces a foreign general. He explains that he and what remains of his troops fled from a neighboring kingdom into your land, and seeks a place to rest and recover. He offers some of his troops and a small amount of gold. Judging by his appearance though, it seems he might have a lot more...",
-    choices: [{
-        text: 'Accept his offer',
-        effects: {
-            gold: +Game.var.amount.gold.medium,
-            like: -Game.var.amount.like.small,
-        },
-        response: "The general bows graciously and signals for a small chest of gold to be delivered at your feet. He camps outside of town while his troops recover. The population seems a bit uneasy with a foreign army outside the city."
-    }, {
-        text: 'Demand more gold',
-        effects: {
-            gold: +Game.var.amount.gold.large,
-            like: -Game.var.amount.like.medium
-        },
-        response: 'The general has no choice but to grudgingly accept your offer. He camps outside of town, but looks the other way when his soldiers decide to stir up trouble with the locals.'
-    }, {
-        text: 'Kill him and his small army',
-        effects: {
-            gold: +Game.var.amount.gold.large * 3,
-            army: -Game.var.amount.army.medium,
-            like: -Game.var.amount.like.medium,
-        },
-        response: 'The general betrays no hint of shock as he draws his sword and orders his troops to defend themselves. Your overwhelming army make short work of the remnants of his, and you discover that he was hoarding quite a lot of gold. Some of your citizens are outraged at the bloodshed, and many of them fear for their own lives.'
-    }]
-};
-
-module.exports = {
-    event
-};
-
+module.exports = __webpack_require__.p + "eb52a564ce981bfa1d97e4c5e8a07141.jpg";
 
 /***/ }),
 /* 131 */
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-
-
-const {Game} = __webpack_require__(1);
-
-let event = {
-    name: 'poison-archduke',
-    type: 'random',
-    image: 'contempt-woman',
-    text: "Late at night, your chamberlain hurriedly escorts in what appears to be a serving woman. She has an evil look about her, and after a token curtsey, explains in hushed tones that she works for the Archduke. She says has reason to despise him, but will not explain exactly why. From the look in her eyes, and your knowledge of the man, you believe she is telling the truth. She goes on to explain that his own troops could be sabotaged by poisoning the common meal they are all served. She would need supplies and a small bribe to carry out the mission.",
-    choices: [{
-        text: 'Give her supplies and gold',
-        effects: {
-            gold: -Game.var.amount.gold.medium,
-            army: +Game.var.amount.army.small,
-        },
-        response: "She thanks you, and leaves the chamber with a fierce and determined look. Later, you hear of the misfortune suffered by many soldiers among the Archduke's private guard. This will make your own army stronger by comparison."
-    }, {
-        text: 'Send the woman away',
-        response: "Poisoning is a low and dishonorable action that you refuse to take. As you send the woman away, the fire in her eyes dissipates, and a worried look appears. Who will she turn to now?"
-    }]
-};
-
-module.exports = {
-    event
-};
-
+module.exports = __webpack_require__.p + "27674d0fe3a72382e9e92b3e82c192b5.jpg";
 
 /***/ }),
 /* 132 */
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-
-
-const {Game} = __webpack_require__(1);
-
-let event = {
-    name: 'weeping-nun',
-    type: 'random',
-    image: 'crying-nun',
-    text: "A weeping nun barges into the throne room and kneels before you. You recognize her as the assistant to the mother superior at the abbey outside the city. She explains that some local scoundrels have been harassing and assaulting the sisters, causing much distress. She begs you to solve the problem. Even though she is upset, you still see a pleading mercy in her eyes.",
-    choices: [{
-        text: 'Slaughter the bastards',
-        effects: {
-            like: -Game.var.amount.like.small
-        },
-        response: "A small number of troops makes short work of the miscreants. The nuns are horrified at the bloodshed, and hold a vigil for the criminals. Perplexing."
-    }, {
-        text: 'Pay off the ruffians',
-        effects: {
-            gold: -Game.var.amount.gold.small,
-            like: +Game.var.amount.like.small,
-        },
-        response: 'While you detest bargaining with criminals, you realize that the nuns will not put up with bloodshed. You have some gold sent to them on the condition that they do not return. They greedily accept.'
-    }, {
-        text: 'Drive them away without bloodshed',
-        effects: {
-            like: +Game.var.amount.like.small,
-            army: -Game.var.amount.army.small,
-        },
-        response: 'The sisters appreciate that your troops removed the louts without killing them, but your troops do not agree. Fed up with what they see as your weakness, a few desert, and malcontent spreads among the rest.'
-    }, {
-        text: 'Send the nun away',
-        effects: {
-            like: -Game.var.amount.like.large,
-            army: -Game.var.amount.army.small,
-        },
-        response: "You don't have time to attend to the needs of these religious nuts. If their God is so merciful, why doesn't he help them? You callously send the sister away while silent tears fall from her despondent eyes. The wretches keep harassing the nuns, and your reputation among the populace and your own troops suffers for your cruelty."
-    }]
-};
-
-module.exports = {
-    event
-};
-
+module.exports = __webpack_require__.p + "a74e7caa84ac015f22a121f6488b577f.jpg";
 
 /***/ }),
 /* 133 */
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-
-
-const {Game} = __webpack_require__(1);
-
-let event = {
-    name: 'fat-merchant',
-    type: 'random',
-    image: 'fat-man-1',
-    text: "A well dressed and quite rotund man saunters into your chamber, giving an overly dramatic bow that ends with a smarmy flourish, bordering on outright disrespect. You frown as the man explains that he is the world's finest purveyor of arms, which he would gladly sell to your army. He demonstrates some of the weapons, which do seem of quite high quality. They're expensive, but they would give your army an edge...",
-    choices: [{
-        text: 'Buy arms for all your troops',
-        effects: {
-            gold: -Game.var.amount.gold.large * 2,
-            army: +Game.var.amount.army.large,
-            like: -Game.var.amount.like.small
-        },
-        response: "The merchant's eyes grow wide when you explain how many weapons you'd like to buy. He wipes his mouth and smacks his lips as he promises to have them delivered immediately. It costs a small fortune, but your soldiers seem impressed with their new hardware. Later, you notice the commoners acting more nervous than usual around your guards."
-    }, {
-        text: 'Buy arms for your elite troops',
-        effects: {
-            gold: -Game.var.amount.gold.large,
-            army: +Game.var.amount.army.medium,
-        },
-        response: "Equipping your entire army would be prohibitively expensive, so you buy enough to distribute to only your best soldiers and royal guard. The rest of your troops are a little jealous, but it also gives them incentive to climb the ranks. The merchant waddles away with a heavy sack of gold and a satisfied grin."
-    }, {
-        text: 'Send the merchant away',
-        effects: {
-            army: -Game.var.amount.army.small,
-        },
-        response: "The smile immediately drops from the merchant's fat mug, and he strides out with a look of frustration. Some of your troops, having seen the weapons on offer, are disappointed that they didn't get any."
-    }, {
-        text: 'Lock the bastard up',
-        effects: {
-            like: -Game.var.amount.like.large
-        },
-        response: "You don't take kindly to merchants who don't show proper respect and deference to the king. The man's eyes show great fear and his stammering mouth is agape in horror as he is dragged away, pleading. Word of your actions gets around, and you find it much harder to find trading partners for some reason..."
-    }]
-};
-
-module.exports = {
-    event
-};
-
+module.exports = __webpack_require__.p + "8ff058bc3f88963ed77a4271671d2eed.jpg";
 
 /***/ }),
 /* 134 */
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-
-
-const {Game} = __webpack_require__(1);
-
-let event = {
-    name: 'sorceress',
-    type: 'random',
-    image: 'sorceress',
-    text: "As you prepare for bed in your chamber, a soft and low voice from behind frightens you. \"Do not be alarmed, Your Majesty, for I come to aid you.\" Spinning around to look, and ready to shout for your guards, you see a tall, pale, and thin woman who has an otherworldly quality about her. She raises a hand and asks you to wait. Entranced, you listen. She explains that she belongs to a coven of powerful mages who practice in secret. She knows about the Archduke and his plans, somehow. Removing a small, luminescent blue stone from the folds of her robe, she promises to aid your escape in return for a select few of your family's ancient gemstones.",
-    choices: [{
-        text: 'Give her the gems',
-        effects: {
-            gold: -Game.var.amount.gold.large,
-            army: +Game.var.amount.army.large,
-        },
-        response: "She gives you a mysterious smile and assures you that you've made a wise choice. With the stone in her closed fist, she tilts her head upward and her eyes roll back while she silently chants. With a shudder, she finishes the spell, and explains that your army will have a blessing of protection when they need it most. Before you can speak, she turns and leaps out of the nearest window. You rush to the sill, but see nothing but the black night."
-    }, {
-        text: 'Call for your guards',
-        effects: {
-            army: -Game.var.amount.army.small,
-        },
-        response: '"Fool!", she yells, and throws the stone to the ground. It shatters in a blinding flash of light, and when your vision recovers, she is gone. Your guards rushes in to your aid to find you bewildered, alone, and blinking. They seem concerned, and rumor spreads among the troops that the king who commands them is going insane.'
-    }]
-};
-
-module.exports = {
-    event
-};
-
+module.exports = __webpack_require__.p + "442d1b80827adbb14cd0cb62e1adf5b8.jpg";
 
 /***/ }),
 /* 135 */
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-
-
-const {Game} = __webpack_require__(1);
-
-let event = {
-    name: 'conerned-soldier',
-    type: 'random',
-    image: 'soldier-2',
-    text: "One of your low-ranking soldiers requests a private audience with you. Noting the grave look of concern on his face, you grant his request, but ask him to make it quick. He explains that he's found out that some of the higher ranking men have been operating a smuggling operation, skimming some gold they were tasked with collecting from local lords. The soldier looks to you expectantly and explains that he does not want to be disloyal to his fellows, but could not in good conscience let them defraud the king.",
-    choices: [{
-        text: 'Purge the smugglers, promote the soldier',
-        effects: {
-            gold: +Game.var.amount.gold.small,
-            army: -Game.var.amount.army.small,
-        },
-        response: "You have the smugglers stripped of their rank and imprisoned as a warning to any others who would attempt such a thing. The young soldier is promoted and put in charge of collections. Your income immediately rises."
-    }, {
-        text: 'Kill the smugglers',
-        effects: {
-            gold: +Game.var.amount.gold.small,
-            army: -Game.var.amount.army.medium,
-            like: -Game.var.amount.like.small,
-        },
-        response: "You tell the young man you'll take care of it, and have the disloyal soldiers summarily executed. Their heads are placed on pikes around the city as a warning to any who would betray you. The young soldier, feeling responsible for their gruesome deaths, abandons his post and leaves the city. The citizens are noticeably fearful.",
-    }, {
-        text: 'Dismiss the fellow',
-        effects: {
-            army: -Game.var.amount.army.small
-        },
-        response: "You don't appreciate soldiers that are not loyal to each other, and dismiss the young man, who looks on the verge of tears. For a moment he appears as if he'll plead with you, but instead he lays his sword at your feet, turns and walks away with eyes downcast."
-    }, {
-        text: 'Blackmail the smugglers',
-        effects: {
-            army: +Game.var.amount.army.small
-        },
-        response: "You assure the young soldier you'll fix the problem. Afterward, you call the smugglers in to your chamber and explain that you know what they've been doing. Their eyes go wide, but before they can stammer a defense, you hold up your hand to silence them. Explaining that you don't care about the gold, but need their loyalty in the times ahead, you make them swear an oath to carry out any dirty work you find necessary. In return, they can keep their operation. They consider for a few moments, and come to agreement."
-    }]
-};
-
-module.exports = {
-    event
-};
-
+module.exports = __webpack_require__.p + "e1adc146fd553c3dd3d9dba85ad49402.jpg";
 
 /***/ })
 /******/ ]);

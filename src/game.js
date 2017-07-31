@@ -47,6 +47,7 @@ class Game {
         this.eventsThisTurn = 0;
         this.gameStarted = false;
         this.introShown = false;
+        this.bonusScore = 0;
 
         this.stats = {
             gold: 50,
@@ -94,20 +95,32 @@ class Game {
     eventChoice(choiceIndex) {
         let choice = this.currentEvent.choices[choiceIndex];
 
-        // send stat effects event if needed
-        if (choice.effects !== undefined) {
-            _.each(['gold', 'army', 'like'], (stat) => {
-                if (choice.effects[stat] !== undefined) {
-                    this.stats[stat] += choice.effects[stat];
-                    if (this.stats[stat] < 0) {
-                        this.stats[stat] = 0;
-                    } else if (this.stats[stat] > 100) {
-                        this.stats[stat] = 100;
-                    }
-                }
-            });
+        // if there are no effects, just send the response
+        if (choice.effects === undefined) {
+            return Actions.emit(Actions.game.respondEvent, choice.response);
         }
-        Actions.emit(Actions.game.statUpdate, this.stats);
+
+        // send stat effects event if needed
+        var statsUpdated = false;
+        _.each(['gold', 'army', 'like'], (stat) => {
+            if (choice.effects[stat] !== undefined) {
+                statsUpdated = true;
+                this.stats[stat] += choice.effects[stat];
+                if (this.stats[stat] < 0) {
+                    this.stats[stat] = 0;
+                } else if (this.stats[stat] > 100) {
+                    this.stats[stat] = 100;
+                }
+            }
+        });
+        if (statsUpdated) {
+            Actions.emit(Actions.game.statUpdate, this.stats);
+        }
+
+        // apply any special callbacks
+        if (choice.effects.callback !== undefined) {
+            choice.effects.callback();
+        }
 
         // send event response event
         Actions.emit(Actions.game.respondEvent, choice.response);
@@ -209,6 +222,8 @@ class Game {
 
         let escapeThreshold = 40;
         let average = (this.stats.gold + this.stats.army + this.stats.like) / 3;
+        average += this.bonusScore;
+
         if (average < escapeThreshold) {
             return worstOutcome;
         } else {
