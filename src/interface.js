@@ -158,8 +158,27 @@ class Interface {
     // update the display of the player's current stats
     statUpdate(stats) {
         _.each(stats, (amount, stat) => {
-            let $stat = this.$gameplay.find(`#stat-${stat}`);
-            $stat.find('.amount').text(amount);
+            var $stat = this.$gameplay.find(`#stat-${stat}`);
+
+            // animate any changes in the stat number
+            var $amount = $stat.find('.amount');
+            var curAmount = parseInt($amount.text(), 10);
+            if (amount !== curAmount) {
+                var $image = $stat.find('.image');
+                $image.css({ opacity: 0 }).addClass('flashing');
+                var time = 1000 / Math.abs(amount - curAmount);
+                var increment = (amount > curAmount ? 1 : -1);
+                var interval = setInterval(() => {
+                    if (curAmount === amount) {
+                        $image.css({ opacity: 1 }).removeClass('flashing');
+                        return clearInterval(interval);
+                    }
+                    curAmount += increment;
+                    $amount.text(curAmount);
+                }, time);
+            }
+
+            // update the meter width
             let $meter = $stat.find('.meter');
             $meter.css({ width: Math.min(amount, 100) + '%' });
             $meter[(amount >= 100 ? 'addClass' : 'removeClass')]('flashing');

@@ -17471,7 +17471,7 @@ exports = module.exports = __webpack_require__(6)(undefined);
 
 
 // module
-exports.push([module.i, "* {\n    box-sizing: border-box;\n}\n\nhtml, body {\n    margin: 0;\n    padding: 0;\n    height: 100%;\n    color: #ccc;\n}\n\nbody {\n    background: #111;\n}\n\nh1 {\n    font-size: 5em;\n}\n\nh2 {\n    font-size: 3em;\n    margin: 0;\n}\n\np {\n    font-size: 2em;\n}\n\n#templates {\n    display: none;\n}\n\n#game {\n    width: 100%;\n    height: 100%;\n    font-family: 'Fondamento', cursive;\n    overflow-y: auto;\n}\n\n#splash {\n    display: flex;\n    flex-direction: column;\n    width: 100%;\n    height: 100%;\n    background-image: url(" + __webpack_require__(7) + ");\n    background-repeat: no-repeat;\n    background-position: center top;\n    background-size: cover;\n}\n\n@media all and (min-width: 1100px) {\n    #splash {\n        background-position: center -10em;\n    }\n}\n\n#splash h1 {\n    margin-top: auto;\n    text-align: center;\n    text-shadow: 0 0 5px black;\n}\n\n#splash .new-game {\n    font-size: 3em;\n    text-shadow: 0 0 5px black;\n    margin: 0 auto;\n    margin-bottom: 10%;\n    cursor: pointer;\n    background: rgba(0,0,0,0.5);\n    padding: 0.25em;\n    border: 1px solid gold;\n}\n\n#intro {\n    padding: 2em;\n    display: flex;\n    flex-direction: column;\n}\n\n#intro h2 {\n    text-align: center;\n}\n\n#intro .start-game {\n    display: inline-block;\n    font-size: 3em;\n    text-shadow: 0 0 5px black;\n    margin: 0 auto;\n    cursor: pointer;\n    background: rgba(0,0,0,0.5);\n    padding: 0.25em;\n    border: 1px solid gold;\n}\n\n#gameplay {\n    display: flex;\n    flex-direction: column;\n    height: 100%;\n    position: relative;\n}\n\n#events {\n    flex: auto;\n    border: 10px solid #777;\n}\n\n#stats {\n    flex: none;\n    width: 100%;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n}\n\n#stats .stat {\n    border: 10px solid #777;\n    border-bottom: none;\n    width: 33.33%;\n    text-align: left;\n    font-size: 2em;\n    font-weight: bold;\n    position: relative;\n}\n\n#stats .stat .image {\n    background-repeat: no-repeat;\n    background-position: center right 5px;\n    position: absolute;\n    right: 5px;\n    top: 0;\n    width: 100%;\n    height: 100%;\n    z-index: 3;\n}\n\n#stats .stat .amount {\n    color: #ddd;\n    position: relative;\n    z-index: 2;\n    padding: 0 10px;\n}\n\n#stats .stat .meter {\n    display: block;\n    height: 100%;\n    width: 0%;\n    position: absolute;\n    z-index: 1;\n    opacity: 0.8;\n}\n\n#stat-gold .image {\n    background-image: url(" + __webpack_require__(8) + ");\n}\n#stat-gold .meter {\n    background-color: gold;\n}\n\n#stat-army .image {\n    background-image: url(" + __webpack_require__(9) + ");\n}\n#stat-army .meter {\n    background-color: red;\n}\n\n#stat-like .image {\n    background-image: url(" + __webpack_require__(10) + ");\n}\n#stat-like .meter {\n    background-color: blue;\n}\n\n@keyframes flashing {\n  50% { opacity: 1; }\n}\n\n.flashing {\n    animation: flashing 1s linear infinite;\n}\n\n#events {\n    display: flex;\n    flex-direction: column;\n    height: 100%;\n}\n\n#events .event-panel {\n    height: 50%;\n    width: 100%;\n    display: flex;\n}\n\n#events .event-panel:not(:last-child) {\n    border-bottom: 10px solid #777;\n}\n\n#event-content .event-image,\n#event-content .event-text {\n    height: 100%;\n}\n\n#event-content .event-image {\n    background-repeat: no-repeat;\n    background-position: center center;\n    background-size: cover;\n    width: 33.33%;\n}\n\n#event-content .event-text {\n    overflow-y: auto;\n    width: 66.66%;\n    padding: 20px;\n    font-size: 1.5em;\n}\n\n#event-choices {\n    overflow-y: auto;\n    flex-wrap: wrap;\n}\n\n#event-choices .event-choice {\n    flex: 1 0 33%;\n    height: 50%;\n    font-size: 2em;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    text-align: center;\n    border: 20px solid rgba(0,0,0,0);\n    box-shadow: 0 0 0 1px gold inset;\n    padding: 10px;\n    cursor: pointer;\n}\n\n#event-choices .event-choice:nth-child(3n + 2),\n#event-choices .event-choice:nth-child(3n + 3) {\n    border-left: none;\n}\n\n#event-choices .event-choice:nth-child(n + 4) {\n    border-top: none;\n}\n\n#event-choices .event-next {\n    width: 100%;\n    height: 100%;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    border: 10px solid gold;\n    font-size: 2em;\n    padding: 20px;\n    cursor: pointer;\n}\n\n#turn-display {\n    display: flex;\n    position: absolute;\n    z-index: 100;\n    height: 100%;\n    width: 100%;\n    background-color: #111;\n    text-align: center;\n    font-size: 5em;\n    border: 20px solid gold;\n    justify-content: center;\n    align-items: center;\n}\n\n#game-over-screen {\n    display: flex;\n    flex-direction: column;\n    justify-content: center;\n    align-items: center;\n    width: 100%;\n    height: 100%;\n    background: #111;\n    padding: 20px;\n}\n\n#game-over-screen h1 {\n    text-align: center;\n}\n\n#game-over-screen .description {\n    font-size: 2em;\n}\n\n#game-over-screen .play-again {\n    font-size: 3em;\n    padding: 20px;\n    border: 1px solid gold;\n    margin-top: 1em;\n    cursor: pointer;\n}\n\n@media all and (max-width: 700px) {\n    #event-content {\n        flex-direction: column;\n        align-items: center;\n    }\n    #event-content .event-image {\n        width: 75%;\n    }\n    #event-content .event-text {\n        width: 100%;\n        padding-top: 5px;\n    }\n    #event-choices .event-choice {\n        font-size: 1.2em;\n        flex: 1 0 50%;\n    }\n    #event-choices .event-choice:nth-child(3n + 2),\n    #event-choices .event-choice:nth-child(3n + 3) {\n        border-left: 20px solid rgba(0,0,0,0);\n    }\n    #event-choices .event-choice:nth-child(n + 4) {\n        border-top: 20px solid rgba(0,0,0,0);\n    }\n    #event-choices .event-choice:nth-child(2n + 2) {\n        border-left: 20px solid rgba(0,0,0,0);\n    }\n    #event-choices .event-choice:nth-child(n + 3) {\n        border-top: 20px solid rgba(0,0,0,0);\n    }\n}\n", ""]);
+exports.push([module.i, "* {\n    box-sizing: border-box;\n}\n\nhtml, body {\n    margin: 0;\n    padding: 0;\n    height: 100%;\n    color: #ccc;\n}\n\nbody {\n    background: #111;\n}\n\nh1 {\n    font-size: 5em;\n}\n\nh2 {\n    font-size: 3em;\n    margin: 0;\n}\n\np {\n    font-size: 2em;\n}\n\n#templates {\n    display: none;\n}\n\n#game {\n    width: 100%;\n    height: 100%;\n    font-family: 'Fondamento', cursive;\n    overflow-y: auto;\n}\n\n#splash {\n    display: flex;\n    flex-direction: column;\n    width: 100%;\n    height: 100%;\n    background-image: url(" + __webpack_require__(7) + ");\n    background-repeat: no-repeat;\n    background-position: center top;\n    background-size: cover;\n}\n\n@media all and (min-width: 1100px) {\n    #splash {\n        background-position: center -10em;\n    }\n}\n\n#splash h1 {\n    margin-top: auto;\n    text-align: center;\n    text-shadow: 0 0 5px black;\n}\n\n#splash .new-game {\n    font-size: 3em;\n    text-shadow: 0 0 5px black;\n    margin: 0 auto;\n    margin-bottom: 10%;\n    cursor: pointer;\n    background: rgba(0,0,0,0.5);\n    padding: 0.25em;\n    border: 1px solid gold;\n}\n\n#intro {\n    padding: 2em;\n    display: flex;\n    flex-direction: column;\n}\n\n#intro h2 {\n    text-align: center;\n}\n\n#intro .start-game {\n    display: inline-block;\n    font-size: 3em;\n    text-shadow: 0 0 5px black;\n    margin: 0 auto;\n    cursor: pointer;\n    background: rgba(0,0,0,0.5);\n    padding: 0.25em;\n    border: 1px solid gold;\n}\n\n#gameplay {\n    display: flex;\n    flex-direction: column;\n    height: 100%;\n    position: relative;\n}\n\n#events {\n    flex: auto;\n    border: 10px solid #777;\n}\n\n#stats {\n    flex: none;\n    width: 100%;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n}\n\n#stats .stat {\n    border: 10px solid #777;\n    border-bottom: none;\n    width: 33.33%;\n    text-align: left;\n    font-size: 2em;\n    font-weight: bold;\n    position: relative;\n}\n\n#stats .stat .image {\n    background-repeat: no-repeat;\n    background-position: center right 5px;\n    position: absolute;\n    right: 5px;\n    top: 0;\n    width: 100%;\n    height: 100%;\n    z-index: 3;\n}\n\n#stats .stat .amount {\n    color: #ddd;\n    position: relative;\n    z-index: 2;\n    padding: 0 10px;\n}\n\n#stats .stat .meter {\n    display: block;\n    height: 100%;\n    width: 0%;\n    position: absolute;\n    z-index: 1;\n    opacity: 0.8;\n    transition: width 1s ease-in-out;\n}\n\n#stat-gold .image {\n    background-image: url(" + __webpack_require__(8) + ");\n}\n#stat-gold .meter {\n    background-color: gold;\n}\n\n#stat-army .image {\n    background-image: url(" + __webpack_require__(9) + ");\n}\n#stat-army .meter {\n    background-color: red;\n}\n\n#stat-like .image {\n    background-image: url(" + __webpack_require__(10) + ");\n}\n#stat-like .meter {\n    background-color: blue;\n}\n\n@keyframes flashing {\n  50% { opacity: 1; }\n}\n\n.flashing {\n    animation: flashing 1s linear infinite;\n}\n\n#events {\n    display: flex;\n    flex-direction: column;\n    height: 100%;\n}\n\n#events .event-panel {\n    height: 50%;\n    width: 100%;\n    display: flex;\n}\n\n#events .event-panel:not(:last-child) {\n    border-bottom: 10px solid #777;\n}\n\n#event-content .event-image,\n#event-content .event-text {\n    height: 100%;\n}\n\n#event-content .event-image {\n    background-repeat: no-repeat;\n    background-position: center center;\n    background-size: cover;\n    width: 33.33%;\n}\n\n#event-content .event-text {\n    overflow-y: auto;\n    width: 66.66%;\n    padding: 20px;\n    font-size: 1.5em;\n}\n\n#event-choices {\n    overflow-y: auto;\n    flex-wrap: wrap;\n}\n\n#event-choices .event-choice {\n    flex: 1 0 33%;\n    height: 50%;\n    font-size: 2em;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    text-align: center;\n    border: 20px solid rgba(0,0,0,0);\n    box-shadow: 0 0 0 1px gold inset;\n    padding: 10px;\n    cursor: pointer;\n}\n\n#event-choices .event-choice:nth-child(3n + 2),\n#event-choices .event-choice:nth-child(3n + 3) {\n    border-left: none;\n}\n\n#event-choices .event-choice:nth-child(n + 4) {\n    border-top: none;\n}\n\n#event-choices .event-next {\n    width: 100%;\n    height: 100%;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    border: 10px solid gold;\n    font-size: 2em;\n    padding: 20px;\n    cursor: pointer;\n}\n\n#turn-display {\n    display: flex;\n    position: absolute;\n    z-index: 100;\n    height: 100%;\n    width: 100%;\n    background-color: #111;\n    text-align: center;\n    font-size: 5em;\n    border: 20px solid gold;\n    justify-content: center;\n    align-items: center;\n}\n\n#game-over-screen {\n    display: flex;\n    flex-direction: column;\n    justify-content: center;\n    align-items: center;\n    width: 100%;\n    height: 100%;\n    background: #111;\n    padding: 20px;\n}\n\n#game-over-screen h1 {\n    text-align: center;\n}\n\n#game-over-screen .description {\n    font-size: 2em;\n}\n\n#game-over-screen .play-again {\n    font-size: 3em;\n    padding: 20px;\n    border: 1px solid gold;\n    margin-top: 1em;\n    cursor: pointer;\n}\n\n@media all and (max-width: 700px) {\n    #event-content {\n        flex-direction: column;\n        align-items: center;\n    }\n    #event-content .event-image {\n        width: 75%;\n    }\n    #event-content .event-text {\n        width: 100%;\n        padding-top: 5px;\n    }\n    #event-choices .event-choice {\n        font-size: 1.2em;\n        flex: 1 0 50%;\n    }\n    #event-choices .event-choice:nth-child(3n + 2),\n    #event-choices .event-choice:nth-child(3n + 3) {\n        border-left: 20px solid rgba(0,0,0,0);\n    }\n    #event-choices .event-choice:nth-child(n + 4) {\n        border-top: 20px solid rgba(0,0,0,0);\n    }\n    #event-choices .event-choice:nth-child(2n + 2) {\n        border-left: 20px solid rgba(0,0,0,0);\n    }\n    #event-choices .event-choice:nth-child(n + 3) {\n        border-top: 20px solid rgba(0,0,0,0);\n    }\n}\n", ""]);
 
 // exports
 
@@ -18413,6 +18413,7 @@ var map = {
 	"./like-low.js": 126,
 	"./money-high.js": 122,
 	"./money-low.js": 127,
+	"./strange-invention.js": 129,
 	"./template.js": 120
 };
 function webpackContext(req) {
@@ -18684,8 +18685,27 @@ class Interface {
     // update the display of the player's current stats
     statUpdate(stats) {
         _.each(stats, (amount, stat) => {
-            let $stat = this.$gameplay.find(`#stat-${stat}`);
-            $stat.find('.amount').text(amount);
+            var $stat = this.$gameplay.find(`#stat-${stat}`);
+
+            // animate any changes in the stat number
+            var $amount = $stat.find('.amount');
+            var curAmount = parseInt($amount.text(), 10);
+            if (amount !== curAmount) {
+                var $image = $stat.find('.image');
+                $image.css({ opacity: 0 }).addClass('flashing');
+                var time = 1000 / Math.abs(amount - curAmount);
+                var increment = (amount > curAmount ? 1 : -1);
+                var interval = setInterval(() => {
+                    if (curAmount === amount) {
+                        $image.css({ opacity: 1 }).removeClass('flashing');
+                        return clearInterval(interval);
+                    }
+                    curAmount += increment;
+                    $amount.text(curAmount);
+                }, time);
+            }
+
+            // update the meter width
             let $meter = $stat.find('.meter');
             $meter.css({ width: Math.min(amount, 100) + '%' });
             $meter[(amount >= 100 ? 'addClass' : 'removeClass')]('flashing');
@@ -29950,6 +29970,51 @@ let event = {
     choices: [{
         text: 'May God help us all.',
         response: "Your chamberlain gives a grave bow and leaves your chamber to make the final preparations for escape. You sit comtemplative, thinking that you should be feeling nervous or anxious. Instead what you feel is a strange sort of giddy anticipation. There is some kind of relief at leaving all these problems behind. Whatever happens, you know you are ready.",
+    }]
+};
+
+module.exports = {
+    event
+};
+
+
+/***/ }),
+/* 129 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const {Game} = __webpack_require__(1);
+
+let event = {
+    name: 'strange-invention',
+    type: 'random',
+    image: 'beard-man-1',
+    text: 'An odd and excited man is granted an audience. He approaches the throne with an intense look of wonder, and there is a kind of strange fire in his eyes whose origin you cannot quite discern. He approaches and speaks: "Your Majesty! I come from the far north, from a distant kingdom. They do not appreciate my genius there, but I have heard that you are far more refined. I come to offer you an invention that will bestow upon you great power..." He goes on to describe a contraption for harnessing aetheric energy whose mechanics you can\'t quite grasp. However, the uses he describes for it are truly fantastic. "I would be glad to sell you this machine, for enough money so that I may continue my research." He\'s asking for a lot. Will you buy it?',
+    choices: [{
+        text: 'Buy the stange machine',
+        effects: {
+            gold: -Game.var.amount.gold.large,
+            like: +Game.var.amount.like.medium
+        },
+        response: "While it isn't entirely useless, your best astronomers can't seem to find much use for it beyond parlour tricks. You give it to the court magician who exhibits it to a bewildered public. They don't know what to make of it either, but they seem to enjoy the spectacle, and leave whispering that the king surely has great powers..."
+    }, {
+        text: 'Lock the charlatan in the dungeon',
+        effects: {
+            like: -Game.var.amount.like.small
+        },
+        response: 'Word gets around of your cruelty. Several members of your staff seem more cautious and distant around you.'
+    },  {
+        text: 'Send the man away',
+        response: "You have no time for the silly inventions of madmen. There are great doings afoot, and you must focus on keeping alive your dynasty."
+    }, {
+        text: "Offer him a royal appointment",
+        effects: {
+            army: +Game.var.amount.army.small,
+            gold: -Game.var.amount.gold.medium,
+        },
+        response: "He accepts your offer on the condition of being given enough money to continue his research. With his machine expertise, he's able to improve a few things about your military's weapons.",
     }]
 };
 

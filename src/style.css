@@ -147,6 +147,7 @@ p {
     position: absolute;
     z-index: 1;
     opacity: 0.8;
+    transition: width 1s ease-in-out;
 }
 
 #stat-gold .image {
