@@ -60,671 +60,11 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 1);
+/******/ 	return __webpack_require__(__webpack_require__.s = 3);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, exports, __webpack_require__) {
-
-const EventEmitter = __webpack_require__(15);
-
-const gameActions = {
-    reset        : 'game.reset',        // completely reset game
-    begin        : 'game.begin',        // begin a new game
-    beginTurn    : 'game.beginTurn',    // begin a new turn N
-    endTurn      : 'game.endTurn',      // end the current turn N
-    beginEvent   : 'game.beginEvent',   // load a new event for player to handle
-    respondEvent : 'game.respondEvent', // send a response to the player choice
-    endEvent     : 'game.endEvent',     // end the current event
-    endGame      : 'game.endGame',      // game over, send final score data
-    statUpdate   : 'game.statUpdate',   // update the current player stats
-};
-
-const interfaceActions = {
-    newGame     : 'interface.newGame',     // press New Game or Play Again
-    eventChoice : 'interface.eventChoice', // make event choice
-    doneEvent   : 'interface.doneEvent',   // press Done on event response
-};
-
-class Actions extends EventEmitter {
-    constructor() {
-        super();
-        this.game = gameActions;
-        this.interface = interfaceActions;
-    }
-}
-
-module.exports = {
-    Actions: new Actions
-};
-
-
-/***/ }),
-/* 1 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__style_css__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__style_css___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__style_css__);
-
-
-const _           = __webpack_require__(11);
-const {Game}      = __webpack_require__(14);
-const {Interface} = __webpack_require__(16);
-const {Actions}   = __webpack_require__(0);
-
-Interface.initialize();
-
-
-/***/ }),
-/* 2 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// style-loader: Adds some css to the DOM by adding a <style> tag
-
-// load the styles
-var content = __webpack_require__(3);
-if(typeof content === 'string') content = [[module.i, content, '']];
-// Prepare cssTransformation
-var transform;
-
-var options = {}
-options.transform = transform
-// add the styles to the DOM
-var update = __webpack_require__(9)(content, options);
-if(content.locals) module.exports = content.locals;
-// Hot Module Replacement
-if(false) {
-	// When the styles change, update the <style> tags
-	if(!content.locals) {
-		module.hot.accept("!!../node_modules/css-loader/index.js!./style.css", function() {
-			var newContent = require("!!../node_modules/css-loader/index.js!./style.css");
-			if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-			update(newContent);
-		});
-	}
-	// When the module is disposed, remove the <style> tags
-	module.hot.dispose(function() { update(); });
-}
-
-/***/ }),
-/* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(4)(undefined);
-// imports
-
-
-// module
-exports.push([module.i, "* {\n    box-sizing: border-box;\n}\n\nhtml, body {\n    margin: 0;\n    padding: 0;\n    height: 100%;\n    color: #ccc;\n}\n\nbody {\n    background: #111;\n}\n\nh1 {\n    font-size: 5em;\n}\n\nh2 {\n    font-size: 3em;\n    margin: 0;\n}\n\np {\n    font-size: 2em;\n}\n\n#templates {\n    display: none;\n}\n\n#game {\n    width: 100%;\n    height: 100%;\n    font-family: 'Fondamento', cursive;\n    overflow-y: auto;\n}\n\n#splash {\n    display: flex;\n    flex-direction: column;\n    width: 100%;\n    height: 100%;\n    background-image: url(" + __webpack_require__(5) + ");\n    background-repeat: no-repeat;\n    background-position: center top;\n    background-size: cover;\n}\n\n@media all and (min-width: 1100px) {\n    #splash {\n        background-position: center -10em;\n    }\n}\n\n#splash h1 {\n    margin-top: auto;\n    text-align: center;\n    text-shadow: 0 0 5px black;\n}\n\n#splash .new-game {\n    font-size: 3em;\n    text-shadow: 0 0 5px black;\n    margin: 0 auto;\n    margin-bottom: 10%;\n    cursor: pointer;\n    background: rgba(0,0,0,0.5);\n    padding: 0.25em;\n    border: 1px solid gold;\n}\n\n#intro {\n    padding: 2em;\n    display: flex;\n    flex-direction: column;\n}\n\n#intro h2 {\n    text-align: center;\n}\n\n#intro .start-game {\n    display: inline-block;\n    font-size: 3em;\n    text-shadow: 0 0 5px black;\n    margin: 0 auto;\n    cursor: pointer;\n    background: rgba(0,0,0,0.5);\n    padding: 0.25em;\n    border: 1px solid gold;\n}\n\n#gameplay {\n    display: flex;\n    flex-direction: column;\n    height: 100%;\n    position: relative;\n}\n\n#events {\n    flex: auto;\n    border: 10px solid #777;\n}\n\n#stats {\n    flex: none;\n    width: 100%;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n}\n\n#stats .stat {\n    border: 10px solid #777;\n    border-bottom: none;\n    width: 33.33%;\n    text-align: left;\n    font-size: 2em;\n    font-weight: bold;\n    position: relative;\n}\n\n#stats .stat .image {\n    background-repeat: no-repeat;\n    background-position: center right 5px;\n    position: absolute;\n    right: 5px;\n    top: 0;\n    width: 100%;\n    height: 100%;\n    z-index: 3;\n}\n\n#stats .stat .amount {\n    color: #ddd;\n    position: relative;\n    z-index: 2;\n    padding: 0 10px;\n}\n\n#stats .stat .meter {\n    display: block;\n    height: 100%;\n    width: 0%;\n    position: absolute;\n    z-index: 1;\n    opacity: 0.8;\n}\n\n#stat-gold .image {\n    background-image: url(" + __webpack_require__(6) + ");\n}\n#stat-gold .meter {\n    background-color: gold;\n}\n\n#stat-army .image {\n    background-image: url(" + __webpack_require__(7) + ");\n}\n#stat-army .meter {\n    background-color: red;\n}\n\n#stat-like .image {\n    background-image: url(" + __webpack_require__(8) + ");\n}\n#stat-like .meter {\n    background-color: blue;\n}\n\n@keyframes flashing {\n  50% { opacity: 1; }\n}\n\n.flashing {\n    animation: flashing 1s linear infinite;\n}\n\n#events {\n    display: flex;\n    flex-direction: column;\n    height: 100%;\n}\n\n#events .event-panel {\n    height: 50%;\n    width: 100%;\n    display: flex;\n}\n\n#events .event-panel:not(:last-child) {\n    border-bottom: 10px solid #777;\n}\n\n#event-content .event-image,\n#event-content .event-text {\n    height: 100%;\n}\n\n#event-content .event-image {\n    background-repeat: no-repeat;\n    background-position: center center;\n    background-size: cover;\n    width: 33.33%;\n}\n\n#event-content .event-text {\n    overflow-y: auto;\n    width: 66.66%;\n    padding: 20px;\n    font-size: 1.5em;\n}\n\n#event-choices {\n    overflow-y: auto;\n    flex-wrap: wrap;\n}\n\n#event-choices .event-choice {\n    flex: 1 0 33%;\n    height: 50%;\n    font-size: 2em;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    text-align: center;\n    border: 20px solid rgba(0,0,0,0);\n    box-shadow: 0 0 0 1px gold inset;\n    padding: 10px;\n    cursor: pointer;\n}\n\n#event-choices .event-choice:nth-child(3n + 2),\n#event-choices .event-choice:nth-child(3n + 3) {\n    border-left: none;\n}\n\n#event-choices .event-choice:nth-child(n + 4) {\n    border-top: none;\n}\n\n#event-choices .event-next {\n    width: 100%;\n    height: 100%;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    border: 10px solid gold;\n    font-size: 2em;\n    padding: 20px;\n    cursor: pointer;\n}\n\n#turn-display {\n    display: flex;\n    position: absolute;\n    z-index: 100;\n    height: 100%;\n    width: 100%;\n    background-color: #111;\n    text-align: center;\n    font-size: 5em;\n    border: 20px solid gold;\n    justify-content: center;\n    align-items: center;\n}\n\n#game-over-screen {\n    display: flex;\n    flex-direction: column;\n    justify-content: center;\n    align-items: center;\n    width: 100%;\n    height: 100%;\n    background: #111;\n    padding: 20px;\n}\n\n#game-over-screen h1 {\n    text-align: center;\n}\n\n#game-over-screen .description {\n    font-size: 2em;\n}\n\n#game-over-screen .play-again {\n    font-size: 3em;\n    padding: 20px;\n    border: 1px solid gold;\n    margin-top: 1em;\n    cursor: pointer;\n}\n\n@media all and (max-width: 700px) {\n    #event-content {\n        flex-direction: column;\n        align-items: center;\n    }\n    #event-content .event-image {\n        width: 75%;\n    }\n    #event-content .event-text {\n        width: 100%;\n        padding-top: 5px;\n    }\n    #event-choices .event-choice {\n        font-size: 1.2em;\n        flex: 1 0 50%;\n    }\n    #event-choices .event-choice:nth-child(3n + 2),\n    #event-choices .event-choice:nth-child(3n + 3) {\n        border-left: 20px solid rgba(0,0,0,0);\n    }\n    #event-choices .event-choice:nth-child(n + 4) {\n        border-top: 20px solid rgba(0,0,0,0);\n    }\n    #event-choices .event-choice:nth-child(2n + 2) {\n        border-left: 20px solid rgba(0,0,0,0);\n    }\n    #event-choices .event-choice:nth-child(n + 3) {\n        border-top: 20px solid rgba(0,0,0,0);\n    }\n}\n", ""]);
-
-// exports
-
-
-/***/ }),
-/* 4 */
-/***/ (function(module, exports) {
-
-/*
-	MIT License http://www.opensource.org/licenses/mit-license.php
-	Author Tobias Koppers @sokra
-*/
-// css base code, injected by the css-loader
-module.exports = function(useSourceMap) {
-	var list = [];
-
-	// return the list of modules as css string
-	list.toString = function toString() {
-		return this.map(function (item) {
-			var content = cssWithMappingToString(item, useSourceMap);
-			if(item[2]) {
-				return "@media " + item[2] + "{" + content + "}";
-			} else {
-				return content;
-			}
-		}).join("");
-	};
-
-	// import a list of modules into the list
-	list.i = function(modules, mediaQuery) {
-		if(typeof modules === "string")
-			modules = [[null, modules, ""]];
-		var alreadyImportedModules = {};
-		for(var i = 0; i < this.length; i++) {
-			var id = this[i][0];
-			if(typeof id === "number")
-				alreadyImportedModules[id] = true;
-		}
-		for(i = 0; i < modules.length; i++) {
-			var item = modules[i];
-			// skip already imported module
-			// this implementation is not 100% perfect for weird media query combinations
-			//  when a module is imported multiple times with different media queries.
-			//  I hope this will never occur (Hey this way we have smaller bundles)
-			if(typeof item[0] !== "number" || !alreadyImportedModules[item[0]]) {
-				if(mediaQuery && !item[2]) {
-					item[2] = mediaQuery;
-				} else if(mediaQuery) {
-					item[2] = "(" + item[2] + ") and (" + mediaQuery + ")";
-				}
-				list.push(item);
-			}
-		}
-	};
-	return list;
-};
-
-function cssWithMappingToString(item, useSourceMap) {
-	var content = item[1] || '';
-	var cssMapping = item[3];
-	if (!cssMapping) {
-		return content;
-	}
-
-	if (useSourceMap && typeof btoa === 'function') {
-		var sourceMapping = toComment(cssMapping);
-		var sourceURLs = cssMapping.sources.map(function (source) {
-			return '/*# sourceURL=' + cssMapping.sourceRoot + source + ' */'
-		});
-
-		return [content].concat(sourceURLs).concat([sourceMapping]).join('\n');
-	}
-
-	return [content].join('\n');
-}
-
-// Adapted from convert-source-map (MIT)
-function toComment(sourceMap) {
-	// eslint-disable-next-line no-undef
-	var base64 = btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap))));
-	var data = 'sourceMappingURL=data:application/json;charset=utf-8;base64,' + base64;
-
-	return '/*# ' + data + ' */';
-}
-
-
-/***/ }),
-/* 5 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__.p + "06f16c27bc17a65587c592f0617c0b58.jpg";
-
-/***/ }),
-/* 6 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__.p + "690f436fc68a202fe567287b60294221.png";
-
-/***/ }),
-/* 7 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__.p + "127145a1913c4b9b22246fafab603026.png";
-
-/***/ }),
-/* 8 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__.p + "26bb22f3c77e10055ef47e9fa81b1042.png";
-
-/***/ }),
-/* 9 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/*
-	MIT License http://www.opensource.org/licenses/mit-license.php
-	Author Tobias Koppers @sokra
-*/
-
-var stylesInDom = {};
-
-var	memoize = function (fn) {
-	var memo;
-
-	return function () {
-		if (typeof memo === "undefined") memo = fn.apply(this, arguments);
-		return memo;
-	};
-};
-
-var isOldIE = memoize(function () {
-	// Test for IE <= 9 as proposed by Browserhacks
-	// @see http://browserhacks.com/#hack-e71d8692f65334173fee715c222cb805
-	// Tests for existence of standard globals is to allow style-loader
-	// to operate correctly into non-standard environments
-	// @see https://github.com/webpack-contrib/style-loader/issues/177
-	return window && document && document.all && !window.atob;
-});
-
-var getElement = (function (fn) {
-	var memo = {};
-
-	return function(selector) {
-		if (typeof memo[selector] === "undefined") {
-			memo[selector] = fn.call(this, selector);
-		}
-
-		return memo[selector]
-	};
-})(function (target) {
-	return document.querySelector(target)
-});
-
-var singleton = null;
-var	singletonCounter = 0;
-var	stylesInsertedAtTop = [];
-
-var	fixUrls = __webpack_require__(10);
-
-module.exports = function(list, options) {
-	if (typeof DEBUG !== "undefined" && DEBUG) {
-		if (typeof document !== "object") throw new Error("The style-loader cannot be used in a non-browser environment");
-	}
-
-	options = options || {};
-
-	options.attrs = typeof options.attrs === "object" ? options.attrs : {};
-
-	// Force single-tag solution on IE6-9, which has a hard limit on the # of <style>
-	// tags it will allow on a page
-	if (!options.singleton) options.singleton = isOldIE();
-
-	// By default, add <style> tags to the <head> element
-	if (!options.insertInto) options.insertInto = "head";
-
-	// By default, add <style> tags to the bottom of the target
-	if (!options.insertAt) options.insertAt = "bottom";
-
-	var styles = listToStyles(list, options);
-
-	addStylesToDom(styles, options);
-
-	return function update (newList) {
-		var mayRemove = [];
-
-		for (var i = 0; i < styles.length; i++) {
-			var item = styles[i];
-			var domStyle = stylesInDom[item.id];
-
-			domStyle.refs--;
-			mayRemove.push(domStyle);
-		}
-
-		if(newList) {
-			var newStyles = listToStyles(newList, options);
-			addStylesToDom(newStyles, options);
-		}
-
-		for (var i = 0; i < mayRemove.length; i++) {
-			var domStyle = mayRemove[i];
-
-			if(domStyle.refs === 0) {
-				for (var j = 0; j < domStyle.parts.length; j++) domStyle.parts[j]();
-
-				delete stylesInDom[domStyle.id];
-			}
-		}
-	};
-};
-
-function addStylesToDom (styles, options) {
-	for (var i = 0; i < styles.length; i++) {
-		var item = styles[i];
-		var domStyle = stylesInDom[item.id];
-
-		if(domStyle) {
-			domStyle.refs++;
-
-			for(var j = 0; j < domStyle.parts.length; j++) {
-				domStyle.parts[j](item.parts[j]);
-			}
-
-			for(; j < item.parts.length; j++) {
-				domStyle.parts.push(addStyle(item.parts[j], options));
-			}
-		} else {
-			var parts = [];
-
-			for(var j = 0; j < item.parts.length; j++) {
-				parts.push(addStyle(item.parts[j], options));
-			}
-
-			stylesInDom[item.id] = {id: item.id, refs: 1, parts: parts};
-		}
-	}
-}
-
-function listToStyles (list, options) {
-	var styles = [];
-	var newStyles = {};
-
-	for (var i = 0; i < list.length; i++) {
-		var item = list[i];
-		var id = options.base ? item[0] + options.base : item[0];
-		var css = item[1];
-		var media = item[2];
-		var sourceMap = item[3];
-		var part = {css: css, media: media, sourceMap: sourceMap};
-
-		if(!newStyles[id]) styles.push(newStyles[id] = {id: id, parts: [part]});
-		else newStyles[id].parts.push(part);
-	}
-
-	return styles;
-}
-
-function insertStyleElement (options, style) {
-	var target = getElement(options.insertInto)
-
-	if (!target) {
-		throw new Error("Couldn't find a style target. This probably means that the value for the 'insertInto' parameter is invalid.");
-	}
-
-	var lastStyleElementInsertedAtTop = stylesInsertedAtTop[stylesInsertedAtTop.length - 1];
-
-	if (options.insertAt === "top") {
-		if (!lastStyleElementInsertedAtTop) {
-			target.insertBefore(style, target.firstChild);
-		} else if (lastStyleElementInsertedAtTop.nextSibling) {
-			target.insertBefore(style, lastStyleElementInsertedAtTop.nextSibling);
-		} else {
-			target.appendChild(style);
-		}
-		stylesInsertedAtTop.push(style);
-	} else if (options.insertAt === "bottom") {
-		target.appendChild(style);
-	} else {
-		throw new Error("Invalid value for parameter 'insertAt'. Must be 'top' or 'bottom'.");
-	}
-}
-
-function removeStyleElement (style) {
-	if (style.parentNode === null) return false;
-	style.parentNode.removeChild(style);
-
-	var idx = stylesInsertedAtTop.indexOf(style);
-	if(idx >= 0) {
-		stylesInsertedAtTop.splice(idx, 1);
-	}
-}
-
-function createStyleElement (options) {
-	var style = document.createElement("style");
-
-	options.attrs.type = "text/css";
-
-	addAttrs(style, options.attrs);
-	insertStyleElement(options, style);
-
-	return style;
-}
-
-function createLinkElement (options) {
-	var link = document.createElement("link");
-
-	options.attrs.type = "text/css";
-	options.attrs.rel = "stylesheet";
-
-	addAttrs(link, options.attrs);
-	insertStyleElement(options, link);
-
-	return link;
-}
-
-function addAttrs (el, attrs) {
-	Object.keys(attrs).forEach(function (key) {
-		el.setAttribute(key, attrs[key]);
-	});
-}
-
-function addStyle (obj, options) {
-	var style, update, remove, result;
-
-	// If a transform function was defined, run it on the css
-	if (options.transform && obj.css) {
-	    result = options.transform(obj.css);
-
-	    if (result) {
-	    	// If transform returns a value, use that instead of the original css.
-	    	// This allows running runtime transformations on the css.
-	    	obj.css = result;
-	    } else {
-	    	// If the transform function returns a falsy value, don't add this css.
-	    	// This allows conditional loading of css
-	    	return function() {
-	    		// noop
-	    	};
-	    }
-	}
-
-	if (options.singleton) {
-		var styleIndex = singletonCounter++;
-
-		style = singleton || (singleton = createStyleElement(options));
-
-		update = applyToSingletonTag.bind(null, style, styleIndex, false);
-		remove = applyToSingletonTag.bind(null, style, styleIndex, true);
-
-	} else if (
-		obj.sourceMap &&
-		typeof URL === "function" &&
-		typeof URL.createObjectURL === "function" &&
-		typeof URL.revokeObjectURL === "function" &&
-		typeof Blob === "function" &&
-		typeof btoa === "function"
-	) {
-		style = createLinkElement(options);
-		update = updateLink.bind(null, style, options);
-		remove = function () {
-			removeStyleElement(style);
-
-			if(style.href) URL.revokeObjectURL(style.href);
-		};
-	} else {
-		style = createStyleElement(options);
-		update = applyToTag.bind(null, style);
-		remove = function () {
-			removeStyleElement(style);
-		};
-	}
-
-	update(obj);
-
-	return function updateStyle (newObj) {
-		if (newObj) {
-			if (
-				newObj.css === obj.css &&
-				newObj.media === obj.media &&
-				newObj.sourceMap === obj.sourceMap
-			) {
-				return;
-			}
-
-			update(obj = newObj);
-		} else {
-			remove();
-		}
-	};
-}
-
-var replaceText = (function () {
-	var textStore = [];
-
-	return function (index, replacement) {
-		textStore[index] = replacement;
-
-		return textStore.filter(Boolean).join('\n');
-	};
-})();
-
-function applyToSingletonTag (style, index, remove, obj) {
-	var css = remove ? "" : obj.css;
-
-	if (style.styleSheet) {
-		style.styleSheet.cssText = replaceText(index, css);
-	} else {
-		var cssNode = document.createTextNode(css);
-		var childNodes = style.childNodes;
-
-		if (childNodes[index]) style.removeChild(childNodes[index]);
-
-		if (childNodes.length) {
-			style.insertBefore(cssNode, childNodes[index]);
-		} else {
-			style.appendChild(cssNode);
-		}
-	}
-}
-
-function applyToTag (style, obj) {
-	var css = obj.css;
-	var media = obj.media;
-
-	if(media) {
-		style.setAttribute("media", media)
-	}
-
-	if(style.styleSheet) {
-		style.styleSheet.cssText = css;
-	} else {
-		while(style.firstChild) {
-			style.removeChild(style.firstChild);
-		}
-
-		style.appendChild(document.createTextNode(css));
-	}
-}
-
-function updateLink (link, options, obj) {
-	var css = obj.css;
-	var sourceMap = obj.sourceMap;
-
-	/*
-		If convertToAbsoluteUrls isn't defined, but sourcemaps are enabled
-		and there is no publicPath defined then lets turn convertToAbsoluteUrls
-		on by default.  Otherwise default to the convertToAbsoluteUrls option
-		directly
-	*/
-	var autoFixUrls = options.convertToAbsoluteUrls === undefined && sourceMap;
-
-	if (options.convertToAbsoluteUrls || autoFixUrls) {
-		css = fixUrls(css);
-	}
-
-	if (sourceMap) {
-		// http://stackoverflow.com/a/26603875
-		css += "\n/*# sourceMappingURL=data:application/json;base64," + btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))) + " */";
-	}
-
-	var blob = new Blob([css], { type: "text/css" });
-
-	var oldSrc = link.href;
-
-	link.href = URL.createObjectURL(blob);
-
-	if(oldSrc) URL.revokeObjectURL(oldSrc);
-}
-
-
-/***/ }),
-/* 10 */
-/***/ (function(module, exports) {
-
-
-/**
- * When source maps are enabled, `style-loader` uses a link element with a data-uri to
- * embed the css on the page. This breaks all relative urls because now they are relative to a
- * bundle instead of the current page.
- *
- * One solution is to only use full urls, but that may be impossible.
- *
- * Instead, this function "fixes" the relative urls to be absolute according to the current page location.
- *
- * A rudimentary test suite is located at `test/fixUrls.js` and can be run via the `npm test` command.
- *
- */
-
-module.exports = function (css) {
-  // get current location
-  var location = typeof window !== "undefined" && window.location;
-
-  if (!location) {
-    throw new Error("fixUrls requires window.location");
-  }
-
-	// blank or null?
-	if (!css || typeof css !== "string") {
-	  return css;
-  }
-
-  var baseUrl = location.protocol + "//" + location.host;
-  var currentDir = baseUrl + location.pathname.replace(/\/[^\/]*$/, "/");
-
-	// convert each url(...)
-	/*
-	This regular expression is just a way to recursively match brackets within
-	a string.
-
-	 /url\s*\(  = Match on the word "url" with any whitespace after it and then a parens
-	   (  = Start a capturing group
-	     (?:  = Start a non-capturing group
-	         [^)(]  = Match anything that isn't a parentheses
-	         |  = OR
-	         \(  = Match a start parentheses
-	             (?:  = Start another non-capturing groups
-	                 [^)(]+  = Match anything that isn't a parentheses
-	                 |  = OR
-	                 \(  = Match a start parentheses
-	                     [^)(]*  = Match anything that isn't a parentheses
-	                 \)  = Match a end parentheses
-	             )  = End Group
-              *\) = Match anything and then a close parens
-          )  = Close non-capturing group
-          *  = Match anything
-       )  = Close capturing group
-	 \)  = Match a close parens
-
-	 /gi  = Get all matches, not the first.  Be case insensitive.
-	 */
-	var fixedCss = css.replace(/url\s*\(((?:[^)(]|\((?:[^)(]+|\([^)(]*\))*\))*)\)/gi, function(fullMatch, origUrl) {
-		// strip quotes (if they exist)
-		var unquotedOrigUrl = origUrl
-			.trim()
-			.replace(/^"(.*)"$/, function(o, $1){ return $1; })
-			.replace(/^'(.*)'$/, function(o, $1){ return $1; });
-
-		// already a full url? no change
-		if (/^(#|data:|http:\/\/|https:\/\/|file:\/\/\/)/i.test(unquotedOrigUrl)) {
-		  return fullMatch;
-		}
-
-		// convert the url to a full url
-		var newUrl;
-
-		if (unquotedOrigUrl.indexOf("//") === 0) {
-		  	//TODO: should we add protocol?
-			newUrl = unquotedOrigUrl;
-		} else if (unquotedOrigUrl.indexOf("/") === 0) {
-			// path should be relative to the base url
-			newUrl = baseUrl + unquotedOrigUrl; // already starts with '/'
-		} else {
-			// path should be relative to current directory
-			newUrl = currentDir + unquotedOrigUrl.replace(/^\.\//, ""); // Strip leading './'
-		}
-
-		// send back the fixed url(...)
-		return "url(" + JSON.stringify(newUrl) + ")";
-	});
-
-	// send back the fixed css
-	return fixedCss;
-};
-
-
-/***/ }),
-/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, module) {var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -17813,72 +17153,17 @@ module.exports = function (css) {
   }
 }.call(this));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(12), __webpack_require__(13)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(13), __webpack_require__(14)(module)))
 
 /***/ }),
-/* 12 */
-/***/ (function(module, exports) {
-
-var g;
-
-// This works in non-strict mode
-g = (function() {
-	return this;
-})();
-
-try {
-	// This works if eval is allowed (see CSP)
-	g = g || Function("return this")() || (1,eval)("this");
-} catch(e) {
-	// This works if the window reference is available
-	if(typeof window === "object")
-		g = window;
-}
-
-// g can still be undefined, but nothing to do about it...
-// We return undefined, instead of nothing here, so it's
-// easier to handle this case. if(!global) { ...}
-
-module.exports = g;
-
-
-/***/ }),
-/* 13 */
-/***/ (function(module, exports) {
-
-module.exports = function(module) {
-	if(!module.webpackPolyfill) {
-		module.deprecate = function() {};
-		module.paths = [];
-		// module.parent = undefined by default
-		if(!module.children) module.children = [];
-		Object.defineProperty(module, "loaded", {
-			enumerable: true,
-			get: function() {
-				return module.l;
-			}
-		});
-		Object.defineProperty(module, "id", {
-			enumerable: true,
-			get: function() {
-				return module.i;
-			}
-		});
-		module.webpackPolyfill = 1;
-	}
-	return module;
-};
-
-
-/***/ }),
-/* 14 */
+/* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-const _         = __webpack_require__(11);
-const {Actions} = __webpack_require__(0);
+const _         = __webpack_require__(0);
+const {Actions} = __webpack_require__(2);
 
 const amount = {
     gold: {
@@ -17919,8 +17204,8 @@ class Game {
 
     initialize() {
         this.turn = 0;
-        this.totalTurns = 30;
-        this.eventsPerTurn = 3;
+        this.totalTurns = 4;
+        this.eventsPerTurn = 4;
         this.eventsThisTurn = 0;
         this.gameStarted = false;
 
@@ -17951,16 +17236,16 @@ class Game {
         }
 
         if (this.turn > this.totalTurns) {
-            let result = this.getGameResult();
-            Actions.emit(Actions.game.endGame, result);
-            return;
+            return this.gameOver();
         } else if (this.eventsThisTurn === 0) {
             Actions.emit(Actions.game.beginTurn, this.turn, this.totalTurns);
         }
 
         this.eventsThisTurn++;
         this.currentEvent = this.getNewEvent();
-        Actions.emit(Actions.game.beginEvent, this.currentEvent);
+        if (this.currentEvent) {
+            Actions.emit(Actions.game.beginEvent, this.currentEvent);
+        }
     }
 
     doneEvent() {
@@ -17971,16 +17256,18 @@ class Game {
         let choice = this.currentEvent.choices[choiceIndex];
 
         // send stat effects event if needed
-        _.each(['gold', 'army', 'like'], (stat) => {
-            if (choice.effects[stat] !== undefined) {
-                this.stats[stat] += choice.effects[stat];
-                if (this.stats[stat] < 0) {
-                    this.stats[stat] = 0;
-                } else if (this.stats[stat] > 100) {
-                    this.stats[stat] = 100;
+        if (choice.effects !== undefined) {
+            _.each(['gold', 'army', 'like'], (stat) => {
+                if (choice.effects[stat] !== undefined) {
+                    this.stats[stat] += choice.effects[stat];
+                    if (this.stats[stat] < 0) {
+                        this.stats[stat] = 0;
+                    } else if (this.stats[stat] > 100) {
+                        this.stats[stat] = 100;
+                    }
                 }
-            }
-        });
+            });
+        }
         Actions.emit(Actions.game.statUpdate, this.stats);
 
         // send event response event
@@ -17991,8 +17278,24 @@ class Game {
         // choose an event according to the current game state
         // for now just random, eventually events appear based
         // on stats, previous events, etc.
-        let event = _.sample(this.events);
-        return event;
+        let event = undefined;
+
+        // first turn show the intro event
+        if (this.turn === 1 && this.eventsThisTurn === 1) {
+            event = this.pluckEvent(this.events.intro);
+        } else {
+            // otherwise return a random event
+            event = this.pluckEvent(this.events.random);
+        }
+
+        // if we somehow run out of events, it's game over I guess
+        return (event || this.gameOver());
+    }
+
+    // remove and return a random element from the given event array
+    pluckEvent(eventArray) {
+        let index = _.random(0, eventArray.length - 1);
+        return _.pullAt(eventArray, index)[0];
     }
 
     getGameResult() {
@@ -18006,20 +17309,743 @@ class Game {
         };
     }
 
+    gameOver() {
+        let result = this.getGameResult();
+        Actions.emit(Actions.game.endGame, result);
+    }
+
     /**
      * Load all events into memory
      */
     loadEvents() {
-        let req = __webpack_require__(41);
+        let req = __webpack_require__(16);
         req.keys().forEach((file) => {
             let {event} = req(file);
-            this.events.push(event);
+            if (this.events[event.type] === undefined) {
+                this.events[event.type] = [];
+            }
+            this.events[event.type].push(event);
         });
     }
 }
 
 module.exports = {
     Game: new Game()
+};
+
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+const EventEmitter = __webpack_require__(15);
+
+const gameActions = {
+    reset        : 'game.reset',        // completely reset game
+    begin        : 'game.begin',        // begin a new game
+    beginTurn    : 'game.beginTurn',    // begin a new turn N
+    endTurn      : 'game.endTurn',      // end the current turn N
+    beginEvent   : 'game.beginEvent',   // load a new event for player to handle
+    respondEvent : 'game.respondEvent', // send a response to the player choice
+    endEvent     : 'game.endEvent',     // end the current event
+    endGame      : 'game.endGame',      // game over, send final score data
+    statUpdate   : 'game.statUpdate',   // update the current player stats
+};
+
+const interfaceActions = {
+    newGame     : 'interface.newGame',     // press New Game or Play Again
+    eventChoice : 'interface.eventChoice', // make event choice
+    doneEvent   : 'interface.doneEvent',   // press Done on event response
+};
+
+class Actions extends EventEmitter {
+    constructor() {
+        super();
+        this.game = gameActions;
+        this.interface = interfaceActions;
+    }
+}
+
+module.exports = {
+    Actions: new Actions
+};
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__style_css__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__style_css___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__style_css__);
+
+
+const _           = __webpack_require__(0);
+const {Game}      = __webpack_require__(1);
+const {Interface} = __webpack_require__(19);
+const {Actions}   = __webpack_require__(2);
+
+Interface.initialize();
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(5);
+if(typeof content === 'string') content = [[module.i, content, '']];
+// Prepare cssTransformation
+var transform;
+
+var options = {}
+options.transform = transform
+// add the styles to the DOM
+var update = __webpack_require__(11)(content, options);
+if(content.locals) module.exports = content.locals;
+// Hot Module Replacement
+if(false) {
+	// When the styles change, update the <style> tags
+	if(!content.locals) {
+		module.hot.accept("!!../node_modules/css-loader/index.js!./style.css", function() {
+			var newContent = require("!!../node_modules/css-loader/index.js!./style.css");
+			if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+			update(newContent);
+		});
+	}
+	// When the module is disposed, remove the <style> tags
+	module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(6)(undefined);
+// imports
+
+
+// module
+exports.push([module.i, "* {\n    box-sizing: border-box;\n}\n\nhtml, body {\n    margin: 0;\n    padding: 0;\n    height: 100%;\n    color: #ccc;\n}\n\nbody {\n    background: #111;\n}\n\nh1 {\n    font-size: 5em;\n}\n\nh2 {\n    font-size: 3em;\n    margin: 0;\n}\n\np {\n    font-size: 2em;\n}\n\n#templates {\n    display: none;\n}\n\n#game {\n    width: 100%;\n    height: 100%;\n    font-family: 'Fondamento', cursive;\n    overflow-y: auto;\n}\n\n#splash {\n    display: flex;\n    flex-direction: column;\n    width: 100%;\n    height: 100%;\n    background-image: url(" + __webpack_require__(7) + ");\n    background-repeat: no-repeat;\n    background-position: center top;\n    background-size: cover;\n}\n\n@media all and (min-width: 1100px) {\n    #splash {\n        background-position: center -10em;\n    }\n}\n\n#splash h1 {\n    margin-top: auto;\n    text-align: center;\n    text-shadow: 0 0 5px black;\n}\n\n#splash .new-game {\n    font-size: 3em;\n    text-shadow: 0 0 5px black;\n    margin: 0 auto;\n    margin-bottom: 10%;\n    cursor: pointer;\n    background: rgba(0,0,0,0.5);\n    padding: 0.25em;\n    border: 1px solid gold;\n}\n\n#intro {\n    padding: 2em;\n    display: flex;\n    flex-direction: column;\n}\n\n#intro h2 {\n    text-align: center;\n}\n\n#intro .start-game {\n    display: inline-block;\n    font-size: 3em;\n    text-shadow: 0 0 5px black;\n    margin: 0 auto;\n    cursor: pointer;\n    background: rgba(0,0,0,0.5);\n    padding: 0.25em;\n    border: 1px solid gold;\n}\n\n#gameplay {\n    display: flex;\n    flex-direction: column;\n    height: 100%;\n    position: relative;\n}\n\n#events {\n    flex: auto;\n    border: 10px solid #777;\n}\n\n#stats {\n    flex: none;\n    width: 100%;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n}\n\n#stats .stat {\n    border: 10px solid #777;\n    border-bottom: none;\n    width: 33.33%;\n    text-align: left;\n    font-size: 2em;\n    font-weight: bold;\n    position: relative;\n}\n\n#stats .stat .image {\n    background-repeat: no-repeat;\n    background-position: center right 5px;\n    position: absolute;\n    right: 5px;\n    top: 0;\n    width: 100%;\n    height: 100%;\n    z-index: 3;\n}\n\n#stats .stat .amount {\n    color: #ddd;\n    position: relative;\n    z-index: 2;\n    padding: 0 10px;\n}\n\n#stats .stat .meter {\n    display: block;\n    height: 100%;\n    width: 0%;\n    position: absolute;\n    z-index: 1;\n    opacity: 0.8;\n}\n\n#stat-gold .image {\n    background-image: url(" + __webpack_require__(8) + ");\n}\n#stat-gold .meter {\n    background-color: gold;\n}\n\n#stat-army .image {\n    background-image: url(" + __webpack_require__(9) + ");\n}\n#stat-army .meter {\n    background-color: red;\n}\n\n#stat-like .image {\n    background-image: url(" + __webpack_require__(10) + ");\n}\n#stat-like .meter {\n    background-color: blue;\n}\n\n@keyframes flashing {\n  50% { opacity: 1; }\n}\n\n.flashing {\n    animation: flashing 1s linear infinite;\n}\n\n#events {\n    display: flex;\n    flex-direction: column;\n    height: 100%;\n}\n\n#events .event-panel {\n    height: 50%;\n    width: 100%;\n    display: flex;\n}\n\n#events .event-panel:not(:last-child) {\n    border-bottom: 10px solid #777;\n}\n\n#event-content .event-image,\n#event-content .event-text {\n    height: 100%;\n}\n\n#event-content .event-image {\n    background-repeat: no-repeat;\n    background-position: center center;\n    background-size: cover;\n    width: 33.33%;\n}\n\n#event-content .event-text {\n    overflow-y: auto;\n    width: 66.66%;\n    padding: 20px;\n    font-size: 1.5em;\n}\n\n#event-choices {\n    overflow-y: auto;\n    flex-wrap: wrap;\n}\n\n#event-choices .event-choice {\n    flex: 1 0 33%;\n    height: 50%;\n    font-size: 2em;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    text-align: center;\n    border: 20px solid rgba(0,0,0,0);\n    box-shadow: 0 0 0 1px gold inset;\n    padding: 10px;\n    cursor: pointer;\n}\n\n#event-choices .event-choice:nth-child(3n + 2),\n#event-choices .event-choice:nth-child(3n + 3) {\n    border-left: none;\n}\n\n#event-choices .event-choice:nth-child(n + 4) {\n    border-top: none;\n}\n\n#event-choices .event-next {\n    width: 100%;\n    height: 100%;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    border: 10px solid gold;\n    font-size: 2em;\n    padding: 20px;\n    cursor: pointer;\n}\n\n#turn-display {\n    display: flex;\n    position: absolute;\n    z-index: 100;\n    height: 100%;\n    width: 100%;\n    background-color: #111;\n    text-align: center;\n    font-size: 5em;\n    border: 20px solid gold;\n    justify-content: center;\n    align-items: center;\n}\n\n#game-over-screen {\n    display: flex;\n    flex-direction: column;\n    justify-content: center;\n    align-items: center;\n    width: 100%;\n    height: 100%;\n    background: #111;\n    padding: 20px;\n}\n\n#game-over-screen h1 {\n    text-align: center;\n}\n\n#game-over-screen .description {\n    font-size: 2em;\n}\n\n#game-over-screen .play-again {\n    font-size: 3em;\n    padding: 20px;\n    border: 1px solid gold;\n    margin-top: 1em;\n    cursor: pointer;\n}\n\n@media all and (max-width: 700px) {\n    #event-content {\n        flex-direction: column;\n        align-items: center;\n    }\n    #event-content .event-image {\n        width: 75%;\n    }\n    #event-content .event-text {\n        width: 100%;\n        padding-top: 5px;\n    }\n    #event-choices .event-choice {\n        font-size: 1.2em;\n        flex: 1 0 50%;\n    }\n    #event-choices .event-choice:nth-child(3n + 2),\n    #event-choices .event-choice:nth-child(3n + 3) {\n        border-left: 20px solid rgba(0,0,0,0);\n    }\n    #event-choices .event-choice:nth-child(n + 4) {\n        border-top: 20px solid rgba(0,0,0,0);\n    }\n    #event-choices .event-choice:nth-child(2n + 2) {\n        border-left: 20px solid rgba(0,0,0,0);\n    }\n    #event-choices .event-choice:nth-child(n + 3) {\n        border-top: 20px solid rgba(0,0,0,0);\n    }\n}\n", ""]);
+
+// exports
+
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports) {
+
+/*
+	MIT License http://www.opensource.org/licenses/mit-license.php
+	Author Tobias Koppers @sokra
+*/
+// css base code, injected by the css-loader
+module.exports = function(useSourceMap) {
+	var list = [];
+
+	// return the list of modules as css string
+	list.toString = function toString() {
+		return this.map(function (item) {
+			var content = cssWithMappingToString(item, useSourceMap);
+			if(item[2]) {
+				return "@media " + item[2] + "{" + content + "}";
+			} else {
+				return content;
+			}
+		}).join("");
+	};
+
+	// import a list of modules into the list
+	list.i = function(modules, mediaQuery) {
+		if(typeof modules === "string")
+			modules = [[null, modules, ""]];
+		var alreadyImportedModules = {};
+		for(var i = 0; i < this.length; i++) {
+			var id = this[i][0];
+			if(typeof id === "number")
+				alreadyImportedModules[id] = true;
+		}
+		for(i = 0; i < modules.length; i++) {
+			var item = modules[i];
+			// skip already imported module
+			// this implementation is not 100% perfect for weird media query combinations
+			//  when a module is imported multiple times with different media queries.
+			//  I hope this will never occur (Hey this way we have smaller bundles)
+			if(typeof item[0] !== "number" || !alreadyImportedModules[item[0]]) {
+				if(mediaQuery && !item[2]) {
+					item[2] = mediaQuery;
+				} else if(mediaQuery) {
+					item[2] = "(" + item[2] + ") and (" + mediaQuery + ")";
+				}
+				list.push(item);
+			}
+		}
+	};
+	return list;
+};
+
+function cssWithMappingToString(item, useSourceMap) {
+	var content = item[1] || '';
+	var cssMapping = item[3];
+	if (!cssMapping) {
+		return content;
+	}
+
+	if (useSourceMap && typeof btoa === 'function') {
+		var sourceMapping = toComment(cssMapping);
+		var sourceURLs = cssMapping.sources.map(function (source) {
+			return '/*# sourceURL=' + cssMapping.sourceRoot + source + ' */'
+		});
+
+		return [content].concat(sourceURLs).concat([sourceMapping]).join('\n');
+	}
+
+	return [content].join('\n');
+}
+
+// Adapted from convert-source-map (MIT)
+function toComment(sourceMap) {
+	// eslint-disable-next-line no-undef
+	var base64 = btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap))));
+	var data = 'sourceMappingURL=data:application/json;charset=utf-8;base64,' + base64;
+
+	return '/*# ' + data + ' */';
+}
+
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__.p + "06f16c27bc17a65587c592f0617c0b58.jpg";
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__.p + "690f436fc68a202fe567287b60294221.png";
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__.p + "127145a1913c4b9b22246fafab603026.png";
+
+/***/ }),
+/* 10 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__.p + "26bb22f3c77e10055ef47e9fa81b1042.png";
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/*
+	MIT License http://www.opensource.org/licenses/mit-license.php
+	Author Tobias Koppers @sokra
+*/
+
+var stylesInDom = {};
+
+var	memoize = function (fn) {
+	var memo;
+
+	return function () {
+		if (typeof memo === "undefined") memo = fn.apply(this, arguments);
+		return memo;
+	};
+};
+
+var isOldIE = memoize(function () {
+	// Test for IE <= 9 as proposed by Browserhacks
+	// @see http://browserhacks.com/#hack-e71d8692f65334173fee715c222cb805
+	// Tests for existence of standard globals is to allow style-loader
+	// to operate correctly into non-standard environments
+	// @see https://github.com/webpack-contrib/style-loader/issues/177
+	return window && document && document.all && !window.atob;
+});
+
+var getElement = (function (fn) {
+	var memo = {};
+
+	return function(selector) {
+		if (typeof memo[selector] === "undefined") {
+			memo[selector] = fn.call(this, selector);
+		}
+
+		return memo[selector]
+	};
+})(function (target) {
+	return document.querySelector(target)
+});
+
+var singleton = null;
+var	singletonCounter = 0;
+var	stylesInsertedAtTop = [];
+
+var	fixUrls = __webpack_require__(12);
+
+module.exports = function(list, options) {
+	if (typeof DEBUG !== "undefined" && DEBUG) {
+		if (typeof document !== "object") throw new Error("The style-loader cannot be used in a non-browser environment");
+	}
+
+	options = options || {};
+
+	options.attrs = typeof options.attrs === "object" ? options.attrs : {};
+
+	// Force single-tag solution on IE6-9, which has a hard limit on the # of <style>
+	// tags it will allow on a page
+	if (!options.singleton) options.singleton = isOldIE();
+
+	// By default, add <style> tags to the <head> element
+	if (!options.insertInto) options.insertInto = "head";
+
+	// By default, add <style> tags to the bottom of the target
+	if (!options.insertAt) options.insertAt = "bottom";
+
+	var styles = listToStyles(list, options);
+
+	addStylesToDom(styles, options);
+
+	return function update (newList) {
+		var mayRemove = [];
+
+		for (var i = 0; i < styles.length; i++) {
+			var item = styles[i];
+			var domStyle = stylesInDom[item.id];
+
+			domStyle.refs--;
+			mayRemove.push(domStyle);
+		}
+
+		if(newList) {
+			var newStyles = listToStyles(newList, options);
+			addStylesToDom(newStyles, options);
+		}
+
+		for (var i = 0; i < mayRemove.length; i++) {
+			var domStyle = mayRemove[i];
+
+			if(domStyle.refs === 0) {
+				for (var j = 0; j < domStyle.parts.length; j++) domStyle.parts[j]();
+
+				delete stylesInDom[domStyle.id];
+			}
+		}
+	};
+};
+
+function addStylesToDom (styles, options) {
+	for (var i = 0; i < styles.length; i++) {
+		var item = styles[i];
+		var domStyle = stylesInDom[item.id];
+
+		if(domStyle) {
+			domStyle.refs++;
+
+			for(var j = 0; j < domStyle.parts.length; j++) {
+				domStyle.parts[j](item.parts[j]);
+			}
+
+			for(; j < item.parts.length; j++) {
+				domStyle.parts.push(addStyle(item.parts[j], options));
+			}
+		} else {
+			var parts = [];
+
+			for(var j = 0; j < item.parts.length; j++) {
+				parts.push(addStyle(item.parts[j], options));
+			}
+
+			stylesInDom[item.id] = {id: item.id, refs: 1, parts: parts};
+		}
+	}
+}
+
+function listToStyles (list, options) {
+	var styles = [];
+	var newStyles = {};
+
+	for (var i = 0; i < list.length; i++) {
+		var item = list[i];
+		var id = options.base ? item[0] + options.base : item[0];
+		var css = item[1];
+		var media = item[2];
+		var sourceMap = item[3];
+		var part = {css: css, media: media, sourceMap: sourceMap};
+
+		if(!newStyles[id]) styles.push(newStyles[id] = {id: id, parts: [part]});
+		else newStyles[id].parts.push(part);
+	}
+
+	return styles;
+}
+
+function insertStyleElement (options, style) {
+	var target = getElement(options.insertInto)
+
+	if (!target) {
+		throw new Error("Couldn't find a style target. This probably means that the value for the 'insertInto' parameter is invalid.");
+	}
+
+	var lastStyleElementInsertedAtTop = stylesInsertedAtTop[stylesInsertedAtTop.length - 1];
+
+	if (options.insertAt === "top") {
+		if (!lastStyleElementInsertedAtTop) {
+			target.insertBefore(style, target.firstChild);
+		} else if (lastStyleElementInsertedAtTop.nextSibling) {
+			target.insertBefore(style, lastStyleElementInsertedAtTop.nextSibling);
+		} else {
+			target.appendChild(style);
+		}
+		stylesInsertedAtTop.push(style);
+	} else if (options.insertAt === "bottom") {
+		target.appendChild(style);
+	} else {
+		throw new Error("Invalid value for parameter 'insertAt'. Must be 'top' or 'bottom'.");
+	}
+}
+
+function removeStyleElement (style) {
+	if (style.parentNode === null) return false;
+	style.parentNode.removeChild(style);
+
+	var idx = stylesInsertedAtTop.indexOf(style);
+	if(idx >= 0) {
+		stylesInsertedAtTop.splice(idx, 1);
+	}
+}
+
+function createStyleElement (options) {
+	var style = document.createElement("style");
+
+	options.attrs.type = "text/css";
+
+	addAttrs(style, options.attrs);
+	insertStyleElement(options, style);
+
+	return style;
+}
+
+function createLinkElement (options) {
+	var link = document.createElement("link");
+
+	options.attrs.type = "text/css";
+	options.attrs.rel = "stylesheet";
+
+	addAttrs(link, options.attrs);
+	insertStyleElement(options, link);
+
+	return link;
+}
+
+function addAttrs (el, attrs) {
+	Object.keys(attrs).forEach(function (key) {
+		el.setAttribute(key, attrs[key]);
+	});
+}
+
+function addStyle (obj, options) {
+	var style, update, remove, result;
+
+	// If a transform function was defined, run it on the css
+	if (options.transform && obj.css) {
+	    result = options.transform(obj.css);
+
+	    if (result) {
+	    	// If transform returns a value, use that instead of the original css.
+	    	// This allows running runtime transformations on the css.
+	    	obj.css = result;
+	    } else {
+	    	// If the transform function returns a falsy value, don't add this css.
+	    	// This allows conditional loading of css
+	    	return function() {
+	    		// noop
+	    	};
+	    }
+	}
+
+	if (options.singleton) {
+		var styleIndex = singletonCounter++;
+
+		style = singleton || (singleton = createStyleElement(options));
+
+		update = applyToSingletonTag.bind(null, style, styleIndex, false);
+		remove = applyToSingletonTag.bind(null, style, styleIndex, true);
+
+	} else if (
+		obj.sourceMap &&
+		typeof URL === "function" &&
+		typeof URL.createObjectURL === "function" &&
+		typeof URL.revokeObjectURL === "function" &&
+		typeof Blob === "function" &&
+		typeof btoa === "function"
+	) {
+		style = createLinkElement(options);
+		update = updateLink.bind(null, style, options);
+		remove = function () {
+			removeStyleElement(style);
+
+			if(style.href) URL.revokeObjectURL(style.href);
+		};
+	} else {
+		style = createStyleElement(options);
+		update = applyToTag.bind(null, style);
+		remove = function () {
+			removeStyleElement(style);
+		};
+	}
+
+	update(obj);
+
+	return function updateStyle (newObj) {
+		if (newObj) {
+			if (
+				newObj.css === obj.css &&
+				newObj.media === obj.media &&
+				newObj.sourceMap === obj.sourceMap
+			) {
+				return;
+			}
+
+			update(obj = newObj);
+		} else {
+			remove();
+		}
+	};
+}
+
+var replaceText = (function () {
+	var textStore = [];
+
+	return function (index, replacement) {
+		textStore[index] = replacement;
+
+		return textStore.filter(Boolean).join('\n');
+	};
+})();
+
+function applyToSingletonTag (style, index, remove, obj) {
+	var css = remove ? "" : obj.css;
+
+	if (style.styleSheet) {
+		style.styleSheet.cssText = replaceText(index, css);
+	} else {
+		var cssNode = document.createTextNode(css);
+		var childNodes = style.childNodes;
+
+		if (childNodes[index]) style.removeChild(childNodes[index]);
+
+		if (childNodes.length) {
+			style.insertBefore(cssNode, childNodes[index]);
+		} else {
+			style.appendChild(cssNode);
+		}
+	}
+}
+
+function applyToTag (style, obj) {
+	var css = obj.css;
+	var media = obj.media;
+
+	if(media) {
+		style.setAttribute("media", media)
+	}
+
+	if(style.styleSheet) {
+		style.styleSheet.cssText = css;
+	} else {
+		while(style.firstChild) {
+			style.removeChild(style.firstChild);
+		}
+
+		style.appendChild(document.createTextNode(css));
+	}
+}
+
+function updateLink (link, options, obj) {
+	var css = obj.css;
+	var sourceMap = obj.sourceMap;
+
+	/*
+		If convertToAbsoluteUrls isn't defined, but sourcemaps are enabled
+		and there is no publicPath defined then lets turn convertToAbsoluteUrls
+		on by default.  Otherwise default to the convertToAbsoluteUrls option
+		directly
+	*/
+	var autoFixUrls = options.convertToAbsoluteUrls === undefined && sourceMap;
+
+	if (options.convertToAbsoluteUrls || autoFixUrls) {
+		css = fixUrls(css);
+	}
+
+	if (sourceMap) {
+		// http://stackoverflow.com/a/26603875
+		css += "\n/*# sourceMappingURL=data:application/json;base64," + btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))) + " */";
+	}
+
+	var blob = new Blob([css], { type: "text/css" });
+
+	var oldSrc = link.href;
+
+	link.href = URL.createObjectURL(blob);
+
+	if(oldSrc) URL.revokeObjectURL(oldSrc);
+}
+
+
+/***/ }),
+/* 12 */
+/***/ (function(module, exports) {
+
+
+/**
+ * When source maps are enabled, `style-loader` uses a link element with a data-uri to
+ * embed the css on the page. This breaks all relative urls because now they are relative to a
+ * bundle instead of the current page.
+ *
+ * One solution is to only use full urls, but that may be impossible.
+ *
+ * Instead, this function "fixes" the relative urls to be absolute according to the current page location.
+ *
+ * A rudimentary test suite is located at `test/fixUrls.js` and can be run via the `npm test` command.
+ *
+ */
+
+module.exports = function (css) {
+  // get current location
+  var location = typeof window !== "undefined" && window.location;
+
+  if (!location) {
+    throw new Error("fixUrls requires window.location");
+  }
+
+	// blank or null?
+	if (!css || typeof css !== "string") {
+	  return css;
+  }
+
+  var baseUrl = location.protocol + "//" + location.host;
+  var currentDir = baseUrl + location.pathname.replace(/\/[^\/]*$/, "/");
+
+	// convert each url(...)
+	/*
+	This regular expression is just a way to recursively match brackets within
+	a string.
+
+	 /url\s*\(  = Match on the word "url" with any whitespace after it and then a parens
+	   (  = Start a capturing group
+	     (?:  = Start a non-capturing group
+	         [^)(]  = Match anything that isn't a parentheses
+	         |  = OR
+	         \(  = Match a start parentheses
+	             (?:  = Start another non-capturing groups
+	                 [^)(]+  = Match anything that isn't a parentheses
+	                 |  = OR
+	                 \(  = Match a start parentheses
+	                     [^)(]*  = Match anything that isn't a parentheses
+	                 \)  = Match a end parentheses
+	             )  = End Group
+              *\) = Match anything and then a close parens
+          )  = Close non-capturing group
+          *  = Match anything
+       )  = Close capturing group
+	 \)  = Match a close parens
+
+	 /gi  = Get all matches, not the first.  Be case insensitive.
+	 */
+	var fixedCss = css.replace(/url\s*\(((?:[^)(]|\((?:[^)(]+|\([^)(]*\))*\))*)\)/gi, function(fullMatch, origUrl) {
+		// strip quotes (if they exist)
+		var unquotedOrigUrl = origUrl
+			.trim()
+			.replace(/^"(.*)"$/, function(o, $1){ return $1; })
+			.replace(/^'(.*)'$/, function(o, $1){ return $1; });
+
+		// already a full url? no change
+		if (/^(#|data:|http:\/\/|https:\/\/|file:\/\/\/)/i.test(unquotedOrigUrl)) {
+		  return fullMatch;
+		}
+
+		// convert the url to a full url
+		var newUrl;
+
+		if (unquotedOrigUrl.indexOf("//") === 0) {
+		  	//TODO: should we add protocol?
+			newUrl = unquotedOrigUrl;
+		} else if (unquotedOrigUrl.indexOf("/") === 0) {
+			// path should be relative to the base url
+			newUrl = baseUrl + unquotedOrigUrl; // already starts with '/'
+		} else {
+			// path should be relative to current directory
+			newUrl = currentDir + unquotedOrigUrl.replace(/^\.\//, ""); // Strip leading './'
+		}
+
+		// send back the fixed url(...)
+		return "url(" + JSON.stringify(newUrl) + ")";
+	});
+
+	// send back the fixed css
+	return fixedCss;
+};
+
+
+/***/ }),
+/* 13 */
+/***/ (function(module, exports) {
+
+var g;
+
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || Function("return this")() || (1,eval)("this");
+} catch(e) {
+	// This works if the window reference is available
+	if(typeof window === "object")
+		g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
+
+
+/***/ }),
+/* 14 */
+/***/ (function(module, exports) {
+
+module.exports = function(module) {
+	if(!module.webpackPolyfill) {
+		module.deprecate = function() {};
+		module.paths = [];
+		// module.parent = undefined by default
+		if(!module.children) module.children = [];
+		Object.defineProperty(module, "loaded", {
+			enumerable: true,
+			get: function() {
+				return module.l;
+			}
+		});
+		Object.defineProperty(module, "id", {
+			enumerable: true,
+			get: function() {
+				return module.i;
+			}
+		});
+		module.webpackPolyfill = 1;
+	}
+	return module;
 };
 
 
@@ -18335,12 +18361,124 @@ function isUndefined(arg) {
 /* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
+var map = {
+	"./barbarians-attack-farmers.js": 17,
+	"./intro.js": 18
+};
+function webpackContext(req) {
+	return __webpack_require__(webpackContextResolve(req));
+};
+function webpackContextResolve(req) {
+	var id = map[req];
+	if(!(id + 1)) // check for number or string
+		throw new Error("Cannot find module '" + req + "'.");
+	return id;
+};
+webpackContext.keys = function webpackContextKeys() {
+	return Object.keys(map);
+};
+webpackContext.resolve = webpackContextResolve;
+module.exports = webpackContext;
+webpackContext.id = 16;
+
+/***/ }),
+/* 17 */
+/***/ (function(module, exports, __webpack_require__) {
+
 "use strict";
 
 
-const _ = __webpack_require__(11);
-const $ = __webpack_require__(17);
-const {Actions} = __webpack_require__(0);
+const {Game} = __webpack_require__(1);
+
+let event = {
+    name: 'barbarians-attack-farmers',
+    type: 'random',
+    image: 'machiavelli',
+    text: 'Your majesty, I have grave news I must impart. There is a legion of barbarians on the outskirts of the city, harassing the local farmers. They will slaughter them if we do not send them gold.',
+    choices: [{
+        text: 'Send them gold',
+        effects: {
+            gold: -Game.var.amount.gold.medium,
+            like: Game.var.amount.like.medium
+        },
+        response: "The barbarians courteously take your money and leave. The farmers are greatly relieved and encouraged that you would consider their lives to be worth so much money."
+    }, {
+        text: 'Send them some peasant girls',
+        effects: {
+            gold: Game.var.amount.gold.small,
+            like: -Game.var.amount.like.large
+        },
+        response: 'Most of the girls are unwilling, but your soldiers see to it that they go. The barbarian chieftan is perplexed at first, but smiles broadly when he understands your offer. They leave with the frightened, pleading girls in tow.'
+    }, {
+        text: 'Attack with your best legion',
+        effects: {
+            gold: Game.var.amount.gold.small,
+            army: -Game.var.amount.army.small,
+        },
+        response: 'Your finest soldiers make short work of the barbarians, slaughtering dozens before the rest cut their losses and retreat. Some of your soldiers have been gravely wounded, however. At least the fiends dropped some of their ill-gotten gold as they fled.'
+    }, {
+        text: 'Attack with your worst legion',
+        effects: {
+            army: Game.var.amount.army.medium,
+        },
+        response: "Even your worst soldiers don't have much trouble chasing off the scoundrels. A score of men on each side are killed, and the barbarians begrudgingly retreat."
+    }, {
+        text: 'Give the farmers weapons',
+        effects: {
+            gold: -Game.var.amount.gold.small,
+            like: -Game.var.amount.like.medium,
+        },
+        response: "The bewildered farmers don't understand at first, but a look of incredulity appears on their faces as the situation becomes clear to them. Reluctantly they pick up the weapons, unsure of how to wield them. Not wanting to engage the invaders head-on, they wait in ambush until nightfall, when the barbarians start setting houses on fire and kicking down doors. Surprisingly, the farmers kill quite a few, but suffer many losses themselves. The barbarians take what meager treasure they find, and ride off to the next village."
+    }, {
+        text: 'Do nothing',
+        effects: {
+            gold: -Game.var.amount.gold.small,
+            like: -Game.var.amount.like.large,
+        },
+        response: "Rumor gets around that you don't intend to give the raiders a response. Offended, they slaughter dozens of innocent farmers, and confiscate everything of value they find before riding off."
+    }],
+};
+
+module.exports = {
+    event
+};
+
+
+/***/ }),
+/* 18 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const {Game} = __webpack_require__(1);
+
+let event = {
+    name: 'intro',
+    type: 'intro',
+    image: 'machiavelli',
+    text: 'Your Majesty, we must act quickly. In order for your Heir to escape safely, we must have enough gold to bribe those who must be bribed en route, enough loyal soldiers to see us through, and enough approval of the citizenry so that our passage will not be obstructed.',
+    choices: [{
+        text: 'Let us begin.',
+        response: "We have four weeks to prepare. You must continue to decide and delegate on anything that happens in the interim. Godspeed."
+    }],
+};
+
+module.exports = {
+    event
+};
+
+
+/***/ }),
+/* 19 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const _ = __webpack_require__(0);
+const $ = __webpack_require__(20);
+const {Actions} = __webpack_require__(2);
 
 class Interface {
     constructor() {
@@ -18432,7 +18570,7 @@ class Interface {
     // show turn intro
     beginTurn(turn, totalTurns) {
         var $turnDisplay = this.$gameplay.find('#turn-display');
-        let text = (turn === totalTurns) ? 'Final Day' : `Day ${turn}`;
+        let text = (turn === totalTurns) ? 'Final Week' : `Week ${turn}`;
         $turnDisplay.find('.text').text(text);
 
         var timedFade = (timeout) => {
@@ -18459,7 +18597,7 @@ class Interface {
         let $eventChoices = this.$gameplay.find('#event-choices');
 
         // load the face image
-        let image = __webpack_require__(42)(`./${event.image}.jpg`);
+        let image = __webpack_require__(21)(`./${event.image}.jpg`);
         $eventContent.find('.event-image').css({
             'background-image': `url("${image}")`
         });
@@ -18523,7 +18661,7 @@ module.exports = {
 
 
 /***/ }),
-/* 17 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -28783,96 +28921,108 @@ return jQuery;
 
 
 /***/ }),
-/* 18 */,
-/* 19 */,
-/* 20 */,
-/* 21 */,
-/* 22 */,
-/* 23 */,
-/* 24 */,
-/* 25 */,
-/* 26 */,
-/* 27 */,
-/* 28 */,
-/* 29 */,
-/* 30 */,
-/* 31 */,
-/* 32 */,
-/* 33 */,
-/* 34 */,
-/* 35 */,
-/* 36 */,
-/* 37 */,
-/* 38 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-const {Game} = __webpack_require__(14);
-
-let event = {
-    name: 'barbarians-attack-farmers',
-    type: 'random',
-    image: 'machiavelli',
-    text: 'Your majesty, I have grave news I must impart. There is a legion of barbarians on the outskirts of the city, harassing the local farmers. They will slaughter them if we do not send them gold.',
-    choices: [{
-        text: 'Send them gold',
-        effects: {
-            gold: -Game.var.amount.gold.medium,
-            like: Game.var.amount.like.medium
-        },
-        response: "The barbarians courteously take your money and leave. The farmers are greatly relieved and encouraged that you would consider their lives to be worth so much gold."
-    }, {
-        text: 'Send them some peasant girls',
-        effects: {
-            gold: Game.var.amount.gold.small,
-            like: -Game.var.amount.like.large
-        },
-        response: 'Most of the girls are unwilling, but your soldiers see to it that they go. The barbarian chieftan is perplexed at first, but smiles broadly when he understands your offer. They leave with the frightened, pleading girls in tow.'
-    }, {
-        text: 'Attack with your best legion',
-        effects: {
-            gold: Game.var.amount.gold.small,
-            army: -Game.var.amount.army.small,
-        },
-        response: 'Your finest soldiers make short work of the barbarians, slaughtering dozens before the rest cut their losses and retreat. Some of your soldiers have been gravely wounded, however. At least the fiends dropped some of their ill-gotten gold as they fled.'
-    }, {
-        text: 'Attack with your worst legion',
-        effects: {
-            army: Game.var.amount.army.medium,
-        },
-        response: "Even your worst soldiers don't have much trouble chasing off the scoundrels. A score of men on each side are killed, and the barbarians begrudgingly retreat."
-    }, {
-        text: 'Give the farmers weapons',
-        effects: {
-            gold: -Game.var.amount.gold.small,
-            like: -Game.var.amount.like.medium,
-        },
-        response: "The bewildered farmers don't understand at first, but a look of incredulity appears on their faces as the situation becomes clear to them. Reluctantly they pick up the weapons, unsure of how to wield them. Not wanting to engage the invaders head-on, they wait in ambush until nightfall, when the barbarians start setting houses on fire and kicking down doors. Surprisingly, the farmers kill quite a few, but suffer many losses themselves. The barbarians take what meager treasure they find, and ride off to the next village."
-    }, {
-        text: 'Do nothing',
-        effects: {
-            gold: -Game.var.amount.gold.small,
-            like: -Game.var.amount.like.large,
-        },
-        response: "Rumor gets around that you don't intend to give the raiders a response. Offended, they slaughter dozens of innocent farmers, and confiscate everything of value they find before riding off."
-    }],
-};
-
-module.exports = {
-    event
-};
-
-
-/***/ }),
-/* 39 */,
-/* 40 */,
-/* 41 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var map = {
-	"./barbarians-attack-farmers.js": 38
+	"./angry-man-1.jpg": 22,
+	"./beard-man-1.jpg": 23,
+	"./beard-man-10.jpg": 24,
+	"./beard-man-11.jpg": 25,
+	"./beard-man-12.jpg": 26,
+	"./beard-man-13.jpg": 27,
+	"./beard-man-14.jpg": 28,
+	"./beard-man-2.jpg": 29,
+	"./beard-man-3.jpg": 30,
+	"./beard-man-4.jpg": 31,
+	"./beard-man-5.jpg": 32,
+	"./beard-man-6.jpg": 33,
+	"./beard-man-7.jpg": 34,
+	"./beard-man-8.jpg": 35,
+	"./beard-man-9.jpg": 36,
+	"./boy-2.jpg": 37,
+	"./contempt-woman.jpg": 38,
+	"./crosseyed-man.jpg": 39,
+	"./crying-nun.jpg": 40,
+	"./deformed-man.jpg": 41,
+	"./erasmus.jpg": 42,
+	"./fat-man-1.jpg": 43,
+	"./girl-1.jpg": 44,
+	"./girl-2.jpg": 45,
+	"./girl-3.jpg": 46,
+	"./girl-4.jpg": 47,
+	"./girl-5.jpg": 48,
+	"./grave-man.jpg": 49,
+	"./heir.jpg": 50,
+	"./horror-man.jpg": 51,
+	"./machiavelli.jpg": 52,
+	"./man-1.jpg": 53,
+	"./man-10.jpg": 54,
+	"./man-11.jpg": 55,
+	"./man-12.jpg": 56,
+	"./man-13.jpg": 57,
+	"./man-14.jpg": 58,
+	"./man-15.jpg": 59,
+	"./man-2.jpg": 60,
+	"./man-3.jpg": 61,
+	"./man-4.jpg": 62,
+	"./man-5.jpg": 63,
+	"./man-6.jpg": 64,
+	"./man-7.jpg": 65,
+	"./man-8.jpg": 66,
+	"./man-9.jpg": 67,
+	"./moustache-man-1.jpg": 68,
+	"./moustache-man-2.jpg": 69,
+	"./moustache-man-3.jpg": 70,
+	"./moustache-man-4.jpg": 71,
+	"./moustache-man-5.jpg": 72,
+	"./moustache-man-6.jpg": 73,
+	"./moustache-man-7.jpg": 74,
+	"./moustache-man-8.jpg": 75,
+	"./moustache-man-9.jpg": 76,
+	"./nun.jpg": 77,
+	"./old-man-1.jpg": 78,
+	"./old-man-2.jpg": 79,
+	"./old-man-3.jpg": 80,
+	"./old-man-4.jpg": 81,
+	"./old-woman-1.jpg": 82,
+	"./old-woman-2.jpg": 83,
+	"./old-woman-3.jpg": 84,
+	"./old-woman-4.jpg": 85,
+	"./old-woman-5.jpg": 86,
+	"./princely-man.jpg": 87,
+	"./queen.jpg": 88,
+	"./regal-woman-1.jpg": 89,
+	"./regal-woman-2.jpg": 90,
+	"./regal-woman-3.jpg": 91,
+	"./regal-woman-4.jpg": 92,
+	"./scar-man.jpg": 93,
+	"./scruffy-man.jpg": 94,
+	"./sideburns-man-1.jpg": 95,
+	"./smug-man-1.jpg": 96,
+	"./soldier-1.jpg": 97,
+	"./soldier-2.jpg": 98,
+	"./sorceress.jpg": 99,
+	"./weary-man-1.jpg": 100,
+	"./woman-.jpg": 101,
+	"./woman-1.jpg": 102,
+	"./woman-10.jpg": 103,
+	"./woman-11.jpg": 104,
+	"./woman-12.jpg": 105,
+	"./woman-13.jpg": 106,
+	"./woman-14.jpg": 107,
+	"./woman-15.jpg": 108,
+	"./woman-16.jpg": 109,
+	"./woman-2.jpg": 110,
+	"./woman-3.jpg": 111,
+	"./woman-4.jpg": 112,
+	"./woman-5.jpg": 113,
+	"./woman-6.jpg": 114,
+	"./woman-7.jpg": 115,
+	"./woman-8.jpg": 116,
+	"./woman-9.jpg": 117,
+	"./woman-and-child.jpg": 118,
+	"./young-man-1.jpg": 119
 };
 function webpackContext(req) {
 	return __webpack_require__(webpackContextResolve(req));
@@ -28888,808 +29038,592 @@ webpackContext.keys = function webpackContextKeys() {
 };
 webpackContext.resolve = webpackContextResolve;
 module.exports = webpackContext;
-webpackContext.id = 41;
+webpackContext.id = 21;
 
 /***/ }),
-/* 42 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var map = {
-	"./angry-man-1.jpg": 141,
-	"./beard-man-1.jpg": 142,
-	"./beard-man-10.jpg": 143,
-	"./beard-man-11.jpg": 144,
-	"./beard-man-12.jpg": 145,
-	"./beard-man-13.jpg": 146,
-	"./beard-man-14.jpg": 147,
-	"./beard-man-2.jpg": 148,
-	"./beard-man-3.jpg": 149,
-	"./beard-man-4.jpg": 150,
-	"./beard-man-5.jpg": 151,
-	"./beard-man-6.jpg": 152,
-	"./beard-man-7.jpg": 153,
-	"./beard-man-8.jpg": 154,
-	"./beard-man-9.jpg": 155,
-	"./boy-2.jpg": 156,
-	"./contempt-woman.jpg": 157,
-	"./crosseyed-man.jpg": 158,
-	"./crying-nun.jpg": 159,
-	"./deformed-man.jpg": 160,
-	"./erasmus.jpg": 139,
-	"./fat-man-1.jpg": 161,
-	"./girl-1.jpg": 162,
-	"./girl-2.jpg": 163,
-	"./girl-3.jpg": 164,
-	"./girl-4.jpg": 165,
-	"./girl-5.jpg": 166,
-	"./grave-man.jpg": 167,
-	"./heir.jpg": 168,
-	"./horror-man.jpg": 169,
-	"./machiavelli.jpg": 140,
-	"./man-1.jpg": 170,
-	"./man-10.jpg": 171,
-	"./man-11.jpg": 172,
-	"./man-12.jpg": 173,
-	"./man-13.jpg": 174,
-	"./man-14.jpg": 175,
-	"./man-15.jpg": 176,
-	"./man-2.jpg": 177,
-	"./man-3.jpg": 178,
-	"./man-4.jpg": 179,
-	"./man-5.jpg": 180,
-	"./man-6.jpg": 181,
-	"./man-7.jpg": 182,
-	"./man-8.jpg": 183,
-	"./man-9.jpg": 184,
-	"./moustache-man-1.jpg": 185,
-	"./moustache-man-2.jpg": 186,
-	"./moustache-man-3.jpg": 187,
-	"./moustache-man-4.jpg": 188,
-	"./moustache-man-5.jpg": 189,
-	"./moustache-man-6.jpg": 190,
-	"./moustache-man-7.jpg": 191,
-	"./moustache-man-8.jpg": 192,
-	"./moustache-man-9.jpg": 193,
-	"./nun.jpg": 194,
-	"./old-man-1.jpg": 195,
-	"./old-man-2.jpg": 196,
-	"./old-man-3.jpg": 197,
-	"./old-man-4.jpg": 198,
-	"./old-woman-1.jpg": 199,
-	"./old-woman-2.jpg": 200,
-	"./old-woman-3.jpg": 201,
-	"./old-woman-4.jpg": 202,
-	"./old-woman-5.jpg": 203,
-	"./princely-man.jpg": 204,
-	"./queen.jpg": 205,
-	"./regal-woman-1.jpg": 206,
-	"./regal-woman-2.jpg": 207,
-	"./regal-woman-3.jpg": 208,
-	"./regal-woman-4.jpg": 209,
-	"./scar-man.jpg": 210,
-	"./scruffy-man.jpg": 211,
-	"./sideburns-man-1.jpg": 212,
-	"./smug-man-1.jpg": 213,
-	"./soldier-1.jpg": 214,
-	"./soldier-2.jpg": 215,
-	"./sorceress.jpg": 216,
-	"./weary-man-1.jpg": 217,
-	"./woman-.jpg": 218,
-	"./woman-1.jpg": 219,
-	"./woman-10.jpg": 220,
-	"./woman-11.jpg": 221,
-	"./woman-12.jpg": 222,
-	"./woman-13.jpg": 223,
-	"./woman-14.jpg": 224,
-	"./woman-15.jpg": 225,
-	"./woman-16.jpg": 226,
-	"./woman-2.jpg": 227,
-	"./woman-3.jpg": 228,
-	"./woman-4.jpg": 229,
-	"./woman-5.jpg": 230,
-	"./woman-6.jpg": 231,
-	"./woman-7.jpg": 232,
-	"./woman-8.jpg": 233,
-	"./woman-9.jpg": 234,
-	"./woman-and-child.jpg": 235,
-	"./young-man-1.jpg": 236
-};
-function webpackContext(req) {
-	return __webpack_require__(webpackContextResolve(req));
-};
-function webpackContextResolve(req) {
-	var id = map[req];
-	if(!(id + 1)) // check for number or string
-		throw new Error("Cannot find module '" + req + "'.");
-	return id;
-};
-webpackContext.keys = function webpackContextKeys() {
-	return Object.keys(map);
-};
-webpackContext.resolve = webpackContextResolve;
-module.exports = webpackContext;
-webpackContext.id = 42;
-
-/***/ }),
-/* 43 */,
-/* 44 */,
-/* 45 */,
-/* 46 */,
-/* 47 */,
-/* 48 */,
-/* 49 */,
-/* 50 */,
-/* 51 */,
-/* 52 */,
-/* 53 */,
-/* 54 */,
-/* 55 */,
-/* 56 */,
-/* 57 */,
-/* 58 */,
-/* 59 */,
-/* 60 */,
-/* 61 */,
-/* 62 */,
-/* 63 */,
-/* 64 */,
-/* 65 */,
-/* 66 */,
-/* 67 */,
-/* 68 */,
-/* 69 */,
-/* 70 */,
-/* 71 */,
-/* 72 */,
-/* 73 */,
-/* 74 */,
-/* 75 */,
-/* 76 */,
-/* 77 */,
-/* 78 */,
-/* 79 */,
-/* 80 */,
-/* 81 */,
-/* 82 */,
-/* 83 */,
-/* 84 */,
-/* 85 */,
-/* 86 */,
-/* 87 */,
-/* 88 */,
-/* 89 */,
-/* 90 */,
-/* 91 */,
-/* 92 */,
-/* 93 */,
-/* 94 */,
-/* 95 */,
-/* 96 */,
-/* 97 */,
-/* 98 */,
-/* 99 */,
-/* 100 */,
-/* 101 */,
-/* 102 */,
-/* 103 */,
-/* 104 */,
-/* 105 */,
-/* 106 */,
-/* 107 */,
-/* 108 */,
-/* 109 */,
-/* 110 */,
-/* 111 */,
-/* 112 */,
-/* 113 */,
-/* 114 */,
-/* 115 */,
-/* 116 */,
-/* 117 */,
-/* 118 */,
-/* 119 */,
-/* 120 */,
-/* 121 */,
-/* 122 */,
-/* 123 */,
-/* 124 */,
-/* 125 */,
-/* 126 */,
-/* 127 */,
-/* 128 */,
-/* 129 */,
-/* 130 */,
-/* 131 */,
-/* 132 */,
-/* 133 */,
-/* 134 */,
-/* 135 */,
-/* 136 */,
-/* 137 */,
-/* 138 */,
-/* 139 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__.p + "727e0f8396d8e4671afb759448f37067.jpg";
-
-/***/ }),
-/* 140 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__.p + "976f75fea7d5bb42019544ef90c8eb54.jpg";
-
-/***/ }),
-/* 141 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "63d6e6d5b56059e22245c24cb3d031a2.jpg";
 
 /***/ }),
-/* 142 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "c0c8a362c14e7405ec28c09fb570544a.jpg";
 
 /***/ }),
-/* 143 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "ef8c6ab9d702b13dd21b59bff0b85ff9.jpg";
 
 /***/ }),
-/* 144 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "eab7cff9a46d89874a5374e5e7c51218.jpg";
 
 /***/ }),
-/* 145 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "8b50ec9c85b7f18358a6353ca6609402.jpg";
 
 /***/ }),
-/* 146 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "67e0f812de3d3a3e5bd542e30f9e6380.jpg";
 
 /***/ }),
-/* 147 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "a24c65de38464d2f9691daa325d6109f.jpg";
 
 /***/ }),
-/* 148 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "08cdac6f656922afb80f05b044f6dd0a.jpg";
 
 /***/ }),
-/* 149 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "c49acbdff9592d5f6fcfc28256c1cebc.jpg";
 
 /***/ }),
-/* 150 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "1aee46190c2f3559269cbee6ed52001c.jpg";
 
 /***/ }),
-/* 151 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "0ccf621be059235bd0644f8323a6db41.jpg";
 
 /***/ }),
-/* 152 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "5e65620feca432769ab657bd1f826a2d.jpg";
 
 /***/ }),
-/* 153 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "d1fd5c4b86b13c73dcfcc75b06c4f969.jpg";
 
 /***/ }),
-/* 154 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "877cb6be2fe14d7d07e43a43418335a9.jpg";
 
 /***/ }),
-/* 155 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "2be571afa03c2eb8f58f8bc511038232.jpg";
 
 /***/ }),
-/* 156 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "57907b2ce6222d7581854a3158c4483c.jpg";
 
 /***/ }),
-/* 157 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "a100f5a2f7b7b881bccb1ac5bb4e2ebc.jpg";
 
 /***/ }),
-/* 158 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "a5dbf8f542d296d1e5af409885be459d.jpg";
 
 /***/ }),
-/* 159 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "b8e0f836fad7dc1a97a259de7a2310d0.jpg";
 
 /***/ }),
-/* 160 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "82d8791138bcd8bb983e4d2a5287bad2.jpg";
 
 /***/ }),
-/* 161 */
+/* 42 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__.p + "727e0f8396d8e4671afb759448f37067.jpg";
+
+/***/ }),
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "f9c2ac8521887acaaf9f6fca18d25e5c.jpg";
 
 /***/ }),
-/* 162 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "f37aedbb4984c340791ca5c6738622ff.jpg";
 
 /***/ }),
-/* 163 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "b3d11facbbdc38c7965cb963214cc8f1.jpg";
 
 /***/ }),
-/* 164 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "e34d146b7a6b2caf59df346a6b288c5e.jpg";
 
 /***/ }),
-/* 165 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "990d56bf51ed2aefe27122495c5733a9.jpg";
 
 /***/ }),
-/* 166 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "48d30e94455cd0daa73ebbaab5a2c724.jpg";
 
 /***/ }),
-/* 167 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "c0805990db3c31275ad20d45fee4aefa.jpg";
 
 /***/ }),
-/* 168 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "768b0533e0a6a6dc966702771bb2b190.jpg";
 
 /***/ }),
-/* 169 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "f2d39d94c5eddadfbff5c3eb78a68448.jpg";
 
 /***/ }),
-/* 170 */
+/* 52 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__.p + "976f75fea7d5bb42019544ef90c8eb54.jpg";
+
+/***/ }),
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "15d1635af84cc7b745be2f4c38214cde.jpg";
 
 /***/ }),
-/* 171 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "c88a07760e4051ccdaccb116174d3a3a.jpg";
 
 /***/ }),
-/* 172 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "14ef691e3a1a99a3b8c4406fa65c75ee.jpg";
 
 /***/ }),
-/* 173 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "1552617ea9078a4f41a68fa7850f7cb9.jpg";
 
 /***/ }),
-/* 174 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "8f87c33ae9e1ce835a14362842d307f8.jpg";
 
 /***/ }),
-/* 175 */
+/* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "1ecb6029d88010f4c555393bd1bf2c78.jpg";
 
 /***/ }),
-/* 176 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "c91136b2a4bfa32a08f3032b83c671f5.jpg";
 
 /***/ }),
-/* 177 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "f3f0426e4c5ca6017b16bbe94f5c30ed.jpg";
 
 /***/ }),
-/* 178 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "fc5a8baee707c1a28a92ef2bbb7f4fc1.jpg";
 
 /***/ }),
-/* 179 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "454ab11d4eb3bd5d8ccd692656930fc1.jpg";
 
 /***/ }),
-/* 180 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "60c02faa5452c1c2a1effd8792cfa8e8.jpg";
 
 /***/ }),
-/* 181 */
+/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "d395b4064511b617813d5186112a52c0.jpg";
 
 /***/ }),
-/* 182 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "43f92ce21b9d7f164648444a74c9fedb.jpg";
 
 /***/ }),
-/* 183 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "4dd9e5919b5c5068399e665bbedaa571.jpg";
 
 /***/ }),
-/* 184 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "3bf477da5484dc6584ccb62122aa2601.jpg";
 
 /***/ }),
-/* 185 */
+/* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "aca4bf93d5a544a2fe2b0a09100de963.jpg";
 
 /***/ }),
-/* 186 */
+/* 69 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "79a825dac1759c07f1590c696097e9c2.jpg";
 
 /***/ }),
-/* 187 */
+/* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "3067a6873d17c285d9b2f6820fcf1a54.jpg";
 
 /***/ }),
-/* 188 */
+/* 71 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "c6c0890fa1b0014c45137df006686364.jpg";
 
 /***/ }),
-/* 189 */
+/* 72 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "4776631b843375bc19c22a99954a3c04.jpg";
 
 /***/ }),
-/* 190 */
+/* 73 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "88c3c01b87375e161c14757eb32f27c7.jpg";
 
 /***/ }),
-/* 191 */
+/* 74 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "e60da4577bde1a56a14666155d743842.jpg";
 
 /***/ }),
-/* 192 */
+/* 75 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "19903bcea284afa09e6aab00ca481b46.jpg";
 
 /***/ }),
-/* 193 */
+/* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "47f1c0222d2793d6217f53d9f1fb9114.jpg";
 
 /***/ }),
-/* 194 */
+/* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "864f805bcdbb93e7be0b3ad5fe309cb8.jpg";
 
 /***/ }),
-/* 195 */
+/* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "abb2a62133e4d3ac686a565df0aaa88b.jpg";
 
 /***/ }),
-/* 196 */
+/* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "ac1dc8688380048c66644e08d2610905.jpg";
 
 /***/ }),
-/* 197 */
+/* 80 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "761b458977979f2e1365ef38324be830.jpg";
 
 /***/ }),
-/* 198 */
+/* 81 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "45f373fa400becbc4681264df4043751.jpg";
 
 /***/ }),
-/* 199 */
+/* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "193aebebfcd5bf4ec541a57e0afd7302.jpg";
 
 /***/ }),
-/* 200 */
+/* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "207f564ccfc2eff15a86d1f151156401.jpg";
 
 /***/ }),
-/* 201 */
+/* 84 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "e96a1280cbdf18368e5d964d6d7fcc59.jpg";
 
 /***/ }),
-/* 202 */
+/* 85 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "cfe2f5013b069c36bd6d60c894a952e7.jpg";
 
 /***/ }),
-/* 203 */
+/* 86 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "980d87b7f442d78d029d9ecfe74fde42.jpg";
 
 /***/ }),
-/* 204 */
+/* 87 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "c833cceef66bb5a25baa2e15325365c3.jpg";
 
 /***/ }),
-/* 205 */
+/* 88 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "d4183df1d7b5f86a7104c9a06f7556cf.jpg";
 
 /***/ }),
-/* 206 */
+/* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "65fdeb0305ba7b571e057f13172faa83.jpg";
 
 /***/ }),
-/* 207 */
+/* 90 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "6771207522e95d419794fe0ff5cdf70f.jpg";
 
 /***/ }),
-/* 208 */
+/* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "2e6e9a88adf58dd31884d9245ced7a08.jpg";
 
 /***/ }),
-/* 209 */
+/* 92 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "e39462e2dff96476af8e5030a5f2e9c7.jpg";
 
 /***/ }),
-/* 210 */
+/* 93 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "a79cbbb283ee6874551a4c65d0adf816.jpg";
 
 /***/ }),
-/* 211 */
+/* 94 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "d1b0a0c246af3aeb645b2090bd783b80.jpg";
 
 /***/ }),
-/* 212 */
+/* 95 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "4e91e17b3659989505ea24fa9fd18874.jpg";
 
 /***/ }),
-/* 213 */
+/* 96 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "66022db8df0906e6e712ec79a476c5c4.jpg";
 
 /***/ }),
-/* 214 */
+/* 97 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "c12116c57415c9dcc79b43eba306508a.jpg";
 
 /***/ }),
-/* 215 */
+/* 98 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "69844651695c19b9294c5ddb85322dba.jpg";
 
 /***/ }),
-/* 216 */
+/* 99 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "2fdaa55a2ba268e86758b6d3d780de31.jpg";
 
 /***/ }),
-/* 217 */
+/* 100 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "9945f0e16db28ecc1c3edc208ce70a1a.jpg";
 
 /***/ }),
-/* 218 */
+/* 101 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "b82b69e06357348bd762c66eb5085f0d.jpg";
 
 /***/ }),
-/* 219 */
+/* 102 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "118c6258b08a21fdf4a50bb5deecd71d.jpg";
 
 /***/ }),
-/* 220 */
+/* 103 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "17655560edba1d0df8a43015c5ad148b.jpg";
 
 /***/ }),
-/* 221 */
+/* 104 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "d192c50e78c312b996271790a15ba14e.jpg";
 
 /***/ }),
-/* 222 */
+/* 105 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "06fd5fd68d974553377b624595dc422f.jpg";
 
 /***/ }),
-/* 223 */
+/* 106 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "94ccaf4f19c5ed395444d1d96dca4aae.jpg";
 
 /***/ }),
-/* 224 */
+/* 107 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "eecafa5f5c73410100d1fc0bb1f89ef0.jpg";
 
 /***/ }),
-/* 225 */
+/* 108 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "1c0c64bb7321d7cfa7d78fdc856db6fc.jpg";
 
 /***/ }),
-/* 226 */
+/* 109 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "fc5a200e2275afba20c64b3addab46d0.jpg";
 
 /***/ }),
-/* 227 */
+/* 110 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "0375e913dcf904a9868a72763313e941.jpg";
 
 /***/ }),
-/* 228 */
+/* 111 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "c1caaba064e25f05a48551ceb4468887.jpg";
 
 /***/ }),
-/* 229 */
+/* 112 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "c1c0114745f08f12e1bbb66baab2f8a4.jpg";
 
 /***/ }),
-/* 230 */
+/* 113 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "143dfc590e97db879c1a17d7088c0fdb.jpg";
 
 /***/ }),
-/* 231 */
+/* 114 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "eb52a564ce981bfa1d97e4c5e8a07141.jpg";
 
 /***/ }),
-/* 232 */
+/* 115 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "27674d0fe3a72382e9e92b3e82c192b5.jpg";
 
 /***/ }),
-/* 233 */
+/* 116 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "a74e7caa84ac015f22a121f6488b577f.jpg";
 
 /***/ }),
-/* 234 */
+/* 117 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "8ff058bc3f88963ed77a4271671d2eed.jpg";
 
 /***/ }),
-/* 235 */
+/* 118 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "442d1b80827adbb14cd0cb62e1adf5b8.jpg";
 
 /***/ }),
-/* 236 */
+/* 119 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "e1adc146fd553c3dd3d9dba85ad49402.jpg";

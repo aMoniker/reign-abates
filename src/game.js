@@ -42,8 +42,8 @@ class Game {
 
     initialize() {
         this.turn = 0;
-        this.totalTurns = 30;
-        this.eventsPerTurn = 3;
+        this.totalTurns = 4;
+        this.eventsPerTurn = 4;
         this.eventsThisTurn = 0;
         this.gameStarted = false;
 
@@ -74,16 +74,16 @@ class Game {
         }
 
         if (this.turn > this.totalTurns) {
-            let result = this.getGameResult();
-            Actions.emit(Actions.game.endGame, result);
-            return;
+            return this.gameOver();
         } else if (this.eventsThisTurn === 0) {
             Actions.emit(Actions.game.beginTurn, this.turn, this.totalTurns);
         }
 
         this.eventsThisTurn++;
         this.currentEvent = this.getNewEvent();
-        Actions.emit(Actions.game.beginEvent, this.currentEvent);
+        if (this.currentEvent) {
+            Actions.emit(Actions.game.beginEvent, this.currentEvent);
+        }
     }
 
     doneEvent() {
@@ -94,16 +94,18 @@ class Game {
         let choice = this.currentEvent.choices[choiceIndex];
 
         // send stat effects event if needed
-        _.each(['gold', 'army', 'like'], (stat) => {
-            if (choice.effects[stat] !== undefined) {
-                this.stats[stat] += choice.effects[stat];
-                if (this.stats[stat] < 0) {
-                    this.stats[stat] = 0;
-                } else if (this.stats[stat] > 100) {
-                    this.stats[stat] = 100;
+        if (choice.effects !== undefined) {
+            _.each(['gold', 'army', 'like'], (stat) => {
+                if (choice.effects[stat] !== undefined) {
+                    this.stats[stat] += choice.effects[stat];
+                    if (this.stats[stat] < 0) {
+                        this.stats[stat] = 0;
+                    } else if (this.stats[stat] > 100) {
+                        this.stats[stat] = 100;
+                    }
                 }
-            }
-        });
+            });
+        }
         Actions.emit(Actions.game.statUpdate, this.stats);
 
         // send event response event
@@ -114,8 +116,24 @@ class Game {
         // choose an event according to the current game state
         // for now just random, eventually events appear based
         // on stats, previous events, etc.
-        let event = _.sample(this.events);
-        return event;
+        let event = undefined;
+
+        // first turn show the intro event
+        if (this.turn === 1 && this.eventsThisTurn === 1) {
+            event = this.pluckEvent(this.events.intro);
+        } else {
+            // otherwise return a random event
+            event = this.pluckEvent(this.events.random);
+        }
+
+        // if we somehow run out of events, it's game over I guess
+        return (event || this.gameOver());
+    }
+
+    // remove and return a random element from the given event array
+    pluckEvent(eventArray) {
+        let index = _.random(0, eventArray.length - 1);
+        return _.pullAt(eventArray, index)[0];
     }
 
     getGameResult() {
@@ -129,6 +147,11 @@ class Game {
         };
     }
 
+    gameOver() {
+        let result = this.getGameResult();
+        Actions.emit(Actions.game.endGame, result);
+    }
+
     /**
      * Load all events into memory
      */
@@ -136,7 +159,10 @@ class Game {
         let req = require.context('./events/', false, /\.js$/);
         req.keys().forEach((file) => {
             let {event} = req(file);
-            this.events.push(event);
+            if (this.events[event.type] === undefined) {
+                this.events[event.type] = [];
+            }
+            this.events[event.type].push(event);
         });
     }
 }

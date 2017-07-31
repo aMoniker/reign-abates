@@ -94,7 +94,7 @@ class Interface {
     // show turn intro
     beginTurn(turn, totalTurns) {
         var $turnDisplay = this.$gameplay.find('#turn-display');
-        let text = (turn === totalTurns) ? 'Final Day' : `Day ${turn}`;
+        let text = (turn === totalTurns) ? 'Final Week' : `Week ${turn}`;
         $turnDisplay.find('.text').text(text);
 
         var timedFade = (timeout) => {

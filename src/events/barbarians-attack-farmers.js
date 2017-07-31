@@ -13,7 +13,7 @@ let event = {
             gold: -Game.var.amount.gold.medium,
             like: Game.var.amount.like.medium
         },
-        response: "The barbarians courteously take your money and leave. The farmers are greatly relieved and encouraged that you would consider their lives to be worth so much gold."
+        response: "The barbarians courteously take your money and leave. The farmers are greatly relieved and encouraged that you would consider their lives to be worth so much money."
     }, {
         text: 'Send them some peasant girls',
         effects: {
