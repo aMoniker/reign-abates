@@ -6,35 +6,58 @@
 </head>
 <body>
     <div id="game"></div>
-    <div id="game-template">
-        <!-- <div id="fade"></div> -->
-        <div id="splash">
-            <h1>The Reign Abates</h1>
-            <div class="new-game">New Game</div>
-        </div>
-        <div id="intro">
-            <h2>The Situation</h2>
-            <div class="description">
-                <p>Your Majesty, our worst suspicions were correct. Your own Archduke has been plotting against you! He plans to murder you and your only Heir, thereby usurping the rulership of your kingdom. His plans are set to be executed on the eve of the Anniversary of your Coronation, in one month's time.</p>
-                <p>However, he does not know that we have found out. While there are many powerful forces at work, and it is much too late to undo his plans entirely, there is still a chance for your Heir to escape &mdash; and you as well, God willing.</p>
-                <p>Please, Your Majesty! Gather your resources, delegate your forces, and make certain your Heir escapes so that he may one day reclaim his rightful throne! If Your Majesty, His Queen, and myself, His humble Chamberlain are able to escape as well, all the better...</p>
-                <p>But, at any cost &mdash; your Heir must survive!</p>
+    <div id="templates">
+        <div id="game-template">
+            <div id="splash">
+                <h1>The Reign Abates</h1>
+                <div class="new-game">New Game</div>
             </div>
-            <div class="start-game">Begin</div>
-        </div>
-        <div id="gameplay">
-            <div id="stats">
-                <div class="stat" id="stat-gold">
-                    <div class="amount">0</div>
+            <div id="intro">
+                <h2>The Situation</h2>
+                <div class="description">
+                    <p>Your Majesty, our worst suspicions were correct. Your own Archduke has been plotting against you! He plans to murder you and your only Heir, thereby usurping the rulership of your kingdom. His plans are set to be executed on the eve of the Anniversary of your Coronation, in one month's time.</p>
+                    <p>However, he does not know that we have found out. While there are many powerful forces at work, and it is much too late to undo his plans entirely, there is still a chance for your Heir to escape &mdash; and you as well, God willing.</p>
+                    <p>Please, Your Majesty! Gather your resources, delegate your forces, and make certain your Heir escapes so that he may one day reclaim his rightful throne! If Your Majesty, His Queen, and myself, His humble Chamberlain are able to escape as well, all the better...</p>
+                    <p>But, at any cost &mdash; your Heir must survive!</p>
                 </div>
-                <div class="stat" id="stat-army">
-                    <div class="amount">0</div>
+                <div class="start-game">Begin</div>
+            </div>
+            <div id="gameplay">
+                <div id="turn-display">
+                    <div class="text"></div>
                 </div>
-                <div class="stat" id="stat-like">
-                    <div class="amount">0</div>
+                <div id="stats">
+                    <div class="stat" id="stat-gold">
+                        <div class="meter"></div>
+                        <div class="image"></div>
+                        <div class="amount">50</div>
+                    </div>
+                    <div class="stat" id="stat-army">
+                        <div class="meter"></div>
+                        <div class="image"></div>
+                        <div class="amount">50</div>
+                    </div>
+                    <div class="stat" id="stat-like">
+                        <div class="meter"></div>
+                        <div class="image"></div>
+                        <div class="amount">50</div>
+                    </div>
+                </div>
+                <div id="events">
+                    <div class="event-panel" id="event-content">
+                        <div class="event-image"></div>
+                        <div class="event-text"></div>
+                    </div>
+                    <div class="event-panel" id="event-choices"></div>
                 </div>
             </div>
-            <div id="events"></div>
+            <div id="game-over-screen">
+                <div class="text">
+                    <h1></h1>
+                    <div class="description"></div>
+                </div>
+                <div class="play-again">Play Again?</div>
+            </div>
         </div>
     </div>
 </body>

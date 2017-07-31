@@ -1,5 +1,6 @@
 'use strict';
 
+const _ = require('lodash');
 const $ = require('jquery');
 const {Actions} = require('./actions');
 
@@ -9,7 +10,7 @@ class Interface {
     }
 
     initialize() {
-        $(function() {
+        $(() => {
             // reinitialize template
             let template = $('#game-template').html();
             this.$game = $('#game');
@@ -18,37 +19,66 @@ class Interface {
             // hide other sections so splash shows
             this.$game.find('#gameplay').hide();
             this.$game.find('#intro').hide();
+            this.$game.find('#game-over-screen').hide();
 
             this.hookInterface();
-        }.bind(this));
+        });
     }
 
     hookInterface() {
-        var $splash = $('#splash');
-        var $intro = $('#intro');
-        var $gameplay = $('#gameplay');
+        this.$splash = $('#splash');
+        this.$intro = $('#intro');
+        this.$gameplay = $('#gameplay');
 
         // splash screen leads to intro
-        $splash.find('.new-game').on('click', function(e) {
+        this.$splash.find('.new-game').on('click', (e) => {
             $(e.target).css({
                 opacity: 0,
                 pointerEvents: 'none'
             });
-            $splash.fadeOut(function() {
-                $intro.fadeIn();
-            });
-        }.bind(this));
+            this.showIntro();
+        });
 
         // intro leads to gameplay
-        $intro.find('.start-game').on('click', function(e) {
+        this.$intro.find('.start-game').on('click', (e) => {
             $(e.target).css({
                 opacity: 0,
                 pointerEvents: 'none'
             });
-            $intro.fadeOut(function() {
-                Actions.emit(Actions.interface.newGame);
-                $gameplay.fadeIn();
-            });
+            this.showGame();
+        });
+
+        // clicking an event choice
+        this.$gameplay.on('click', '#event-choices .event-choice', (e) => {
+            let $button = $(e.target);
+            let choice = $button.data('choice');
+            $button.closest('#event-choices').html('');
+            Actions.emit(Actions.interface.eventChoice, choice);
+        });
+
+        // clicking on Continue after event
+        this.$gameplay.on('click', '#event-choices .event-next', (e) => {
+            let $button = $(e.target);
+            $button.closest('#event-choices').html('');
+            Actions.emit(Actions.interface.doneEvent);
+        });
+
+        // clicking Play Again on the game over screen resets the game
+        this.$game.on('click', '#game-over-screen .play-again', (e) => {
+            this.reset();
+        });
+    }
+
+    showIntro() {
+        this.$splash.fadeOut(() => {
+            this.$intro.fadeIn();
+        });
+    }
+
+    showGame() {
+        this.$intro.fadeOut(() => {
+            Actions.emit(Actions.interface.newGame);
+            this.$gameplay.fadeIn();
         });
     }
 
@@ -61,20 +91,55 @@ class Interface {
         // show the Done button
     }
 
-    beginTurn() {
-        // show turn intro
+    // show turn intro
+    beginTurn(turn, totalTurns) {
+        var $turnDisplay = this.$gameplay.find('#turn-display');
+        let text = (turn === totalTurns) ? 'Final Day' : `Day ${turn}`;
+        $turnDisplay.find('.text').text(text);
+
+        var timedFade = (timeout) => {
+            timeout = timeout || 1000;
+            setTimeout(() => {
+                $turnDisplay.fadeOut();
+            }, timeout);
+        };
+
+        if (turn === 1) {
+            timedFade(2000);
+        } else {
+            $turnDisplay.show(timedFade);
+        }
     }
 
     endTurn() {
-        // show turn outro
+        //
     }
 
+    // display the event and its choices
     beginEvent(event) {
-        // display the event and its choices
+        let $eventContent = this.$gameplay.find('#event-content');
+        let $eventChoices = this.$gameplay.find('#event-choices');
+
+        // load the face image
+        let image = require(`./images/faces/${event.image}.jpg`);
+        $eventContent.find('.event-image').css({
+            'background-image': `url("${image}")`
+        });
+
+        // load the text
+        $eventContent.find('.event-text').text(event.text);
+
+        // load the event choices
+        event.choices.forEach((choice, i) => {
+            $eventChoices.append(`<div class="event-choice" data-choice="${i}">${choice.text}</div>`);
+        });
     }
 
     respondEvent(response) {
-        // show the response to the event choice and a Done button
+        let $eventContent = this.$gameplay.find('#event-content');
+        $eventContent.find('.event-text').text(response || 'Understood.');
+        let $eventChoices = this.$gameplay.find('#event-choices');
+        $eventChoices.append('<div class="event-next">Continue</div>');
     }
 
     endEvent(event) {
@@ -82,11 +147,23 @@ class Interface {
     }
 
     endGame(result) {
-        // display the final result and a Play Again button
+        let $gameOver = this.$game.find('#game-over-screen');
+        $gameOver.addClass(result.win ? 'win' : 'lose');
+        $gameOver.find('.text h1').text(result.title);
+        $gameOver.find('.text .description').text(result.text);
+        $gameOver.siblings().remove();
+        $gameOver.show();
     }
 
+    // update the display of the player's current stats
     statUpdate(stats) {
-        // update the display of the player's current stats
+        _.each(stats, (amount, stat) => {
+            let $stat = this.$gameplay.find(`#stat-${stat}`);
+            $stat.find('.amount').text(amount);
+            let $meter = $stat.find('.meter');
+            $meter.css({ width: Math.min(amount, 100) + '%' });
+            $meter[(amount >= 100 ? 'addClass' : 'removeClass')]('.flashing');
+        });
     }
 
     hookGameActions() {
