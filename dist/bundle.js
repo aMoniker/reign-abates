@@ -17473,7 +17473,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 const _           = __webpack_require__(1);
 const {Game}      = __webpack_require__(0);
-const {Interface} = __webpack_require__(35);
+const {Interface} = __webpack_require__(40);
 const {Actions}   = __webpack_require__(2);
 
 Interface.initialize();
@@ -17519,7 +17519,7 @@ exports = module.exports = __webpack_require__(6)(undefined);
 
 
 // module
-exports.push([module.i, "* {\n    box-sizing: border-box;\n}\n\nhtml, body {\n    margin: 0;\n    padding: 0;\n    height: 100%;\n    color: #ccc;\n}\n\nbody {\n    background: #111;\n}\n\nh1 {\n    font-size: 5em;\n}\n\nh2 {\n    font-size: 3em;\n    margin: 0;\n}\n\np {\n    font-size: 2em;\n}\n\n#templates {\n    display: none;\n}\n\n#game {\n    width: 100%;\n    height: 100%;\n    font-family: 'Fondamento', cursive;\n    overflow-y: auto;\n}\n\n#splash {\n    display: flex;\n    flex-direction: column;\n    width: 100%;\n    height: 100%;\n    background-image: url(" + __webpack_require__(7) + ");\n    background-repeat: no-repeat;\n    background-position: center top;\n    background-size: cover;\n}\n\n@media all and (min-width: 1100px) {\n    #splash {\n        background-position: center -10em;\n    }\n}\n\n#splash h1 {\n    margin-top: auto;\n    text-align: center;\n    text-shadow: 0 0 5px black;\n}\n\n#splash .new-game {\n    font-size: 3em;\n    text-shadow: 0 0 5px black;\n    margin: 0 auto;\n    margin-bottom: 10%;\n    cursor: pointer;\n    background: rgba(0,0,0,0.5);\n    padding: 0.25em;\n    border: 1px solid gold;\n}\n\n#intro {\n    padding: 2em;\n    display: flex;\n    flex-direction: column;\n}\n\n#intro h2 {\n    text-align: center;\n}\n\n#intro .start-game {\n    display: inline-block;\n    font-size: 3em;\n    text-shadow: 0 0 5px black;\n    margin: 0 auto;\n    cursor: pointer;\n    background: rgba(0,0,0,0.5);\n    padding: 0.25em;\n    border: 1px solid gold;\n}\n\n#gameplay {\n    display: flex;\n    flex-direction: column;\n    height: 100%;\n    position: relative;\n}\n\n#events {\n    flex: auto;\n    border: 10px solid #777;\n}\n\n#stats {\n    flex: none;\n    width: 100%;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n}\n\n#stats .stat {\n    border: 10px solid #777;\n    border-bottom: none;\n    width: 33.33%;\n    text-align: left;\n    font-size: 2em;\n    font-weight: bold;\n    position: relative;\n}\n\n#stats .stat .image {\n    background-repeat: no-repeat;\n    background-position: center right 5px;\n    position: absolute;\n    right: 5px;\n    top: 0;\n    width: 100%;\n    height: 100%;\n    z-index: 3;\n}\n\n#stats .stat .amount {\n    color: #ddd;\n    position: relative;\n    z-index: 2;\n    padding: 0 10px;\n}\n\n#stats .stat .meter {\n    display: block;\n    height: 100%;\n    width: 0%;\n    position: absolute;\n    z-index: 1;\n    opacity: 0.8;\n    transition: width 1s ease-in-out;\n}\n\n#stat-gold .image {\n    background-image: url(" + __webpack_require__(8) + ");\n}\n#stat-gold .meter {\n    background-color: gold;\n}\n\n#stat-army .image {\n    background-image: url(" + __webpack_require__(9) + ");\n}\n#stat-army .meter {\n    background-color: red;\n}\n\n#stat-like .image {\n    background-image: url(" + __webpack_require__(10) + ");\n}\n#stat-like .meter {\n    background-color: blue;\n}\n\n@keyframes flashing {\n  50% { opacity: 1; }\n}\n\n.flashing {\n    animation: flashing 1s linear infinite;\n}\n\n#events {\n    display: flex;\n    flex-direction: column;\n    height: 100%;\n}\n\n#events .event-panel {\n    height: 50%;\n    width: 100%;\n    display: flex;\n}\n\n#events .event-panel:not(:last-child) {\n    border-bottom: 10px solid #777;\n}\n\n#event-content .event-image,\n#event-content .event-text {\n    height: 100%;\n}\n\n#event-content .event-image {\n    background-repeat: no-repeat;\n    background-position: center center;\n    background-size: cover;\n    width: 33.33%;\n}\n\n#event-content .event-text {\n    overflow-y: auto;\n    width: 66.66%;\n    padding: 20px;\n    font-size: 1.5em;\n}\n\n#event-choices {\n    overflow-y: auto;\n    flex-wrap: wrap;\n}\n\n#event-choices .event-choice {\n    flex: 1 0 33%;\n    height: 50%;\n    font-size: 2em;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    text-align: center;\n    border: 20px solid rgba(0,0,0,0);\n    box-shadow: 0 0 0 1px gold inset;\n    padding: 10px;\n    cursor: pointer;\n}\n\n#event-choices .event-choice:nth-child(3n + 2),\n#event-choices .event-choice:nth-child(3n + 3) {\n    border-left: none;\n}\n\n#event-choices .event-choice:nth-child(n + 4) {\n    border-top: none;\n}\n\n#event-choices .event-next {\n    width: 100%;\n    height: 100%;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    border: 10px solid gold;\n    font-size: 2em;\n    padding: 20px;\n    cursor: pointer;\n}\n\n#turn-display {\n    display: flex;\n    position: absolute;\n    z-index: 100;\n    height: 100%;\n    width: 100%;\n    background-color: #111;\n    text-align: center;\n    font-size: 5em;\n    border: 20px solid gold;\n    justify-content: center;\n    align-items: center;\n}\n\n#game-over-screen {\n    display: flex;\n    flex-direction: column;\n    justify-content: center;\n    align-items: center;\n    width: 100%;\n    height: 100%;\n    background: #111;\n    padding: 20px;\n}\n\n#game-over-screen h1 {\n    text-align: center;\n}\n\n#game-over-screen .description {\n    font-size: 2em;\n}\n\n#game-over-screen .play-again {\n    font-size: 3em;\n    padding: 20px;\n    border: 1px solid gold;\n    margin-top: 1em;\n    cursor: pointer;\n}\n\n@media all and (max-width: 700px) {\n    #event-content {\n        flex-direction: column;\n        align-items: center;\n    }\n    #event-content .event-image {\n        width: 75%;\n    }\n    #event-content .event-text {\n        width: 100%;\n        padding-top: 5px;\n    }\n    #event-choices .event-choice {\n        font-size: 1.2em;\n        flex: 1 0 50%;\n    }\n    #event-choices .event-choice:nth-child(3n + 2),\n    #event-choices .event-choice:nth-child(3n + 3) {\n        border-left: 20px solid rgba(0,0,0,0);\n    }\n    #event-choices .event-choice:nth-child(n + 4) {\n        border-top: 20px solid rgba(0,0,0,0);\n    }\n    #event-choices .event-choice:nth-child(2n + 2) {\n        border-left: 20px solid rgba(0,0,0,0);\n    }\n    #event-choices .event-choice:nth-child(n + 3) {\n        border-top: 20px solid rgba(0,0,0,0);\n    }\n}\n", ""]);
+exports.push([module.i, "* {\n    box-sizing: border-box;\n}\n\nhtml, body {\n    margin: 0;\n    padding: 0;\n    height: 100%;\n    color: #ccc;\n}\n\nbody {\n    background: #111;\n}\n\nh1 {\n    font-size: 5em;\n}\n\nh2 {\n    font-size: 3em;\n    margin: 0;\n}\n\np {\n    font-size: 2em;\n}\n\n#templates {\n    display: none;\n}\n\n#game {\n    width: 100%;\n    height: 100%;\n    font-family: 'Fondamento', cursive;\n    overflow-y: auto;\n}\n\n#splash {\n    display: flex;\n    flex-direction: column;\n    width: 100%;\n    height: 100%;\n    background-image: url(" + __webpack_require__(7) + ");\n    background-repeat: no-repeat;\n    background-position: center top;\n    background-size: cover;\n}\n\n@media all and (min-width: 1100px) {\n    #splash {\n        background-position: center -10em;\n    }\n}\n\n#splash h1 {\n    margin-top: auto;\n    text-align: center;\n    text-shadow: 0 0 5px black;\n}\n\n#splash .new-game {\n    font-size: 3em;\n    text-shadow: 0 0 5px black;\n    margin: 0 auto;\n    margin-bottom: 10%;\n    cursor: pointer;\n    background: rgba(0,0,0,0.5);\n    padding: 0.25em;\n    border: 1px solid gold;\n}\n\n#intro {\n    padding: 2em;\n    display: flex;\n    flex-direction: column;\n}\n\n#intro h2 {\n    text-align: center;\n}\n\n#intro .start-game {\n    display: inline-block;\n    font-size: 3em;\n    text-shadow: 0 0 5px black;\n    margin: 0 auto;\n    cursor: pointer;\n    background: rgba(0,0,0,0.5);\n    padding: 0.25em;\n    border: 1px solid gold;\n}\n\n#gameplay {\n    display: flex;\n    flex-direction: column;\n    height: 100%;\n    position: relative;\n}\n\n#events {\n    flex: auto;\n    border: 10px solid #777;\n}\n\n#stats {\n    flex: none;\n    width: 100%;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n}\n\n#stats .stat {\n    border: 10px solid #777;\n    border-bottom: none;\n    width: 33.33%;\n    text-align: left;\n    font-size: 2em;\n    font-weight: bold;\n    position: relative;\n}\n\n#stats .stat .image {\n    background-repeat: no-repeat;\n    background-position: center right 5px;\n    position: absolute;\n    right: 5px;\n    top: 0;\n    width: 100%;\n    height: 100%;\n    z-index: 3;\n}\n\n#stats .stat .amount {\n    color: #ddd;\n    position: relative;\n    z-index: 2;\n    padding: 0 10px;\n}\n\n#stats .stat .meter {\n    display: block;\n    height: 100%;\n    width: 0%;\n    position: absolute;\n    z-index: 1;\n    opacity: 0.8;\n    transition: width 1s ease-in-out;\n}\n\n#stat-gold .image {\n    background-image: url(" + __webpack_require__(8) + ");\n}\n#stat-gold .meter {\n    background-color: gold;\n}\n\n#stat-army .image {\n    background-image: url(" + __webpack_require__(9) + ");\n}\n#stat-army .meter {\n    background-color: red;\n}\n\n#stat-like .image {\n    background-image: url(" + __webpack_require__(10) + ");\n}\n#stat-like .meter {\n    background-color: blue;\n}\n\n@keyframes flashing {\n  50% { opacity: 1; }\n}\n\n.flashing {\n    animation: flashing 1s linear infinite;\n}\n\n#events {\n    display: flex;\n    flex-direction: column;\n    height: 100%;\n}\n\n#events .event-panel {\n    height: 50%;\n    width: 100%;\n    display: flex;\n}\n\n#events .event-panel:not(:last-child) {\n    border-bottom: 10px solid #777;\n}\n\n#event-content .event-image,\n#event-content .event-text {\n    height: 100%;\n}\n\n#event-content .event-image {\n    background-repeat: no-repeat;\n    background-position: center center;\n    background-size: cover;\n    width: 33.33%;\n}\n\n#event-content .event-text {\n    overflow-y: auto;\n    width: 66.66%;\n    padding: 20px;\n    font-size: 1.5em;\n}\n\n#event-choices {\n    overflow-y: auto;\n    flex-wrap: wrap;\n}\n\n#event-choices .event-choice {\n    flex: 1 0 33%;\n    height: 50%;\n    font-size: 2em;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    text-align: center;\n    border: 20px solid rgba(0,0,0,0);\n    box-shadow: 0 0 0 1px gold inset;\n    padding: 10px;\n    cursor: pointer;\n}\n\n#event-choices .event-choice:nth-child(3n + 2),\n#event-choices .event-choice:nth-child(3n + 3) {\n    border-left: none;\n}\n\n#event-choices .event-choice:nth-child(n + 4) {\n    border-top: none;\n}\n\n#event-choices .event-next {\n    width: 100%;\n    height: 100%;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    border: 10px solid gold;\n    font-size: 2em;\n    padding: 20px;\n    cursor: pointer;\n}\n\n#turn-display {\n    display: flex;\n    position: absolute;\n    z-index: 100;\n    height: 100%;\n    width: 100%;\n    background-color: #111;\n    text-align: center;\n    font-size: 5em;\n    border: 20px solid gold;\n    justify-content: center;\n    align-items: center;\n}\n\n#game-over-screen {\n    display: flex;\n    flex-direction: column;\n    justify-content: center;\n    align-items: center;\n    width: 100%;\n    height: 100%;\n    background: #111;\n    padding: 20px;\n}\n\n#game-over-screen h1 {\n    text-align: center;\n}\n\n#game-over-screen .description {\n    font-size: 2em;\n}\n\n#game-over-screen .play-again {\n    font-size: 3em;\n    padding: 20px;\n    border: 1px solid gold;\n    margin-top: 1em;\n    cursor: pointer;\n}\n\n@media all and (max-width: 700px) {\n    #event-content {\n        flex-direction: column;\n        align-items: center;\n    }\n    #event-content .event-image {\n        width: 75%;\n    }\n    #event-content .event-text {\n        width: 100%;\n        padding-top: 5px;\n    }\n    #event-choices .event-choice {\n        font-size: 1.2em;\n        flex: 1 0 50%;\n    }\n    #event-choices .event-choice:nth-child(3n + 2),\n    #event-choices .event-choice:nth-child(3n + 3) {\n        border-left: 20px solid rgba(0,0,0,0);\n    }\n    #event-choices .event-choice:nth-child(n + 4) {\n        border-top: 20px solid rgba(0,0,0,0);\n    }\n    #event-choices .event-choice:nth-child(2n + 2) {\n        border-left: 20px solid rgba(0,0,0,0);\n    }\n    #event-choices .event-choice:nth-child(n + 3) {\n        border-top: 20px solid rgba(0,0,0,0);\n    }\n}\n\n@media all and (min-width: 2000px) {\n    body {\n        font-size: 2.5em;\n    }\n}\n", ""]);
 
 // exports
 
@@ -18452,29 +18452,29 @@ function isUndefined(arg) {
 /***/ (function(module, exports, __webpack_require__) {
 
 var map = {
-	"./angry-merchant.js": 136,
-	"./army-high.js": 17,
-	"./army-low.js": 18,
-	"./barbarians-attack-farmers.js": 19,
-	"./blackmail.js": 140,
-	"./concerned-soldier.js": 20,
-	"./concert.js": 139,
-	"./cult-leader.js": 137,
-	"./fat-merchant.js": 21,
-	"./final.js": 22,
-	"./foreign-general.js": 23,
-	"./intro.js": 24,
-	"./like-high.js": 25,
-	"./like-low.js": 26,
-	"./money-high.js": 27,
-	"./money-low.js": 28,
-	"./poison-archduke.js": 29,
-	"./raiders.js": 138,
-	"./secret-tunnel.js": 30,
-	"./sorceress.js": 31,
-	"./strange-invention.js": 32,
-	"./template.js": 33,
-	"./weeping-nun.js": 34
+	"./angry-merchant.js": 17,
+	"./army-high.js": 18,
+	"./army-low.js": 19,
+	"./barbarians-attack-farmers.js": 20,
+	"./blackmail.js": 21,
+	"./concerned-soldier.js": 22,
+	"./concert.js": 23,
+	"./cult-leader.js": 24,
+	"./fat-merchant.js": 25,
+	"./final.js": 26,
+	"./foreign-general.js": 27,
+	"./intro.js": 28,
+	"./like-high.js": 29,
+	"./like-low.js": 30,
+	"./money-high.js": 31,
+	"./money-low.js": 32,
+	"./poison-archduke.js": 33,
+	"./raiders.js": 34,
+	"./secret-tunnel.js": 35,
+	"./sorceress.js": 36,
+	"./strange-invention.js": 37,
+	"./template.js": 38,
+	"./weeping-nun.js": 39
 };
 function webpackContext(req) {
 	return __webpack_require__(webpackContextResolve(req));
@@ -18494,6 +18494,48 @@ webpackContext.id = 16;
 
 /***/ }),
 /* 17 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const {Game} = __webpack_require__(0);
+
+let event = {
+    name: 'angry-merchant',
+    type: 'random',
+    image: 'angry-man-1',
+    text: "A man barges into your throne room and with only the most cursory of bows, proceeds to rant and rave about a problem one of your soldiers has caused. Nearly frothing at the mouth, the merchant explains that one of your soldiers from among the lower ranks openly steals from the merchants stalls in front of his customers. This, he explains, has damaged his reputation and encouraged all manner of thieves to follow the soldier's example. He requests, nay, demands that you do something about this.",
+    choices: [{
+        text: 'Punish the unruly soldier',
+        effects: {
+            army: -Game.var.amount.army.small,
+            like: +Game.var.amount.like.medium,
+        },
+        response: "Frowning, you ask the merchant to identify the soldier, and he is brought before you. Visibly sweating, the soldier grovels before you most pitifully. Disgusted, you dismiss him from his post and have him locked in the dungeon for a month. The merchant is pleased, and so is the citizenry, realizing that you put the good of the people above even your own soldiers."
+    }, {
+        text: 'Agree to help for a price',
+        effects: {
+            army: -Game.var.amount.army.small,
+            gold: +Game.var.amount.gold.small,
+        },
+        response: "Seeing an opportunity to take advantage of a man with resources, you tell the merchant you'll help him if he pays you a small sum of gold to make up for the loss of one of your soldiers. He looks disgusted, but agrees to your offer. The soldier is removed and arrested."
+    }, {
+        text: "Punish the merchant",
+        effects: {
+            like: -Game.var.amount.like.small
+        },
+        response: "The disrespectful cur ought to learn how to address a king! To the merchant's horror, you order your guard to throw him in a cell for a few days. His eyes take on a dark and piercing gleam, and you know you've made an enemy for life."
+    }]
+};
+
+module.exports = {
+    event
+};
+
+
+/***/ }),
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18529,7 +18571,7 @@ module.exports = {
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18565,7 +18607,7 @@ module.exports = {
 
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18628,7 +18670,53 @@ module.exports = {
 
 
 /***/ }),
-/* 20 */
+/* 21 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const {Game} = __webpack_require__(0);
+
+let event = {
+    name: 'blackmail',
+    type: 'random',
+    image: 'regal-woman-1',
+    text: "A noblewoman from a house you recognize approaches the throne and executes a perfect curtsey. In her eyes though, there is menace. She explains that she knows the situation between you and the Archduke, and will tell the Archduke what you're planning unless you pay her off with a large sum of gold. The impudence of this woman! To blackmail a KING! Containing your anger, you consider your options. Before you speak, she tells you quite plainly that any attempt on your part to punish or silence her will not work, as the Archduke will still be informed by her family. She smiles a little too graciously and wiggles her head at you.",
+    choices: [{
+        text: "Pay the traitor",
+        effects: {
+            gold: -Game.var.amount.gold.large
+        },
+        response: "Realizing you have no choice, you arrange the gold to be sent to her. This you will not forget, and you vow your revenge upon her house even if it takes generations."
+    }, {
+        text: "Imprison her",
+        effects: {
+            like: -Game.var.amount.like.small,
+            callback: function() {
+                Game.bonusScore -= 0.1;
+            }
+        },
+        response: "You'll be damned if some noble bosses you around! The guards haul her off as she shrieks with laughter. You know you won't be able to keep her long, and you're fairly certain she wasn't kidding about having the Archduke informed no matter what. Your chances of escape may now be in danger."
+    }, {
+        text: "Kill her",
+        effects: {
+            like: -Game.var.amount.like.medium,
+            callback: function() {
+                Game.bonusScore -= 0.2;
+            }
+        },
+        response: "She barely contains her murderous rage as you sentence her to death. This was not the outcome she was expecting. Perhaps she deserves it, but you are almost certain she isn't lying about informing the Archduke. Your chances of escape may not be in great danger."
+    }]
+};
+
+module.exports = {
+    event
+};
+
+
+/***/ }),
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18677,7 +18765,82 @@ module.exports = {
 
 
 /***/ }),
-/* 21 */
+/* 23 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const {Game} = __webpack_require__(0);
+
+let event = {
+    name: 'concert',
+    type: 'random',
+    image: 'man-2',
+    text: "A well-dressed man with wild hair and intensely bright eyes gains an audience. With deference and awe, he explains that he has composed a profound and stirring piece of music. He requests that you give him a small amount of gold so that he may arrange a public concert. You consider his request, knowing that the citizenry would probably appreciate it.",
+    choices: [{
+        text: "Pay for the concert",
+        effects: {
+            gold: -Game.var.amount.gold.small,
+            like: +Game.var.amount.like.medium,
+        },
+        response: "You know it will be a cheap way to keep the people happy, so you comply with the man's request. Surprisingly, he wasn't kidding when he said the music was profound. It speaks directly to your heart, and brings a tear to your eye as you are swept away in a vision of your now far-away youth, spent in the sunny fields and mountains of your kingdom's countryside. The raucous cheers from the crowd after the performance break your reverie, and you notice quite a few looking approvingly in your direction."
+    }, {
+        text: "No funds for this",
+        response: "While you appreciate good music, you simply do not have the funds to spare for a frivilous expense. You send the musician on his way, but he does not seem too disappointed."
+    }]
+};
+
+module.exports = {
+    event
+};
+
+
+/***/ }),
+/* 24 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const {Game} = __webpack_require__(0);
+
+let event = {
+    name: 'cult-leader',
+    type: 'random',
+    image: 'beard-man-6',
+    text: "Your guards haul in a nonchalant man dressed in plain raiment. He has an enigmatic smile and a strange charisma about him. He doesn't seem to mind being treated roughly like this. The guards explain that he was agitating the peasantry, and putting wild ideas in their minds about their own sovereignty. You ask the man to explain, but he only seems to speak in riddles. The guards go on to say he's attracted quite a large following, and could be a dangerous element if left unchecked.",
+    choices: [{
+        text: 'Exile the man',
+        effects: {
+            army: +Game.var.amount.army.small,
+            like: -Game.var.amount.like.large,
+        },
+        response: "Your guards are pleased, but the citizenry is outraged. They don't revolt, but you can tell that their attitude toward you has changed, and you fear they plan revenge."
+    }, {
+        text: 'Introduce the man to your scribe',
+        effects: {
+            army: -Game.var.amount.army.small,
+            like: +Game.var.amount.like.medium,
+        },
+        response: "Not being able to made head or tail of his comments, but hearing some strange wisdom in them, you hand the man over to your chief scribe for his opinion. After a long discussion, the scribe returns and tells you the man is a prophet. It would be most unwise to harm him, as the citizens would rebel. Instead, he recommends that he keep eyes on him, and you agree. The soldiers, however, are slightly upset that the man is allowed to continue proselytizing."
+    }, {
+        text: 'Have the man killed',
+        effects: {
+            army: +Game.var.amount.army.small,
+            like: -Game.var.amount.like.large * 3,
+        },
+        response: "Perhaps unwisely, you decide to put a quick end to the man, hoping that this will end the spread of his ideas. The most sadistic among the guards are very pleased, but the citizenry is on the verge of outright rebellion."
+    }]
+};
+
+module.exports = {
+    event
+};
+
+
+/***/ }),
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18726,7 +18889,7 @@ module.exports = {
 
 
 /***/ }),
-/* 22 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18751,7 +18914,7 @@ module.exports = {
 
 
 /***/ }),
-/* 23 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18795,7 +18958,7 @@ module.exports = {
 
 
 /***/ }),
-/* 24 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18820,7 +18983,7 @@ module.exports = {
 
 
 /***/ }),
-/* 25 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18856,7 +19019,7 @@ module.exports = {
 
 
 /***/ }),
-/* 26 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18892,7 +19055,7 @@ module.exports = {
 
 
 /***/ }),
-/* 27 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18928,7 +19091,7 @@ module.exports = {
 
 
 /***/ }),
-/* 28 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18964,7 +19127,7 @@ module.exports = {
 
 
 /***/ }),
-/* 29 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18996,7 +19159,51 @@ module.exports = {
 
 
 /***/ }),
-/* 30 */
+/* 34 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const {Game} = __webpack_require__(0);
+
+let event = {
+    name: 'raiders',
+    type: 'random',
+    image: 'horror-man',
+    text: "A beleagured man covered in dirt and blood limps into the throne room. The guards take notice and step closer to stop him, but you motion for them to stand down. The man's face has a look unlike any you've ever seen, like a pure horror that has frozen his countenance into a terrible mask. Calming the man, you offer him water and ask him to explain his condition. He tells you that he is the only survivor from a remote village in the bounds of your kingdom, far to the south. Raiders have sacked it, slaughtered everyone, and cannibalized them. He tries to explain what they did, but merely stutters and begins to weep. You signal for an attendant to find the man a place to rest while you decide how to proceed.",
+    choices: [{
+        text: "Attack with a large force",
+        effects: {
+            gold: +Game.var.amount.gold.medium,
+            army: -Game.var.amount.army.medium,
+            like: +Game.var.amount.like.medium,
+        },
+        response: "One thing you will not put up with under your rule are beasts of men. You order your best soldiers to proceed to the village and destroy every last raider. They willingly oblige, and later return in diminished, exhausted numbers with the collected wealth of the former village. The citizens of neighboring villages are thankful that you spared them a similar fate."
+    }, {
+        text: "Attack with a small force",
+        effects: {
+            army: -Game.var.amount.army.small,
+            like: +Game.var.amount.like.small,
+        },
+        response: "You can't afford to send your best, so you send what you can. The soldiers are evenly matched against the raiders, and it turns into a bloodbath on both sides. The remains of the raiders finally leave, and the few soldiers left alive return to the city."
+    }, {
+        text: "Ignore the raiders",
+        effects: {
+            army: -Game.var.amount.army.small,
+            like: -Game.var.amount.like.small,
+        },
+        response: "Hoping they'll go back from whence they came or move on to another village outside your realm, you decide to do nothing. Word gets out, and both your army and the citizens are displeased with your decision."
+    }]
+};
+
+module.exports = {
+    event
+};
+
+
+/***/ }),
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19041,7 +19248,7 @@ module.exports = {
 
 
 /***/ }),
-/* 31 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19076,7 +19283,7 @@ module.exports = {
 
 
 /***/ }),
-/* 32 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19121,7 +19328,7 @@ module.exports = {
 
 
 /***/ }),
-/* 33 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19159,7 +19366,7 @@ module.exports = {
 
 
 /***/ }),
-/* 34 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19208,14 +19415,14 @@ module.exports = {
 
 
 /***/ }),
-/* 35 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 const _ = __webpack_require__(1);
-const $ = __webpack_require__(36);
+const $ = __webpack_require__(41);
 const {Actions} = __webpack_require__(2);
 
 class Interface {
@@ -19335,7 +19542,7 @@ class Interface {
         let $eventChoices = this.$gameplay.find('#event-choices');
 
         // load the face image
-        let image = __webpack_require__(37)(`./${event.image}.jpg`);
+        let image = __webpack_require__(42)(`./${event.image}.jpg`);
         $eventContent.find('.event-image').css({
             'background-image': `url("${image}")`
         });
@@ -19418,7 +19625,7 @@ module.exports = {
 
 
 /***/ }),
-/* 36 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -29678,108 +29885,108 @@ return jQuery;
 
 
 /***/ }),
-/* 37 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var map = {
-	"./angry-man-1.jpg": 38,
-	"./beard-man-1.jpg": 39,
-	"./beard-man-10.jpg": 40,
-	"./beard-man-11.jpg": 41,
-	"./beard-man-12.jpg": 42,
-	"./beard-man-13.jpg": 43,
-	"./beard-man-14.jpg": 44,
-	"./beard-man-2.jpg": 45,
-	"./beard-man-3.jpg": 46,
-	"./beard-man-4.jpg": 47,
-	"./beard-man-5.jpg": 48,
-	"./beard-man-6.jpg": 49,
-	"./beard-man-7.jpg": 50,
-	"./beard-man-8.jpg": 51,
-	"./beard-man-9.jpg": 52,
-	"./boy-2.jpg": 53,
-	"./contempt-woman.jpg": 54,
-	"./crosseyed-man.jpg": 55,
-	"./crying-nun.jpg": 56,
-	"./deformed-man.jpg": 57,
-	"./erasmus.jpg": 58,
-	"./fat-man-1.jpg": 59,
-	"./girl-1.jpg": 60,
-	"./girl-2.jpg": 61,
-	"./girl-3.jpg": 62,
-	"./girl-4.jpg": 63,
-	"./girl-5.jpg": 64,
-	"./grave-man.jpg": 65,
-	"./heir.jpg": 66,
-	"./horror-man.jpg": 67,
-	"./machiavelli.jpg": 68,
-	"./man-1.jpg": 69,
-	"./man-10.jpg": 70,
-	"./man-11.jpg": 71,
-	"./man-12.jpg": 72,
-	"./man-13.jpg": 73,
-	"./man-14.jpg": 74,
-	"./man-15.jpg": 75,
-	"./man-2.jpg": 76,
-	"./man-3.jpg": 77,
-	"./man-4.jpg": 78,
-	"./man-5.jpg": 79,
-	"./man-6.jpg": 80,
-	"./man-7.jpg": 81,
-	"./man-8.jpg": 82,
-	"./man-9.jpg": 83,
-	"./moustache-man-1.jpg": 84,
-	"./moustache-man-2.jpg": 85,
-	"./moustache-man-3.jpg": 86,
-	"./moustache-man-4.jpg": 87,
-	"./moustache-man-5.jpg": 88,
-	"./moustache-man-6.jpg": 89,
-	"./moustache-man-7.jpg": 90,
-	"./moustache-man-8.jpg": 91,
-	"./moustache-man-9.jpg": 92,
-	"./nun.jpg": 93,
-	"./old-man-1.jpg": 94,
-	"./old-man-2.jpg": 95,
-	"./old-man-3.jpg": 96,
-	"./old-man-4.jpg": 97,
-	"./old-woman-1.jpg": 98,
-	"./old-woman-2.jpg": 99,
-	"./old-woman-3.jpg": 100,
-	"./old-woman-4.jpg": 101,
-	"./old-woman-5.jpg": 102,
-	"./princely-man.jpg": 103,
-	"./queen.jpg": 104,
-	"./regal-woman-1.jpg": 105,
-	"./regal-woman-2.jpg": 106,
-	"./regal-woman-3.jpg": 107,
-	"./regal-woman-4.jpg": 108,
-	"./scar-man.jpg": 109,
-	"./scruffy-man.jpg": 110,
-	"./sideburns-man-1.jpg": 111,
-	"./smug-man-1.jpg": 112,
-	"./soldier-1.jpg": 113,
-	"./soldier-2.jpg": 114,
-	"./sorceress.jpg": 115,
-	"./weary-man-1.jpg": 116,
-	"./woman-.jpg": 117,
-	"./woman-1.jpg": 118,
-	"./woman-10.jpg": 119,
-	"./woman-11.jpg": 120,
-	"./woman-12.jpg": 121,
-	"./woman-13.jpg": 122,
-	"./woman-14.jpg": 123,
-	"./woman-15.jpg": 124,
-	"./woman-16.jpg": 125,
-	"./woman-2.jpg": 126,
-	"./woman-3.jpg": 127,
-	"./woman-4.jpg": 128,
-	"./woman-5.jpg": 129,
-	"./woman-6.jpg": 130,
-	"./woman-7.jpg": 131,
-	"./woman-8.jpg": 132,
-	"./woman-9.jpg": 133,
-	"./woman-and-child.jpg": 134,
-	"./young-man-1.jpg": 135
+	"./angry-man-1.jpg": 43,
+	"./beard-man-1.jpg": 44,
+	"./beard-man-10.jpg": 45,
+	"./beard-man-11.jpg": 46,
+	"./beard-man-12.jpg": 47,
+	"./beard-man-13.jpg": 48,
+	"./beard-man-14.jpg": 49,
+	"./beard-man-2.jpg": 50,
+	"./beard-man-3.jpg": 51,
+	"./beard-man-4.jpg": 52,
+	"./beard-man-5.jpg": 53,
+	"./beard-man-6.jpg": 54,
+	"./beard-man-7.jpg": 55,
+	"./beard-man-8.jpg": 56,
+	"./beard-man-9.jpg": 57,
+	"./boy-2.jpg": 58,
+	"./contempt-woman.jpg": 59,
+	"./crosseyed-man.jpg": 60,
+	"./crying-nun.jpg": 61,
+	"./deformed-man.jpg": 62,
+	"./erasmus.jpg": 63,
+	"./fat-man-1.jpg": 64,
+	"./girl-1.jpg": 65,
+	"./girl-2.jpg": 66,
+	"./girl-3.jpg": 67,
+	"./girl-4.jpg": 68,
+	"./girl-5.jpg": 69,
+	"./grave-man.jpg": 70,
+	"./heir.jpg": 71,
+	"./horror-man.jpg": 72,
+	"./machiavelli.jpg": 73,
+	"./man-1.jpg": 74,
+	"./man-10.jpg": 75,
+	"./man-11.jpg": 76,
+	"./man-12.jpg": 77,
+	"./man-13.jpg": 78,
+	"./man-14.jpg": 79,
+	"./man-15.jpg": 80,
+	"./man-2.jpg": 81,
+	"./man-3.jpg": 82,
+	"./man-4.jpg": 83,
+	"./man-5.jpg": 84,
+	"./man-6.jpg": 85,
+	"./man-7.jpg": 86,
+	"./man-8.jpg": 87,
+	"./man-9.jpg": 88,
+	"./moustache-man-1.jpg": 89,
+	"./moustache-man-2.jpg": 90,
+	"./moustache-man-3.jpg": 91,
+	"./moustache-man-4.jpg": 92,
+	"./moustache-man-5.jpg": 93,
+	"./moustache-man-6.jpg": 94,
+	"./moustache-man-7.jpg": 95,
+	"./moustache-man-8.jpg": 96,
+	"./moustache-man-9.jpg": 97,
+	"./nun.jpg": 98,
+	"./old-man-1.jpg": 99,
+	"./old-man-2.jpg": 100,
+	"./old-man-3.jpg": 101,
+	"./old-man-4.jpg": 102,
+	"./old-woman-1.jpg": 103,
+	"./old-woman-2.jpg": 104,
+	"./old-woman-3.jpg": 105,
+	"./old-woman-4.jpg": 106,
+	"./old-woman-5.jpg": 107,
+	"./princely-man.jpg": 108,
+	"./queen.jpg": 109,
+	"./regal-woman-1.jpg": 110,
+	"./regal-woman-2.jpg": 111,
+	"./regal-woman-3.jpg": 112,
+	"./regal-woman-4.jpg": 113,
+	"./scar-man.jpg": 114,
+	"./scruffy-man.jpg": 115,
+	"./sideburns-man-1.jpg": 116,
+	"./smug-man-1.jpg": 117,
+	"./soldier-1.jpg": 118,
+	"./soldier-2.jpg": 119,
+	"./sorceress.jpg": 120,
+	"./weary-man-1.jpg": 121,
+	"./woman-.jpg": 122,
+	"./woman-1.jpg": 123,
+	"./woman-10.jpg": 124,
+	"./woman-11.jpg": 125,
+	"./woman-12.jpg": 126,
+	"./woman-13.jpg": 127,
+	"./woman-14.jpg": 128,
+	"./woman-15.jpg": 129,
+	"./woman-16.jpg": 130,
+	"./woman-2.jpg": 131,
+	"./woman-3.jpg": 132,
+	"./woman-4.jpg": 133,
+	"./woman-5.jpg": 134,
+	"./woman-6.jpg": 135,
+	"./woman-7.jpg": 136,
+	"./woman-8.jpg": 137,
+	"./woman-9.jpg": 138,
+	"./woman-and-child.jpg": 139,
+	"./young-man-1.jpg": 140
 };
 function webpackContext(req) {
 	return __webpack_require__(webpackContextResolve(req));
@@ -29795,802 +30002,595 @@ webpackContext.keys = function webpackContextKeys() {
 };
 webpackContext.resolve = webpackContextResolve;
 module.exports = webpackContext;
-webpackContext.id = 37;
-
-/***/ }),
-/* 38 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__.p + "63d6e6d5b56059e22245c24cb3d031a2.jpg";
-
-/***/ }),
-/* 39 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__.p + "c0c8a362c14e7405ec28c09fb570544a.jpg";
-
-/***/ }),
-/* 40 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__.p + "ef8c6ab9d702b13dd21b59bff0b85ff9.jpg";
-
-/***/ }),
-/* 41 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__.p + "eab7cff9a46d89874a5374e5e7c51218.jpg";
-
-/***/ }),
-/* 42 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__.p + "8b50ec9c85b7f18358a6353ca6609402.jpg";
+webpackContext.id = 42;
 
 /***/ }),
 /* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "67e0f812de3d3a3e5bd542e30f9e6380.jpg";
+module.exports = __webpack_require__.p + "63d6e6d5b56059e22245c24cb3d031a2.jpg";
 
 /***/ }),
 /* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "a24c65de38464d2f9691daa325d6109f.jpg";
+module.exports = __webpack_require__.p + "c0c8a362c14e7405ec28c09fb570544a.jpg";
 
 /***/ }),
 /* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "08cdac6f656922afb80f05b044f6dd0a.jpg";
+module.exports = __webpack_require__.p + "ef8c6ab9d702b13dd21b59bff0b85ff9.jpg";
 
 /***/ }),
 /* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "c49acbdff9592d5f6fcfc28256c1cebc.jpg";
+module.exports = __webpack_require__.p + "eab7cff9a46d89874a5374e5e7c51218.jpg";
 
 /***/ }),
 /* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "1aee46190c2f3559269cbee6ed52001c.jpg";
+module.exports = __webpack_require__.p + "8b50ec9c85b7f18358a6353ca6609402.jpg";
 
 /***/ }),
 /* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "0ccf621be059235bd0644f8323a6db41.jpg";
+module.exports = __webpack_require__.p + "67e0f812de3d3a3e5bd542e30f9e6380.jpg";
 
 /***/ }),
 /* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "5e65620feca432769ab657bd1f826a2d.jpg";
+module.exports = __webpack_require__.p + "a24c65de38464d2f9691daa325d6109f.jpg";
 
 /***/ }),
 /* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "d1fd5c4b86b13c73dcfcc75b06c4f969.jpg";
+module.exports = __webpack_require__.p + "08cdac6f656922afb80f05b044f6dd0a.jpg";
 
 /***/ }),
 /* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "877cb6be2fe14d7d07e43a43418335a9.jpg";
+module.exports = __webpack_require__.p + "c49acbdff9592d5f6fcfc28256c1cebc.jpg";
 
 /***/ }),
 /* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "2be571afa03c2eb8f58f8bc511038232.jpg";
+module.exports = __webpack_require__.p + "1aee46190c2f3559269cbee6ed52001c.jpg";
 
 /***/ }),
 /* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "57907b2ce6222d7581854a3158c4483c.jpg";
+module.exports = __webpack_require__.p + "0ccf621be059235bd0644f8323a6db41.jpg";
 
 /***/ }),
 /* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "a100f5a2f7b7b881bccb1ac5bb4e2ebc.jpg";
+module.exports = __webpack_require__.p + "5e65620feca432769ab657bd1f826a2d.jpg";
 
 /***/ }),
 /* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "a5dbf8f542d296d1e5af409885be459d.jpg";
+module.exports = __webpack_require__.p + "d1fd5c4b86b13c73dcfcc75b06c4f969.jpg";
 
 /***/ }),
 /* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "b8e0f836fad7dc1a97a259de7a2310d0.jpg";
+module.exports = __webpack_require__.p + "877cb6be2fe14d7d07e43a43418335a9.jpg";
 
 /***/ }),
 /* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "82d8791138bcd8bb983e4d2a5287bad2.jpg";
+module.exports = __webpack_require__.p + "2be571afa03c2eb8f58f8bc511038232.jpg";
 
 /***/ }),
 /* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "727e0f8396d8e4671afb759448f37067.jpg";
+module.exports = __webpack_require__.p + "57907b2ce6222d7581854a3158c4483c.jpg";
 
 /***/ }),
 /* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "f9c2ac8521887acaaf9f6fca18d25e5c.jpg";
+module.exports = __webpack_require__.p + "a100f5a2f7b7b881bccb1ac5bb4e2ebc.jpg";
 
 /***/ }),
 /* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "f37aedbb4984c340791ca5c6738622ff.jpg";
+module.exports = __webpack_require__.p + "a5dbf8f542d296d1e5af409885be459d.jpg";
 
 /***/ }),
 /* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "b3d11facbbdc38c7965cb963214cc8f1.jpg";
+module.exports = __webpack_require__.p + "b8e0f836fad7dc1a97a259de7a2310d0.jpg";
 
 /***/ }),
 /* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "e34d146b7a6b2caf59df346a6b288c5e.jpg";
+module.exports = __webpack_require__.p + "82d8791138bcd8bb983e4d2a5287bad2.jpg";
 
 /***/ }),
 /* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "990d56bf51ed2aefe27122495c5733a9.jpg";
+module.exports = __webpack_require__.p + "727e0f8396d8e4671afb759448f37067.jpg";
 
 /***/ }),
 /* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "48d30e94455cd0daa73ebbaab5a2c724.jpg";
+module.exports = __webpack_require__.p + "f9c2ac8521887acaaf9f6fca18d25e5c.jpg";
 
 /***/ }),
 /* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "c0805990db3c31275ad20d45fee4aefa.jpg";
+module.exports = __webpack_require__.p + "f37aedbb4984c340791ca5c6738622ff.jpg";
 
 /***/ }),
 /* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "768b0533e0a6a6dc966702771bb2b190.jpg";
+module.exports = __webpack_require__.p + "b3d11facbbdc38c7965cb963214cc8f1.jpg";
 
 /***/ }),
 /* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "f2d39d94c5eddadfbff5c3eb78a68448.jpg";
+module.exports = __webpack_require__.p + "e34d146b7a6b2caf59df346a6b288c5e.jpg";
 
 /***/ }),
 /* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "976f75fea7d5bb42019544ef90c8eb54.jpg";
+module.exports = __webpack_require__.p + "990d56bf51ed2aefe27122495c5733a9.jpg";
 
 /***/ }),
 /* 69 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "15d1635af84cc7b745be2f4c38214cde.jpg";
+module.exports = __webpack_require__.p + "48d30e94455cd0daa73ebbaab5a2c724.jpg";
 
 /***/ }),
 /* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "c88a07760e4051ccdaccb116174d3a3a.jpg";
+module.exports = __webpack_require__.p + "c0805990db3c31275ad20d45fee4aefa.jpg";
 
 /***/ }),
 /* 71 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "14ef691e3a1a99a3b8c4406fa65c75ee.jpg";
+module.exports = __webpack_require__.p + "768b0533e0a6a6dc966702771bb2b190.jpg";
 
 /***/ }),
 /* 72 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "1552617ea9078a4f41a68fa7850f7cb9.jpg";
+module.exports = __webpack_require__.p + "f2d39d94c5eddadfbff5c3eb78a68448.jpg";
 
 /***/ }),
 /* 73 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "8f87c33ae9e1ce835a14362842d307f8.jpg";
+module.exports = __webpack_require__.p + "976f75fea7d5bb42019544ef90c8eb54.jpg";
 
 /***/ }),
 /* 74 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "1ecb6029d88010f4c555393bd1bf2c78.jpg";
+module.exports = __webpack_require__.p + "15d1635af84cc7b745be2f4c38214cde.jpg";
 
 /***/ }),
 /* 75 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "c91136b2a4bfa32a08f3032b83c671f5.jpg";
+module.exports = __webpack_require__.p + "c88a07760e4051ccdaccb116174d3a3a.jpg";
 
 /***/ }),
 /* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "f3f0426e4c5ca6017b16bbe94f5c30ed.jpg";
+module.exports = __webpack_require__.p + "14ef691e3a1a99a3b8c4406fa65c75ee.jpg";
 
 /***/ }),
 /* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "fc5a8baee707c1a28a92ef2bbb7f4fc1.jpg";
+module.exports = __webpack_require__.p + "1552617ea9078a4f41a68fa7850f7cb9.jpg";
 
 /***/ }),
 /* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "454ab11d4eb3bd5d8ccd692656930fc1.jpg";
+module.exports = __webpack_require__.p + "8f87c33ae9e1ce835a14362842d307f8.jpg";
 
 /***/ }),
 /* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "60c02faa5452c1c2a1effd8792cfa8e8.jpg";
+module.exports = __webpack_require__.p + "1ecb6029d88010f4c555393bd1bf2c78.jpg";
 
 /***/ }),
 /* 80 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "d395b4064511b617813d5186112a52c0.jpg";
+module.exports = __webpack_require__.p + "c91136b2a4bfa32a08f3032b83c671f5.jpg";
 
 /***/ }),
 /* 81 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "43f92ce21b9d7f164648444a74c9fedb.jpg";
+module.exports = __webpack_require__.p + "f3f0426e4c5ca6017b16bbe94f5c30ed.jpg";
 
 /***/ }),
 /* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "4dd9e5919b5c5068399e665bbedaa571.jpg";
+module.exports = __webpack_require__.p + "fc5a8baee707c1a28a92ef2bbb7f4fc1.jpg";
 
 /***/ }),
 /* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "3bf477da5484dc6584ccb62122aa2601.jpg";
+module.exports = __webpack_require__.p + "454ab11d4eb3bd5d8ccd692656930fc1.jpg";
 
 /***/ }),
 /* 84 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "aca4bf93d5a544a2fe2b0a09100de963.jpg";
+module.exports = __webpack_require__.p + "60c02faa5452c1c2a1effd8792cfa8e8.jpg";
 
 /***/ }),
 /* 85 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "79a825dac1759c07f1590c696097e9c2.jpg";
+module.exports = __webpack_require__.p + "d395b4064511b617813d5186112a52c0.jpg";
 
 /***/ }),
 /* 86 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "3067a6873d17c285d9b2f6820fcf1a54.jpg";
+module.exports = __webpack_require__.p + "43f92ce21b9d7f164648444a74c9fedb.jpg";
 
 /***/ }),
 /* 87 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "c6c0890fa1b0014c45137df006686364.jpg";
+module.exports = __webpack_require__.p + "4dd9e5919b5c5068399e665bbedaa571.jpg";
 
 /***/ }),
 /* 88 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "4776631b843375bc19c22a99954a3c04.jpg";
+module.exports = __webpack_require__.p + "3bf477da5484dc6584ccb62122aa2601.jpg";
 
 /***/ }),
 /* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "88c3c01b87375e161c14757eb32f27c7.jpg";
+module.exports = __webpack_require__.p + "aca4bf93d5a544a2fe2b0a09100de963.jpg";
 
 /***/ }),
 /* 90 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "e60da4577bde1a56a14666155d743842.jpg";
+module.exports = __webpack_require__.p + "79a825dac1759c07f1590c696097e9c2.jpg";
 
 /***/ }),
 /* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "19903bcea284afa09e6aab00ca481b46.jpg";
+module.exports = __webpack_require__.p + "3067a6873d17c285d9b2f6820fcf1a54.jpg";
 
 /***/ }),
 /* 92 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "47f1c0222d2793d6217f53d9f1fb9114.jpg";
+module.exports = __webpack_require__.p + "c6c0890fa1b0014c45137df006686364.jpg";
 
 /***/ }),
 /* 93 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "864f805bcdbb93e7be0b3ad5fe309cb8.jpg";
+module.exports = __webpack_require__.p + "4776631b843375bc19c22a99954a3c04.jpg";
 
 /***/ }),
 /* 94 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "abb2a62133e4d3ac686a565df0aaa88b.jpg";
+module.exports = __webpack_require__.p + "88c3c01b87375e161c14757eb32f27c7.jpg";
 
 /***/ }),
 /* 95 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "ac1dc8688380048c66644e08d2610905.jpg";
+module.exports = __webpack_require__.p + "e60da4577bde1a56a14666155d743842.jpg";
 
 /***/ }),
 /* 96 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "761b458977979f2e1365ef38324be830.jpg";
+module.exports = __webpack_require__.p + "19903bcea284afa09e6aab00ca481b46.jpg";
 
 /***/ }),
 /* 97 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "45f373fa400becbc4681264df4043751.jpg";
+module.exports = __webpack_require__.p + "47f1c0222d2793d6217f53d9f1fb9114.jpg";
 
 /***/ }),
 /* 98 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "193aebebfcd5bf4ec541a57e0afd7302.jpg";
+module.exports = __webpack_require__.p + "864f805bcdbb93e7be0b3ad5fe309cb8.jpg";
 
 /***/ }),
 /* 99 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "207f564ccfc2eff15a86d1f151156401.jpg";
+module.exports = __webpack_require__.p + "abb2a62133e4d3ac686a565df0aaa88b.jpg";
 
 /***/ }),
 /* 100 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "e96a1280cbdf18368e5d964d6d7fcc59.jpg";
+module.exports = __webpack_require__.p + "ac1dc8688380048c66644e08d2610905.jpg";
 
 /***/ }),
 /* 101 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "cfe2f5013b069c36bd6d60c894a952e7.jpg";
+module.exports = __webpack_require__.p + "761b458977979f2e1365ef38324be830.jpg";
 
 /***/ }),
 /* 102 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "980d87b7f442d78d029d9ecfe74fde42.jpg";
+module.exports = __webpack_require__.p + "45f373fa400becbc4681264df4043751.jpg";
 
 /***/ }),
 /* 103 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "c833cceef66bb5a25baa2e15325365c3.jpg";
+module.exports = __webpack_require__.p + "193aebebfcd5bf4ec541a57e0afd7302.jpg";
 
 /***/ }),
 /* 104 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "d4183df1d7b5f86a7104c9a06f7556cf.jpg";
+module.exports = __webpack_require__.p + "207f564ccfc2eff15a86d1f151156401.jpg";
 
 /***/ }),
 /* 105 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "65fdeb0305ba7b571e057f13172faa83.jpg";
+module.exports = __webpack_require__.p + "e96a1280cbdf18368e5d964d6d7fcc59.jpg";
 
 /***/ }),
 /* 106 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "6771207522e95d419794fe0ff5cdf70f.jpg";
+module.exports = __webpack_require__.p + "cfe2f5013b069c36bd6d60c894a952e7.jpg";
 
 /***/ }),
 /* 107 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "2e6e9a88adf58dd31884d9245ced7a08.jpg";
+module.exports = __webpack_require__.p + "980d87b7f442d78d029d9ecfe74fde42.jpg";
 
 /***/ }),
 /* 108 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "e39462e2dff96476af8e5030a5f2e9c7.jpg";
+module.exports = __webpack_require__.p + "c833cceef66bb5a25baa2e15325365c3.jpg";
 
 /***/ }),
 /* 109 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "a79cbbb283ee6874551a4c65d0adf816.jpg";
+module.exports = __webpack_require__.p + "d4183df1d7b5f86a7104c9a06f7556cf.jpg";
 
 /***/ }),
 /* 110 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "d1b0a0c246af3aeb645b2090bd783b80.jpg";
+module.exports = __webpack_require__.p + "65fdeb0305ba7b571e057f13172faa83.jpg";
 
 /***/ }),
 /* 111 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "4e91e17b3659989505ea24fa9fd18874.jpg";
+module.exports = __webpack_require__.p + "6771207522e95d419794fe0ff5cdf70f.jpg";
 
 /***/ }),
 /* 112 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "66022db8df0906e6e712ec79a476c5c4.jpg";
+module.exports = __webpack_require__.p + "2e6e9a88adf58dd31884d9245ced7a08.jpg";
 
 /***/ }),
 /* 113 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "c12116c57415c9dcc79b43eba306508a.jpg";
+module.exports = __webpack_require__.p + "e39462e2dff96476af8e5030a5f2e9c7.jpg";
 
 /***/ }),
 /* 114 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "69844651695c19b9294c5ddb85322dba.jpg";
+module.exports = __webpack_require__.p + "a79cbbb283ee6874551a4c65d0adf816.jpg";
 
 /***/ }),
 /* 115 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "2fdaa55a2ba268e86758b6d3d780de31.jpg";
+module.exports = __webpack_require__.p + "d1b0a0c246af3aeb645b2090bd783b80.jpg";
 
 /***/ }),
 /* 116 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "9945f0e16db28ecc1c3edc208ce70a1a.jpg";
+module.exports = __webpack_require__.p + "4e91e17b3659989505ea24fa9fd18874.jpg";
 
 /***/ }),
 /* 117 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "b82b69e06357348bd762c66eb5085f0d.jpg";
+module.exports = __webpack_require__.p + "66022db8df0906e6e712ec79a476c5c4.jpg";
 
 /***/ }),
 /* 118 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "118c6258b08a21fdf4a50bb5deecd71d.jpg";
+module.exports = __webpack_require__.p + "c12116c57415c9dcc79b43eba306508a.jpg";
 
 /***/ }),
 /* 119 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "17655560edba1d0df8a43015c5ad148b.jpg";
+module.exports = __webpack_require__.p + "69844651695c19b9294c5ddb85322dba.jpg";
 
 /***/ }),
 /* 120 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "d192c50e78c312b996271790a15ba14e.jpg";
+module.exports = __webpack_require__.p + "2fdaa55a2ba268e86758b6d3d780de31.jpg";
 
 /***/ }),
 /* 121 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "06fd5fd68d974553377b624595dc422f.jpg";
+module.exports = __webpack_require__.p + "9945f0e16db28ecc1c3edc208ce70a1a.jpg";
 
 /***/ }),
 /* 122 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "94ccaf4f19c5ed395444d1d96dca4aae.jpg";
+module.exports = __webpack_require__.p + "b82b69e06357348bd762c66eb5085f0d.jpg";
 
 /***/ }),
 /* 123 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "eecafa5f5c73410100d1fc0bb1f89ef0.jpg";
+module.exports = __webpack_require__.p + "118c6258b08a21fdf4a50bb5deecd71d.jpg";
 
 /***/ }),
 /* 124 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "1c0c64bb7321d7cfa7d78fdc856db6fc.jpg";
+module.exports = __webpack_require__.p + "17655560edba1d0df8a43015c5ad148b.jpg";
 
 /***/ }),
 /* 125 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "fc5a200e2275afba20c64b3addab46d0.jpg";
+module.exports = __webpack_require__.p + "d192c50e78c312b996271790a15ba14e.jpg";
 
 /***/ }),
 /* 126 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "0375e913dcf904a9868a72763313e941.jpg";
+module.exports = __webpack_require__.p + "06fd5fd68d974553377b624595dc422f.jpg";
 
 /***/ }),
 /* 127 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "c1caaba064e25f05a48551ceb4468887.jpg";
+module.exports = __webpack_require__.p + "94ccaf4f19c5ed395444d1d96dca4aae.jpg";
 
 /***/ }),
 /* 128 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "c1c0114745f08f12e1bbb66baab2f8a4.jpg";
+module.exports = __webpack_require__.p + "eecafa5f5c73410100d1fc0bb1f89ef0.jpg";
 
 /***/ }),
 /* 129 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "143dfc590e97db879c1a17d7088c0fdb.jpg";
+module.exports = __webpack_require__.p + "1c0c64bb7321d7cfa7d78fdc856db6fc.jpg";
 
 /***/ }),
 /* 130 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "eb52a564ce981bfa1d97e4c5e8a07141.jpg";
+module.exports = __webpack_require__.p + "fc5a200e2275afba20c64b3addab46d0.jpg";
 
 /***/ }),
 /* 131 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "27674d0fe3a72382e9e92b3e82c192b5.jpg";
+module.exports = __webpack_require__.p + "0375e913dcf904a9868a72763313e941.jpg";
 
 /***/ }),
 /* 132 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "a74e7caa84ac015f22a121f6488b577f.jpg";
+module.exports = __webpack_require__.p + "c1caaba064e25f05a48551ceb4468887.jpg";
 
 /***/ }),
 /* 133 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "8ff058bc3f88963ed77a4271671d2eed.jpg";
+module.exports = __webpack_require__.p + "c1c0114745f08f12e1bbb66baab2f8a4.jpg";
 
 /***/ }),
 /* 134 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "442d1b80827adbb14cd0cb62e1adf5b8.jpg";
+module.exports = __webpack_require__.p + "143dfc590e97db879c1a17d7088c0fdb.jpg";
 
 /***/ }),
 /* 135 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__.p + "e1adc146fd553c3dd3d9dba85ad49402.jpg";
+module.exports = __webpack_require__.p + "eb52a564ce981bfa1d97e4c5e8a07141.jpg";
 
 /***/ }),
 /* 136 */
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-
-
-const {Game} = __webpack_require__(0);
-
-let event = {
-    name: 'angry-merchant',
-    type: 'random',
-    image: 'angry-man-1',
-    text: "A man barges into your throne room and with only the most cursory of bows, proceeds to rant and rave about a problem one of your soldiers has caused. Nearly frothing at the mouth, the merchant explains that one of your soldiers from among the lower ranks openly steals from the merchants stalls in front of his customers. This, he explains, has damaged his reputation and encouraged all manner of thieves to follow the soldier's example. He requests, nay, demands that you do something about this.",
-    choices: [{
-        text: 'Punish the unruly soldier',
-        effects: {
-            army: -Game.var.amount.army.small,
-            like: +Game.var.amount.like.medium,
-        },
-        response: "Frowning, you ask the merchant to identify the soldier, and he is brought before you. Visibly sweating, the soldier grovels before you most pitifully. Disgusted, you dismiss him from his post and have him locked in the dungeon for a month. The merchant is pleased, and so is the citizenry, realizing that you put the good of the people above even your own soldiers."
-    }, {
-        text: 'Agree to help for a price',
-        effects: {
-            army: -Game.var.amount.army.small,
-            gold: +Game.var.amount.gold.small,
-        },
-        response: "Seeing an opportunity to take advantage of a man with resources, you tell the merchant you'll help him if he pays you a small sum of gold to make up for the loss of one of your soldiers. He looks disgusted, but agrees to your offer. The soldier is removed and arrested."
-    }, {
-        text: "Punish the merchant",
-        effects: {
-            like: -Game.var.amount.like.small
-        },
-        response: "The disrespectful cur ought to learn how to address a king! To the merchant's horror, you order your guard to throw him in a cell for a few days. His eyes take on a dark and piercing gleam, and you know you've made an enemy for life."
-    }]
-};
-
-module.exports = {
-    event
-};
-
+module.exports = __webpack_require__.p + "27674d0fe3a72382e9e92b3e82c192b5.jpg";
 
 /***/ }),
 /* 137 */
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-
-
-const {Game} = __webpack_require__(0);
-
-let event = {
-    name: 'cult-leader',
-    type: 'random',
-    image: 'beard-man-6',
-    text: "Your guards haul in a nonchalant man dressed in plain raiment. He has an enigmatic smile and a strange charisma about him. He doesn't seem to mind being treated roughly like this. The guards explain that he was agitating the peasantry, and putting wild ideas in their minds about their own sovereignty. You ask the man to explain, but he only seems to speak in riddles. The guards go on to say he's attracted quite a large following, and could be a dangerous element if left unchecked.",
-    choices: [{
-        text: 'Exile the man',
-        effects: {
-            army: +Game.var.amount.army.small,
-            like: -Game.var.amount.like.large,
-        },
-        response: "Your guards are pleased, but the citizenry is outraged. They don't revolt, but you can tell that their attitude toward you has changed, and you fear they plan revenge."
-    }, {
-        text: 'Introduce the man to your scribe',
-        effects: {
-            army: -Game.var.amount.army.small,
-            like: +Game.var.amount.like.medium,
-        },
-        response: "Not being able to made head or tail of his comments, but hearing some strange wisdom in them, you hand the man over to your chief scribe for his opinion. After a long discussion, the scribe returns and tells you the man is a prophet. It would be most unwise to harm him, as the citizens would rebel. Instead, he recommends that he keep eyes on him, and you agree. The soldiers, however, are slightly upset that the man is allowed to continue proselytizing."
-    }, {
-        text: 'Have the man killed',
-        effects: {
-            army: +Game.var.amount.army.small,
-            like: -Game.var.amount.like.large * 3,
-        },
-        response: "Perhaps unwisely, you decide to put a quick end to the man, hoping that this will end the spread of his ideas. The most sadistic among the guards are very pleased, but the citizenry is on the verge of outright rebellion."
-    }]
-};
-
-module.exports = {
-    event
-};
-
+module.exports = __webpack_require__.p + "a74e7caa84ac015f22a121f6488b577f.jpg";
 
 /***/ }),
 /* 138 */
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-
-
-const {Game} = __webpack_require__(0);
-
-let event = {
-    name: 'raiders',
-    type: 'random',
-    image: 'horror-man',
-    text: "A beleagured man covered in dirt and blood limps into the throne room. The guards take notice and step closer to stop him, but you motion for them to stand down. The man's face has a look unlike any you've ever seen, like a pure horror that has frozen his countenance into a terrible mask. Calming the man, you offer him water and ask him to explain his condition. He tells you that he is the only survivor from a remote village in the bounds of your kingdom, far to the south. Raiders have sacked it, slaughtered everyone, and cannibalized them. He tries to explain what they did, but merely stutters and begins to weep. You signal for an attendant to find the man a place to rest while you decide how to proceed.",
-    choices: [{
-        text: "Attack with a large force",
-        effects: {
-            gold: +Game.var.amount.gold.medium,
-            army: -Game.var.amount.army.medium,
-            like: +Game.var.amount.like.medium,
-        },
-        response: "One thing you will not put up with under your rule are beasts of men. You order your best soldiers to proceed to the village and destroy every last raider. They willingly oblige, and later return in diminished, exhausted numbers with the collected wealth of the former village. The citizens of neighboring villages are thankful that you spared them a similar fate."
-    }, {
-        text: "Attack with a small force",
-        effects: {
-            army: -Game.var.amount.army.small,
-            like: +Game.var.amount.like.small,
-        },
-        response: "You can't afford to send your best, so you send what you can. The soldiers are evenly matched against the raiders, and it turns into a bloodbath on both sides. The remains of the raiders finally leave, and the few soldiers left alive return to the city."
-    }, {
-        text: "Ignore the raiders",
-        effects: {
-            army: -Game.var.amount.army.small,
-            like: -Game.var.amount.like.small,
-        },
-        response: "Hoping they'll go back from whence they came or move on to another village outside your realm, you decide to do nothing. Word gets out, and both your army and the citizens are displeased with your decision."
-    }]
-};
-
-module.exports = {
-    event
-};
-
+module.exports = __webpack_require__.p + "8ff058bc3f88963ed77a4271671d2eed.jpg";
 
 /***/ }),
 /* 139 */
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-
-
-const {Game} = __webpack_require__(0);
-
-let event = {
-    name: 'concert',
-    type: 'random',
-    image: 'man-2',
-    text: "A well-dressed man with wild hair and intensely bright eyes gains an audience. With deference and awe, he explains that he has composed a profound and stirring piece of music. He requests that you give him a small amount of gold so that he may arrange a public concert. You consider his request, knowing that the citizenry would probably appreciate it.",
-    choices: [{
-        text: "Pay for the concert",
-        effects: {
-            gold: -Game.var.amount.gold.small,
-            like: +Game.var.amount.like.medium,
-        },
-        response: "You know it will be a cheap way to keep the people happy, so you comply with the man's request. Surprisingly, he wasn't kidding when he said the music was profound. It speaks directly to your heart, and brings a tear to your eye as you are swept away in a vision of your now far-away youth, spent in the sunny fields and mountains of your kingdom's countryside. The raucous cheers from the crowd after the performance break your reverie, and you notice quite a few looking approvingly in your direction."
-    }, {
-        text: "No funds for this",
-        response: "While you appreciate good music, you simply do not have the funds to spare for a frivilous expense. You send the musician on his way, but he does not seem too disappointed."
-    }]
-};
-
-module.exports = {
-    event
-};
-
+module.exports = __webpack_require__.p + "442d1b80827adbb14cd0cb62e1adf5b8.jpg";
 
 /***/ }),
 /* 140 */
 /***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
-
-
-const {Game} = __webpack_require__(0);
-
-let event = {
-    name: 'blackmail',
-    type: 'random',
-    image: 'regal-woman-1',
-    text: "A noblewoman from a house you recognize approaches the throne and executes a perfect curtsey. In her eyes though, there is menace. She explains that she knows the situation between you and the Archduke, and will tell the Archduke what you're planning unless you pay her off with a large sum of gold. The impudence of this woman! To blackmail a KING! Containing your anger, you consider your options. Before you speak, she tells you quite plainly that any attempt on your part to punish or silence her will not work, as the Archduke will still be informed by her family. She smiles a little too graciously and wiggles her head at you.",
-    choices: [{
-        text: "Pay the traitor",
-        effects: {
-            gold: -Game.var.amount.gold.large
-        },
-        response: "Realizing you have no choice, you arrange the gold to be sent to her. This you will not forget, and you vow your revenge upon her house even if it takes generations."
-    }, {
-        text: "Imprison her",
-        effects: {
-            like: -Game.var.amount.like.small,
-            callback: function() {
-                Game.bonusScore -= 0.1;
-            }
-        },
-        response: "You'll be damned if some noble bosses you around! The guards haul her off as she shrieks with laughter. You know you won't be able to keep her long, and you're fairly certain she wasn't kidding about having the Archduke informed no matter what. Your chances of escape may now be in danger."
-    }, {
-        text: "Kill her",
-        effects: {
-            like: -Game.var.amount.like.medium,
-            callback: function() {
-                Game.bonusScore -= 0.2;
-            }
-        },
-        response: "She barely contains her murderous rage as you sentence her to death. This was not the outcome she was expecting. Perhaps she deserves it, but you are almost certain she isn't lying about informing the Archduke. Your chances of escape may not be in great danger."
-    }]
-};
-
-module.exports = {
-    event
-};
-
+module.exports = __webpack_require__.p + "e1adc146fd553c3dd3d9dba85ad49402.jpg";
 
 /***/ })
 /******/ ]);
