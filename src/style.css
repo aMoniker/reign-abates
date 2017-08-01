@@ -125,6 +125,7 @@ p {
 #stats .stat .image {
     background-repeat: no-repeat;
     background-position: center right 5px;
+    background-size: contain;
     position: absolute;
     right: 5px;
     top: 0;
@@ -329,5 +330,18 @@ p {
 @media all and (min-width: 2000px) {
     body {
         font-size: 2.5em;
+    }
+}
+
+@media all and (min-width: 3400px) {
+    #splash {
+        background-position: center -15em;
+    }
+    #splash h1 {
+        font-size: 3em;
+    }
+    #splash .new-game {
+        margin-bottom: 2.5%;
+        font-size: 2em;
     }
 }
