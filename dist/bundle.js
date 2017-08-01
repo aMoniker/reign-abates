@@ -30532,7 +30532,7 @@ let event = {
         text: "Pay for the concert",
         effects: {
             gold: -Game.var.amount.gold.small,
-            like: -Game.var.amount.like.medium,
+            like: +Game.var.amount.like.medium,
         },
         response: "You know it will be a cheap way to keep the people happy, so you comply with the man's request. Surprisingly, he wasn't kidding when he said the music was profound. It speaks directly to your heart, and brings a tear to your eye as you are swept away in a vision of your now far-away youth, spent in the sunny fields and mountains of your kingdom's countryside. The raucous cheers from the crowd after the performance break your reverie, and you notice quite a few looking approvingly in your direction."
     }, {
