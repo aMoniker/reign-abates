@@ -18452,10 +18452,13 @@ function isUndefined(arg) {
 /***/ (function(module, exports, __webpack_require__) {
 
 var map = {
+	"./angry-merchant.js": 136,
 	"./army-high.js": 17,
 	"./army-low.js": 18,
 	"./barbarians-attack-farmers.js": 19,
 	"./concerned-soldier.js": 20,
+	"./concert.js": 139,
+	"./cult-leader.js": 137,
 	"./fat-merchant.js": 21,
 	"./final.js": 22,
 	"./foreign-general.js": 23,
@@ -18465,6 +18468,7 @@ var map = {
 	"./money-high.js": 27,
 	"./money-low.js": 28,
 	"./poison-archduke.js": 29,
+	"./raiders.js": 138,
 	"./secret-tunnel.js": 30,
 	"./sorceress.js": 31,
 	"./strange-invention.js": 32,
@@ -30379,6 +30383,167 @@ module.exports = __webpack_require__.p + "442d1b80827adbb14cd0cb62e1adf5b8.jpg";
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__.p + "e1adc146fd553c3dd3d9dba85ad49402.jpg";
+
+/***/ }),
+/* 136 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const {Game} = __webpack_require__(0);
+
+let event = {
+    name: 'angry-merchant',
+    type: 'random',
+    image: 'angry-man-1',
+    text: "A man barges into your throne room and with only the most cursory of bows, proceeds to rant and rave about a problem one of your soldiers has caused. Nearly frothing at the mouth, the merchant explains that one of your soldiers from among the lower ranks openly steals from the merchants stalls in front of his customers. This, he explains, has damaged his reputation and encouraged all manner of thieves to follow the soldier's example. He requests, nay, demands that you do something about this.",
+    choices: [{
+        text: 'Punish the unruly soldier',
+        effects: {
+            army: -Game.var.amount.army.small,
+            like: +Game.var.amount.like.medium,
+        },
+        response: "Frowning, you ask the merchant to identify the soldier, and he is brought before you. Visibly sweating, the soldier grovels before you most pitifully. Disgusted, you dismiss him from his post and have him locked in the dungeon for a month. The merchant is pleased, and so is the citizenry, realizing that you put the good of the people above even your own soldiers."
+    }, {
+        text: 'Agree to help for a price',
+        effects: {
+            army: -Game.var.amount.army.small,
+            gold: +Game.var.amount.gold.small,
+        },
+        response: "Seeing an opportunity to take advantage of a man with resources, you tell the merchant you'll help him if he pays you a small sum of gold to make up for the loss of one of your soldiers. He looks disgusted, but agrees to your offer. The soldier is removed and arrested."
+    }, {
+        text: "Punish the merchant",
+        effects: {
+            like: -Game.var.amount.like.small
+        },
+        response: "The disrespectful cur ought to learn how to address a king! To the merchant's horror, you order your guard to throw him in a cell for a few days. His eyes take on a dark and piercing gleam, and you know you've made an enemy for life."
+    }]
+};
+
+module.exports = {
+    event
+};
+
+
+/***/ }),
+/* 137 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const {Game} = __webpack_require__(0);
+
+let event = {
+    name: 'cult-leader',
+    type: 'random',
+    image: 'beard-man-6',
+    text: "Your guards haul in a nonchalant man dressed in plain raiment. He has an enigmatic smile and a strange charisma about him. He doesn't seem to mind being treated roughly like this. The guards explain that he was agitating the peasantry, and putting wild ideas in their minds about their own sovereignty. You ask the man to explain, but he only seems to speak in riddles. The guards go on to say he's attracted quite a large following, and could be a dangerous element if left unchecked.",
+    choices: [{
+        text: 'Exile the man',
+        effects: {
+            army: +Game.var.amount.army.small,
+            like: -Game.var.amount.like.large,
+        },
+        response: "Your guards are pleased, but the citizenry is outraged. They don't revolt, but you can tell that their attitude toward you has changed, and you fear they plan revenge."
+    }, {
+        text: 'Introduce the man to your scribe',
+        effects: {
+            army: -Game.var.amount.army.small,
+            like: +Game.var.amount.like.medium,
+        },
+        response: "Not being able to made head or tail of his comments, but hearing some strange wisdom in them, you hand the man over to your chief scribe for his opinion. After a long discussion, the scribe returns and tells you the man is a prophet. It would be most unwise to harm him, as the citizens would rebel. Instead, he recommends that he keep eyes on him, and you agree. The soldiers, however, are slightly upset that the man is allowed to continue proselytizing."
+    }, {
+        text: 'Have the man killed',
+        effects: {
+            army: +Game.var.amount.army.small,
+            like: -Game.var.amount.like.large * 3,
+        },
+        response: "Perhaps unwisely, you decide to put a quick end to the man, hoping that this will end the spread of his ideas. The most sadistic among the guards are very pleased, but the citizenry is on the verge of outright rebellion."
+    }]
+};
+
+module.exports = {
+    event
+};
+
+
+/***/ }),
+/* 138 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const {Game} = __webpack_require__(0);
+
+let event = {
+    name: 'raiders',
+    type: 'random',
+    image: 'horror-man',
+    text: "A beleagured man covered in dirt and blood limps into the throne room. The guards take notice and step closer to stop him, but you motion for them to stand down. The man's face has a look unlike any you've ever seen, like a pure horror that has frozen his countenance into a terrible mask. Calming the man, you offer him water and ask him to explain his condition. He tells you that he is the only survivor from a remote village in the bounds of your kingdom, far to the south. Raiders have sacked it, slaughtered everyone, and cannibalized them. He tries to explain what they did, but merely stutters and begins to weep. You signal for an attendant to find the man a place to rest while you decide how to proceed.",
+    choices: [{
+        text: "Attack with a large force",
+        effects: {
+            gold: +Game.var.amount.gold.medium,
+            army: -Game.var.amount.army.medium,
+            like: +Game.var.amount.like.medium,
+        },
+        response: "One thing you will not put up with under your rule are beasts of men. You order your best soldiers to proceed to the village and destroy every last raider. They willingly oblige, and later return in diminished, exhausted numbers with the collected wealth of the former village. The citizens of neighboring villages are thankful that you spared them a similar fate."
+    }, {
+        text: "Attack with a small force",
+        effects: {
+            army: -Game.var.amount.army.small,
+            like: +Game.var.amount.like.small,
+        },
+        response: "You can't afford to send your best, so you send what you can. The soldiers are evenly matched against the raiders, and it turns into a bloodbath on both sides. The remains of the raiders finally leave, and the few soldiers left alive return to the city."
+    }, {
+        text: "Ignore the raiders",
+        effects: {
+            army: -Game.var.amount.army.small,
+            like: -Game.var.amount.like.small,
+        },
+        response: "Hoping they'll go back from whence they came or move on to another village outside your realm, you decide to do nothing. Word gets out, and both your army and the citizens are displeased with your decision."
+    }]
+};
+
+module.exports = {
+    event
+};
+
+
+/***/ }),
+/* 139 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+const {Game} = __webpack_require__(0);
+
+let event = {
+    name: 'concert',
+    type: 'random',
+    image: 'man-2',
+    text: "A well-dressed man with wild hair and intensely bright eyes gains an audience. With deference and awe, he explains that he has composed a profound and stirring piece of music. He requests that you give him a small amount of gold so that he may arrange a public concert. You consider his request, knowing that the citizenry would probably appreciate it.",
+    choices: [{
+        text: "Pay for the concert",
+        effects: {
+            gold: -Game.var.amount.gold.small,
+            like: -Game.var.amount.like.medium,
+        },
+        response: "You know it will be a cheap way to keep the people happy, so you comply with the man's request. Surprisingly, he wasn't kidding when he said the music was profound. It speaks directly to your heart, and brings a tear to your eye as you are swept away in a vision of your now far-away youth, spent in the sunny fields and mountains of your kingdom's countryside. The raucous cheers from the crowd after the performance break your reverie, and you notice quite a few looking approvingly in your direction."
+    }, {
+        text: "No funds for this",
+        response: "While you appreciate good music, you simply do not have the funds to spare for a frivilous expense. You send the musician on his way, but he does not seem too disappointed."
+    }]
+};
+
+module.exports = {
+    event
+};
+
 
 /***/ })
 /******/ ]);
